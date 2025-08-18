@@ -66,10 +66,12 @@ function saveSuspectData() {
         fullname: document.getElementById('fullname').value,
         birthdate: document.getElementById('birthdate').value,
         address: document.getElementById('address').value,
-        city: document.getElementById('city').value,
-        idNumber: document.getElementById('id-number').value,
+        issueType: document.getElementById('issue-type').value,
+        familyStatus: document.getElementById('family-status').value,
+        job: document.getElementById('job').value,
+        imprisonment: document.getElementById('imprisonment').value,
         phone: document.getElementById('phone').value,
-        notes: document.getElementById('notes').value,
+        sentTo: document.getElementById('sent-to').value,
         timestamp: new Date().toLocaleString('ar-SA')
     };
 
@@ -118,7 +120,7 @@ function generateSuspectCard(data) {
     ctx.font = 'bold 40px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('بطاقة معلومات المتهم', canvas.width / 2, 60);
+    ctx.fillText('كارتا زانیاریێن تومەتباری', canvas.width / 2, 60);
     
     // Add photo if available
     if (data.photo) {
@@ -157,35 +159,33 @@ function generateSuspectCard(data) {
         
         // Draw text info
         const startY = 380;
-        const lineHeight = 60;
+        const lineHeight = 50;
         
         // Draw labels and values
-        drawTextLine('الاسم الكامل:', data.fullname, startY);
-        drawTextLine('تاريخ الميلاد:', formatDate(data.birthdate), startY + lineHeight);
-        drawTextLine('عنوان السكن:', data.address, startY + lineHeight * 2);
-        drawTextLine('المدينة:', data.city, startY + lineHeight * 3);
+        drawTextLine('ناڤێ تومەتباری:', data.fullname, startY);
+        drawTextLine('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
+        drawTextLine('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
+        drawTextLine('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
+        drawTextLine('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
+        drawTextLine('كارێ وی:', data.job, startY + lineHeight * 5);
         
-        if (data.idNumber) {
-            drawTextLine('رقم الهوية:', data.idNumber, startY + lineHeight * 4);
+        if (data.imprisonment) {
+            drawTextLine('زیندانكرن:', data.imprisonment, startY + lineHeight * 6);
         }
         
         if (data.phone) {
-            drawTextLine('رقم الهاتف:', data.phone, startY + lineHeight * 5);
+            drawTextLine('ژمارا موبایلی:', data.phone, startY + lineHeight * 7);
         }
         
-        if (data.notes) {
-            ctx.font = 'bold 30px Arial';
-            ctx.fillText('ملاحظات:', canvas.width - 50, startY + lineHeight * 6);
-            
-            ctx.font = '26px Arial';
-            wrapText(ctx, data.notes, canvas.width - 50, startY + lineHeight * 6 + 40, canvas.width - 100, 30);
+        if (data.sentTo) {
+            drawTextLine('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * 8);
         }
         
         // Add timestamp
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#777777';
         ctx.textAlign = 'center';
-        ctx.fillText('تاريخ التسجيل: ' + data.timestamp, canvas.width / 2, canvas.height - 50);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 50);
     }
     
     function drawTextLine(label, value, y) {
@@ -199,12 +199,13 @@ function generateSuspectCard(data) {
     }
 }
 
-// Format date to Arabic format
+// Format date to Kurdish format
 function formatDate(dateString) {
     if (!dateString) return '';
     
     const date = new Date(dateString);
-    return date.toLocaleDateString('ar-SA');
+    // Using Kurdish locale if available, falling back to Arabic if not
+    return date.toLocaleDateString('ckb-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 // Wrap text function for canvas
@@ -264,11 +265,11 @@ function saveImageToDevice() {
         // Add a small delay before removing the link
         setTimeout(() => {
             document.body.removeChild(tempLink);
-            alert('تم حفظ البطاقة في جهازك');
+            alert('كارت هاتە خەزنكرن ل جهازێ تە');
         }, 100);
     } catch (error) {
         console.error('Error saving image:', error);
-        alert('حدث خطأ أثناء حفظ الصورة. يرجى المحاولة مرة أخرى.');
+        alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
     }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل المتهم - Misconduct Logger</title>
+    <title>توماركرنا تومەتباری - Misconduct Logger</title>
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +18,7 @@
 <body>
     <div class="app-container">
         <header>
-            <h1>تسجيل المتهم</h1>
+            <h1>توماركرنا تومەتباری</h1>
             <h2>Misconduct Logger</h2>
         </header>
 
@@ -26,10 +26,10 @@
             <div class="photo-section">
                 <div id="photo-preview">
                     <i class="fas fa-user-circle" id="default-photo-icon"></i>
-                    <img id="selected-photo" style="display: none;" alt="صورة المتهم">
+                    <img id="selected-photo" style="display: none;" alt="وێنێ تومەتباری">
                 </div>
                 <button id="photo-button" class="primary-button">
-                    <i class="fas fa-camera"></i> التقاط أو تحميل صورة
+                    <i class="fas fa-camera"></i> وێنەگرتن یان باركرن
                 </button>
                 <input type="file" id="photo-input" accept="image/*" style="display: none;">
             </div>
@@ -37,42 +37,52 @@
             <div class="form-section">
                 <form id="suspect-form">
                     <div class="form-group">
-                        <label for="fullname">الاسم الكامل</label>
+                        <label for="fullname">ناڤێ تومەتباری</label>
                         <input type="text" id="fullname" name="fullname" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="birthdate">تاريخ الميلاد</label>
+                        <label for="birthdate">ژدایـــكبون</label>
                         <input type="date" id="birthdate" name="birthdate" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="address">عنوان السكن</label>
+                        <label for="address">ئاكنجی بوون</label>
                         <textarea id="address" name="address" rows="2" required></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="city">اسم المدينة</label>
-                        <input type="text" id="city" name="city" required>
+                        <label for="issue-type">جورێ ئاریشێ</label>
+                        <input type="text" id="issue-type" name="issue-type" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="id-number">رقم الهوية أو رقم وطني (اختياري)</label>
-                        <input type="text" id="id-number" name="id-number">
+                        <label for="family-status">بارێ خێزانی</label>
+                        <input type="text" id="family-status" name="family-status" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">رقم الهاتف (اختياري)</label>
+                        <label for="job">كارێ وی</label>
+                        <input type="text" id="job" name="job" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imprisonment">زیندانكرن</label>
+                        <input type="text" id="imprisonment" name="imprisonment">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">ژمارا موبایلی</label>
                         <input type="tel" id="phone" name="phone">
                     </div>
 
                     <div class="form-group">
-                        <label for="notes">ملاحظات إضافية</label>
-                        <textarea id="notes" name="notes" rows="3"></textarea>
+                        <label for="sent-to">رەوانەكرن بـــو</label>
+                        <input type="text" id="sent-to" name="sent-to">
                     </div>
 
                     <button type="submit" id="save-button" class="primary-button">
-                        <i class="fas fa-save"></i> حفظ البطاقة
+                        <i class="fas fa-save"></i> خەزنكرنا كارتێ
                     </button>
                 </form>
             </div>
@@ -80,16 +90,16 @@
 
         <div id="success-modal" class="modal">
             <div class="modal-content">
-                <h3><i class="fas fa-check-circle"></i> تم حفظ البيانات بنجاح</h3>
+                <h3><i class="fas fa-check-circle"></i> زانیاری ب سەركەفتی هاتنە خەزنكرن</h3>
                 <div class="modal-buttons">
                     <button id="save-to-device" class="action-button save-button">
-                        <i class="fas fa-download"></i> حفظ البطاقة في الجهاز
+                        <i class="fas fa-download"></i> خەزنكرنا كارتێ ل جهازی
                     </button>
                     <button id="share-whatsapp" class="action-button whatsapp-button">
-                        <i class="fab fa-whatsapp"></i> إرسال عبر واتساب
+                        <i class="fab fa-whatsapp"></i> هنارتن ب رێیا واتساب
                     </button>
                     <button id="new-entry" class="action-button">
-                        <i class="fas fa-plus-circle"></i> إدخال معلومات جديدة
+                        <i class="fas fa-plus-circle"></i> زێدەكرنا زانیاریێن نوی
                     </button>
                 </div>
             </div>
