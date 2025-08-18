@@ -100,8 +100,8 @@ function generateSuspectCard(data) {
     const ctx = canvas.getContext('2d');
     
     // Set canvas dimensions
-    canvas.width = 800;
-    canvas.height = 1000;
+    canvas.width = 1000;
+    canvas.height = 800;
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -144,29 +144,37 @@ function generateSuspectCard(data) {
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     
+    // Draw suspect info first
+    drawSuspectInfo();
+    
     // Add photo if available
     if (data.photo) {
         const img = new Image();
         img.src = data.photo;
         
-        // Draw photo background and frame
+        // Draw photo background and frame - positioned on the right side
+        const photoX = canvas.width - 250; // Right side position
+        const photoY = canvas.height / 2; // Vertical center
+        const photoRadius = 150;
+        
+        // Draw photo background
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
+        ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2, true);
         ctx.fill();
         
         // Add photo frame
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
+        ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2, true);
         ctx.stroke();
         
         // Add decorative elements around photo
         for (let i = 0; i < 8; i++) {
             const angle = (i * Math.PI) / 4;
-            const x = canvas.width / 2 + Math.cos(angle) * 145;
-            const y = 220 + Math.sin(angle) * 145;
+            const x = photoX + Math.cos(angle) * (photoRadius + 20);
+            const y = photoY + Math.sin(angle) * (photoRadius + 20);
             
             ctx.fillStyle = '#f39c12';
             ctx.beginPath();
@@ -177,26 +185,29 @@ function generateSuspectCard(data) {
         // Draw circular photo
         ctx.save();
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 120, 0, Math.PI * 2, true);
+        ctx.arc(photoX, photoY, photoRadius - 5, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.clip();
         
         // Wait for image to load
         img.onload = function() {
-            ctx.drawImage(img, canvas.width / 2 - 120, 100, 240, 240);
+            // Draw the image to fill the circular area
+            ctx.drawImage(img, photoX - (photoRadius - 5), photoY - (photoRadius - 5), (photoRadius - 5) * 2, (photoRadius - 5) * 2);
             ctx.restore();
-            
-            // Continue with drawing text after image loads
-            drawSuspectInfo();
             
             // Save the final image
             currentSuspectData.cardImage = canvas.toDataURL('image/png');
         };
     } else {
-        // No photo, draw a placeholder
+        // No photo, draw a placeholder on the right side
+        const photoX = canvas.width - 250; // Right side position
+        const photoY = canvas.height / 2; // Vertical center
+        const photoRadius = 150;
+        
+        // Background circle
         ctx.fillStyle = '#ecf0f1';
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 120, 0, Math.PI * 2, true);
+        ctx.arc(photoX, photoY, photoRadius - 5, 0, Math.PI * 2, true);
         ctx.fill();
         
         // Add photo frame
@@ -210,11 +221,11 @@ function generateSuspectCard(data) {
         ctx.fillStyle = '#bdc3c7';
         // Head
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 200, 50, 0, Math.PI * 2, true);
+        ctx.arc(photoX, photoY - 50, 60, 0, Math.PI * 2, true);
         ctx.fill();
         // Body
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 320, 70, Math.PI, 0, true);
+        ctx.arc(photoX, photoY + 70, 80, Math.PI, 0, true);
         ctx.fill();
         
         // Continue with drawing text
@@ -223,19 +234,24 @@ function generateSuspectCard(data) {
     }
     
     function drawSuspectInfo() {
-        // Draw info section background
+        // Draw info section background - positioned on the left side
+        const infoX = 50;
+        const infoY = 150;
+        const infoWidth = canvas.width - 400; // Leave space for photo on right
+        const infoHeight = canvas.height - 250; // Leave space for header and footer
+        
         ctx.fillStyle = '#f8f9fa';
-        roundRect(ctx, 50, 350, canvas.width - 100, 550, 10, true, false);
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
         
         // Add section title
         ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#2980b9';
         ctx.textAlign = 'center';
-        ctx.fillText('زانیاریێن كەسی', canvas.width / 2, 390);
+        ctx.fillText('زانیاریێن كەسی', infoX + (infoWidth / 2), infoY + 40);
         
         // Add decorative line under section title
         ctx.fillStyle = '#e74c3c';
-        ctx.fillRect(canvas.width / 2 - 100, 405, 200, 2);
+        ctx.fillRect(infoX + (infoWidth / 2) - 100, infoY + 55, 200, 2);
         
         // Text settings
         ctx.font = 'bold 28px Arial';
@@ -243,31 +259,31 @@ function generateSuspectCard(data) {
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = 450;
+        const startY = infoY + 100;
         const lineHeight = 55;
         
         // Draw info boxes with labels and values
-        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
-        drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
-        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
-        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
-        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
+        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, infoX, infoWidth);
+        drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight, infoX, infoWidth);
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2, infoX, infoWidth);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3, infoX, infoWidth);
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4, infoX, infoWidth);
+        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5, infoX, infoWidth);
         
         let additionalFields = 0;
         
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields), infoX, infoWidth);
             additionalFields++;
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields), infoX, infoWidth);
             additionalFields++;
         }
         
         if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields), infoX, infoWidth);
         }
         
         // Add footer with timestamp
@@ -280,29 +296,32 @@ function generateSuspectCard(data) {
         ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
     }
     
-    function drawInfoBox(label, value, y) {
+    function drawInfoBox(label, value, y, infoX, infoWidth) {
         // Draw box background
         ctx.fillStyle = '#ffffff';
-        roundRect(ctx, 80, y - 30, canvas.width - 160, 45, 8, true, false);
+        roundRect(ctx, infoX + 30, y - 30, infoWidth - 60, 45, 8, true, false);
         
         // Add left accent
         ctx.fillStyle = '#3498db';
-        roundRect(ctx, 80, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
+        roundRect(ctx, infoX + 30, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
         
         // Draw label
         ctx.font = 'bold 26px Arial';
         ctx.fillStyle = '#2c3e50';
-        ctx.fillText(label, canvas.width - 100, y);
+        ctx.fillText(label, infoX + infoWidth - 50, y);
         
         // Draw value
         ctx.font = '26px Arial';
         ctx.fillStyle = '#34495e';
-        ctx.fillText(value, canvas.width - 320, y);
+        ctx.fillText(value, infoX + infoWidth - 270, y);
     }
     
     // Keep old function for compatibility
     function drawTextLine(label, value, y) {
-        drawInfoBox(label, value, y);
+        // For backward compatibility, call drawInfoBox with default info area parameters
+        const infoX = 50;
+        const infoWidth = canvas.width - 400;
+        drawInfoBox(label, value, y, infoX, infoWidth);
     }
 }
 
