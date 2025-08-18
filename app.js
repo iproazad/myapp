@@ -103,29 +103,76 @@ function generateSuspectCard(data) {
     canvas.width = 800;
     canvas.height = 1000;
     
-    // Fill background
-    ctx.fillStyle = '#ffffff';
+    // Create gradient background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#f5f7fa');
+    gradient.addColorStop(1, '#e4e8f0');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add rounded rectangle background
+    ctx.fillStyle = '#ffffff';
+    roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 15, true, false);
     
     // Add border
     ctx.strokeStyle = '#3498db';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+    ctx.lineWidth = 3;
+    roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 15, false, true);
     
-    // Add header
-    ctx.fillStyle = '#3498db';
-    ctx.fillRect(0, 0, canvas.width, 100);
+    // Add header with gradient
+    const headerGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    headerGradient.addColorStop(0, '#3498db');
+    headerGradient.addColorStop(1, '#2980b9');
+    ctx.fillStyle = headerGradient;
+    roundRect(ctx, 20, 20, canvas.width - 40, 100, {tl: 15, tr: 15, bl: 0, br: 0}, true, false);
     
-    // Add title
-    ctx.font = 'bold 40px Arial';
+    // Add decorative line under header
+    ctx.fillStyle = '#f39c12';
+    ctx.fillRect(50, 130, canvas.width - 100, 3);
+    
+    // Add title with shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.font = 'bold 42px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('كارتا زانیاریێن تومەتباری', canvas.width / 2, 60);
+    ctx.fillText('كارتا زانیاریێن تومەتباری', canvas.width / 2, 80);
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
     
     // Add photo if available
     if (data.photo) {
         const img = new Image();
         img.src = data.photo;
+        
+        // Draw photo background and frame
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Add photo frame
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
+        ctx.stroke();
+        
+        // Add decorative elements around photo
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI) / 4;
+            const x = canvas.width / 2 + Math.cos(angle) * 145;
+            const y = 220 + Math.sin(angle) * 145;
+            
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
         
         // Draw circular photo
         ctx.save();
@@ -146,56 +193,116 @@ function generateSuspectCard(data) {
             currentSuspectData.cardImage = canvas.toDataURL('image/png');
         };
     } else {
-        // No photo, just draw the info
+        // No photo, draw a placeholder
+        ctx.fillStyle = '#ecf0f1';
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 220, 120, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Add photo frame
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
+        ctx.stroke();
+        
+        // Draw user icon
+        ctx.fillStyle = '#bdc3c7';
+        // Head
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 200, 50, 0, Math.PI * 2, true);
+        ctx.fill();
+        // Body
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, 320, 70, Math.PI, 0, true);
+        ctx.fill();
+        
+        // Continue with drawing text
         drawSuspectInfo();
         currentSuspectData.cardImage = canvas.toDataURL('image/png');
     }
     
     function drawSuspectInfo() {
+        // Draw info section background
+        ctx.fillStyle = '#f8f9fa';
+        roundRect(ctx, 50, 350, canvas.width - 100, 550, 10, true, false);
+        
+        // Add section title
+        ctx.font = 'bold 32px Arial';
+        ctx.fillStyle = '#2980b9';
+        ctx.textAlign = 'center';
+        ctx.fillText('زانیاریێن كەسی', canvas.width / 2, 390);
+        
+        // Add decorative line under section title
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(canvas.width / 2 - 100, 405, 200, 2);
+        
         // Text settings
-        ctx.font = 'bold 30px Arial';
+        ctx.font = 'bold 28px Arial';
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = 380;
-        const lineHeight = 50;
+        const startY = 450;
+        const lineHeight = 55;
         
-        // Draw labels and values
-        drawTextLine('ناڤێ تومەتباری:', data.fullname, startY);
-        drawTextLine('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
-        drawTextLine('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
-        drawTextLine('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
-        drawTextLine('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
-        drawTextLine('كارێ وی:', data.job, startY + lineHeight * 5);
+        // Draw info boxes with labels and values
+        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
+        drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
+        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
+        
+        let additionalFields = 0;
         
         if (data.imprisonment) {
-            drawTextLine('زیندانكرن:', data.imprisonment, startY + lineHeight * 6);
+            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
+            additionalFields++;
         }
         
         if (data.phone) {
-            drawTextLine('ژمارا موبایلی:', data.phone, startY + lineHeight * 7);
+            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
+            additionalFields++;
         }
         
         if (data.sentTo) {
-            drawTextLine('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * 8);
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
         }
         
-        // Add timestamp
+        // Add footer with timestamp
+        ctx.fillStyle = '#34495e';
+        roundRect(ctx, 20, canvas.height - 80, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
+        
         ctx.font = 'italic 24px Arial';
-        ctx.fillStyle = '#777777';
+        ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 50);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
     }
     
-    function drawTextLine(label, value, y) {
-        ctx.font = 'bold 30px Arial';
-        ctx.fillStyle = '#333333';
-        ctx.fillText(label, canvas.width - 50, y);
+    function drawInfoBox(label, value, y) {
+        // Draw box background
+        ctx.fillStyle = '#ffffff';
+        roundRect(ctx, 80, y - 30, canvas.width - 160, 45, 8, true, false);
         
-        ctx.font = '30px Arial';
-        ctx.fillStyle = '#555555';
-        ctx.fillText(value, canvas.width - 250, y);
+        // Add left accent
+        ctx.fillStyle = '#3498db';
+        roundRect(ctx, 80, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
+        
+        // Draw label
+        ctx.font = 'bold 26px Arial';
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillText(label, canvas.width - 100, y);
+        
+        // Draw value
+        ctx.font = '26px Arial';
+        ctx.fillStyle = '#34495e';
+        ctx.fillText(value, canvas.width - 320, y);
+    }
+    
+    // Keep old function for compatibility
+    function drawTextLine(label, value, y) {
+        drawInfoBox(label, value, y);
     }
 }
 
@@ -206,6 +313,35 @@ function formatDate(dateString) {
     const date = new Date(dateString);
     // Using Kurdish locale if available, falling back to Arabic if not
     return date.toLocaleDateString('ckb-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+// Function to draw rounded rectangles
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+    if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+    } else {
+        radius = {...{tl: 0, tr: 0, br: 0, bl: 0}, ...radius};
+    }
+    
+    ctx.beginPath();
+    ctx.moveTo(x + radius.tl, y);
+    ctx.lineTo(x + width - radius.tr, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+    ctx.lineTo(x + width, y + height - radius.br);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+    ctx.lineTo(x + radius.bl, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+    ctx.lineTo(x, y + radius.tl);
+    ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+    ctx.closePath();
+    
+    if (fill) {
+        ctx.fill();
+    }
+    
+    if (stroke) {
+        ctx.stroke();
+    }
 }
 
 // Wrap text function for canvas
