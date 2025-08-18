@@ -154,45 +154,45 @@ function generateSuspectCard(data) {
         
         // Draw photo background and frame - positioned on the right side
         const photoX = canvas.width - 250; // Right side position
-        const photoY = canvas.height / 2; // Vertical center
-        const photoRadius = 150;
+        const photoY = 150; // Top position aligned with info section
+        const photoWidth = 200;
+        const photoHeight = canvas.height - 250; // Same height as info section
         
         // Draw photo background
         ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2, true);
-        ctx.fill();
+        roundRect(ctx, photoX - photoWidth/2, photoY, photoWidth, photoHeight, 10, true, false);
         
         // Add photo frame
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.arc(photoX, photoY, photoRadius, 0, Math.PI * 2, true);
-        ctx.stroke();
+        roundRect(ctx, photoX - photoWidth/2, photoY, photoWidth, photoHeight, 10, false, true);
         
-        // Add decorative elements around photo
-        for (let i = 0; i < 8; i++) {
-            const angle = (i * Math.PI) / 4;
-            const x = photoX + Math.cos(angle) * (photoRadius + 20);
-            const y = photoY + Math.sin(angle) * (photoRadius + 20);
-            
+        // Add decorative elements at corners
+        const cornerOffset = 15;
+        const cornerPositions = [
+            {x: photoX - photoWidth/2 + cornerOffset, y: photoY + cornerOffset}, // Top left
+            {x: photoX + photoWidth/2 - cornerOffset, y: photoY + cornerOffset}, // Top right
+            {x: photoX - photoWidth/2 + cornerOffset, y: photoY + photoHeight - cornerOffset}, // Bottom left
+            {x: photoX + photoWidth/2 - cornerOffset, y: photoY + photoHeight - cornerOffset} // Bottom right
+        ];
+        
+        for (const pos of cornerPositions) {
             ctx.fillStyle = '#f39c12';
             ctx.beginPath();
-            ctx.arc(x, y, 8, 0, Math.PI * 2, true);
+            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
             ctx.fill();
         }
         
-        // Draw circular photo
+        // Draw rectangular photo
         ctx.save();
         ctx.beginPath();
-        ctx.arc(photoX, photoY, photoRadius - 5, 0, Math.PI * 2, true);
-        ctx.closePath();
+        roundRect(ctx, photoX - photoWidth/2 + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 5, true, false);
         ctx.clip();
         
         // Wait for image to load
         img.onload = function() {
-            // Draw the image to fill the circular area
-            ctx.drawImage(img, photoX - (photoRadius - 5), photoY - (photoRadius - 5), (photoRadius - 5) * 2, (photoRadius - 5) * 2);
+            // Draw the image to fill the rectangular area
+            ctx.drawImage(img, photoX - photoWidth/2 + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
             ctx.restore();
             
             // Save the final image
@@ -201,31 +201,53 @@ function generateSuspectCard(data) {
     } else {
         // No photo, draw a placeholder on the right side
         const photoX = canvas.width - 250; // Right side position
-        const photoY = canvas.height / 2; // Vertical center
-        const photoRadius = 150;
+        const photoY = 150; // Top position aligned with info section
+        const photoWidth = 200;
+        const photoHeight = canvas.height - 250; // Same height as info section
         
-        // Background circle
+        // Background rectangle
         ctx.fillStyle = '#ecf0f1';
-        ctx.beginPath();
-        ctx.arc(photoX, photoY, photoRadius - 5, 0, Math.PI * 2, true);
-        ctx.fill();
+        roundRect(ctx, photoX - photoWidth/2, photoY, photoWidth, photoHeight, 10, true, false);
         
         // Add photo frame
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
-        ctx.stroke();
+        roundRect(ctx, photoX - photoWidth/2, photoY, photoWidth, photoHeight, 10, false, true);
+        
+        // Add decorative elements at corners
+        const cornerOffset = 15;
+        const cornerPositions = [
+            {x: photoX - photoWidth/2 + cornerOffset, y: photoY + cornerOffset}, // Top left
+            {x: photoX + photoWidth/2 - cornerOffset, y: photoY + cornerOffset}, // Top right
+            {x: photoX - photoWidth/2 + cornerOffset, y: photoY + photoHeight - cornerOffset}, // Bottom left
+            {x: photoX + photoWidth/2 - cornerOffset, y: photoY + photoHeight - cornerOffset} // Bottom right
+        ];
+        
+        for (const pos of cornerPositions) {
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
         
         // Draw user icon
         ctx.fillStyle = '#bdc3c7';
+        // Draw a simple user silhouette in the center of the photo area
+        const iconX = photoX;
+        const iconY = photoY + photoHeight/2 - 50;
+        
         // Head
         ctx.beginPath();
-        ctx.arc(photoX, photoY - 50, 60, 0, Math.PI * 2, true);
+        ctx.arc(iconX, iconY, 50, 0, Math.PI * 2, true);
         ctx.fill();
+        
         // Body
         ctx.beginPath();
-        ctx.arc(photoX, photoY + 70, 80, Math.PI, 0, true);
+        ctx.moveTo(iconX - 40, iconY + 50);
+        ctx.lineTo(iconX + 40, iconY + 50);
+        ctx.lineTo(iconX + 50, iconY + 150);
+        ctx.lineTo(iconX - 50, iconY + 150);
+        ctx.closePath();
         ctx.fill();
         
         // Continue with drawing text
