@@ -9,6 +9,7 @@ const defaultPhotoIcon = document.getElementById('default-photo-icon');
 const suspectForm = document.getElementById('suspect-form');
 const successModal = document.getElementById('success-modal');
 const shareWhatsappBtn = document.getElementById('share-whatsapp');
+const saveToDeviceBtn = document.getElementById('save-to-device');
 const newEntryBtn = document.getElementById('new-entry');
 
 // Current suspect data
@@ -48,6 +49,7 @@ function initApp() {
 
     // Modal actions
     shareWhatsappBtn.addEventListener('click', shareViaWhatsapp);
+    saveToDeviceBtn.addEventListener('click', saveImageToDevice);
     newEntryBtn.addEventListener('click', resetForm);
 
     // Check for camera support
@@ -230,13 +232,8 @@ function wrapText(context, text, x, y, maxWidth, lineHeight) {
 // Share via WhatsApp
 function shareViaWhatsapp() {
     if (currentSuspectData.cardImage) {
-        // Create a temporary link to download the image
-        const tempLink = document.createElement('a');
-        tempLink.href = currentSuspectData.cardImage;
-        tempLink.download = 'suspect_card_' + new Date().getTime() + '.png';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
+        // Save the image to device
+        saveImageToDevice();
         
         // Prepare WhatsApp message
         const message = 'معلومات المتهم: ' + currentSuspectData.fullname;
@@ -244,6 +241,34 @@ function shareViaWhatsapp() {
         
         // Open WhatsApp
         window.open(whatsappUrl, '_blank');
+    }
+}
+
+// Function to save image to device
+function saveImageToDevice() {
+    try {
+        // Create a temporary link to download the image
+        const tempLink = document.createElement('a');
+        tempLink.href = currentSuspectData.cardImage;
+        tempLink.download = 'suspect_card_' + new Date().getTime() + '.png';
+        
+        // Explicitly set attributes for better compatibility
+        tempLink.setAttribute('download', 'suspect_card_' + new Date().getTime() + '.png');
+        tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
+        tempLink.setAttribute('target', '_blank');
+        
+        // Append to body, click, and remove
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        
+        // Add a small delay before removing the link
+        setTimeout(() => {
+            document.body.removeChild(tempLink);
+            alert('تم حفظ البطاقة في جهازك');
+        }, 100);
+    } catch (error) {
+        console.error('Error saving image:', error);
+        alert('حدث خطأ أثناء حفظ الصورة. يرجى المحاولة مرة أخرى.');
     }
 }
 

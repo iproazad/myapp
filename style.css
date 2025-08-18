@@ -204,6 +204,11 @@ input:focus, textarea:focus {
     color: white;
 }
 
+.save-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
 .action-button:hover {
     opacity: 0.9;
 }
