@@ -327,14 +327,83 @@ function generateSuspectCard(data) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Set canvas dimensions - reduced height for more compact layout
+    // Set canvas dimensions - optimized for better photo display
     canvas.width = 1500;
-    canvas.height = 900; // Reduced height for more compact layout with horizontal arrangement
+    canvas.height = 900; // Optimized height for better photo display with horizontal arrangement
     
-    // Create gradient background
+    // Function to draw header
+    function drawHeader() {
+        // Define header dimensions - slightly reduced height
+        const headerHeight = 140;
+        
+        // Draw header background with enhanced gradient
+        const headerGradient = ctx.createLinearGradient(0, 0, 0, headerHeight);
+        headerGradient.addColorStop(0, '#3498db');
+        headerGradient.addColorStop(0.7, '#2980b9');
+        headerGradient.addColorStop(1, '#1c6ea4'); // Darker at bottom for depth
+        ctx.fillStyle = headerGradient;
+        ctx.fillRect(0, 0, canvas.width, headerHeight);
+        
+        // Add subtle pattern to header
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        for (let i = 0; i < canvas.width; i += 20) {
+            ctx.fillRect(i, 0, 10, headerHeight);
+        }
+        
+        // Add title with shadow effect
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.font = 'bold 44px Arial'; // Slightly smaller font
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('بطاقة معلومات', canvas.width / 2, 55);
+        
+        // Add subtitle with same shadow
+        ctx.font = 'bold 26px Arial'; // Slightly smaller font
+        ctx.fillText('سیستەمێ زانیاریێن كەسی', canvas.width / 2, 95);
+        
+        // Reset shadow for decorative elements
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // Add enhanced decorative line
+        const lineWidth = 220;
+        const lineHeight = 3;
+        const lineY = 115;
+        
+        // Add glow effect to line
+        const lineGradient = ctx.createLinearGradient(canvas.width / 2 - lineWidth / 2, lineY, canvas.width / 2 + lineWidth / 2, lineY);
+        lineGradient.addColorStop(0, '#f39c12');
+        lineGradient.addColorStop(0.5, '#f5b041');
+        lineGradient.addColorStop(1, '#f39c12');
+        ctx.fillStyle = lineGradient;
+        ctx.fillRect(canvas.width / 2 - lineWidth / 2, lineY, lineWidth, lineHeight);
+        
+        // Add decorative dots at ends of line
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2 - lineWidth / 2, lineY + lineHeight / 2, 4, 0, Math.PI * 2, true);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2 + lineWidth / 2, lineY + lineHeight / 2, 4, 0, Math.PI * 2, true);
+        ctx.fill();
+    }
+    
+    // Create a variable to hold the photo image
+    let photoImg = null;
+    if (data.photo) {
+        photoImg = new Image();
+        photoImg.src = data.photo;
+    }
+    
+    // Create gradient background - slightly lighter for better contrast
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#f5f7fa');
-    gradient.addColorStop(1, '#e4e8f0');
+    gradient.addColorStop(0, '#f8fafd'); // Lighter background
+    gradient.addColorStop(1, '#e9edf5'); // Lighter background
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
@@ -386,57 +455,73 @@ function generateSuspectCard(data) {
     ctx.shadowOffsetY = 0;
     
     // Add photo if available
-    if (data.photo) {
-        const img = new Image();
-        img.src = data.photo;
-        
-        // Draw rectangular photo background and frame
-        const photoX = canvas.width - 470; // Position on the right side
-        const photoY = 180;
-        const photoWidth = 420;
-        const photoHeight = 550; // تقليل طول الصورة العمودية لتناسب المعلومات المعاد ترتيبها
-        
-        // Draw photo background
-        ctx.fillStyle = '#ffffff';
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
-        
-        // Add photo frame
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 5;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
-        
-        // Add decorative elements around photo (corners)
-        const cornerPositions = [
-            {x: photoX - 5, y: photoY - 5}, // Top left
-            {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
-            {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
-            {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
-        ];
-        
-        cornerPositions.forEach(pos => {
-            ctx.fillStyle = '#f39c12';
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
-            ctx.fill();
-        });
-        
-        // Draw rectangular photo
-        ctx.save();
+if (data.photo) {
+    const img = new Image();
+    img.src = data.photo;
+    
+    // Draw rectangular photo background and frame - adjusted for better layout
+    const photoX = canvas.width - 470; // Position on the right side
+    const photoY = 180;
+    const photoWidth = 420;
+    const photoHeight = 550; // تقليل طول الصورة العمودية لتناسب المعلومات المعاد ترتيبها
+    
+    // Draw photo background with lighter color
+    ctx.fillStyle = '#f8f8f8';
+    roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
+    
+    // Add photo frame with thinner line
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 3;
+    roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+    
+    // Add decorative elements around photo (corners) - smaller
+    const cornerPositions = [
+        {x: photoX - 5, y: photoY - 5}, // Top left
+        {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
+        {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
+        {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
+    ];
+    
+    cornerPositions.forEach(pos => {
+        ctx.fillStyle = '#f39c12';
         ctx.beginPath();
-        roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
-        ctx.clip();
+        ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2, true);
+        ctx.fill();
+    });
+    
+    // Draw rectangular photo with better aspect ratio handling
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
+    ctx.clip();
+    
+    // Wait for image to load
+    img.onload = function() {
+        // Calculate dimensions to maintain aspect ratio
+        const imgRatio = img.width / img.height;
+        let drawWidth = photoWidth - 10;
+        let drawHeight = drawWidth / imgRatio;
         
-        // Wait for image to load
-        img.onload = function() {
-            ctx.drawImage(img, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
-            ctx.restore();
-            
-            // Continue with drawing text after image loads
-            drawSuspectInfo();
-            
-            // Save the final image
-            currentSuspectData.cardImage = canvas.toDataURL('image/png');
-        };
+        // If the height is too large, scale based on height instead
+        if (drawHeight > photoHeight - 10) {
+            drawHeight = photoHeight - 10;
+            drawWidth = drawHeight * imgRatio;
+        }
+        
+        // Center the image within the photo area
+        const offsetX = photoX + 5 + (photoWidth - 10 - drawWidth) / 2;
+        const offsetY = photoY + 5 + (photoHeight - 10 - drawHeight) / 2;
+        
+        // Draw the image
+        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        ctx.restore();
+        
+        // Continue with drawing text after image loads
+        drawSuspectInfo();
+        
+        // Save the final image
+        currentSuspectData.cardImage = canvas.toDataURL('image/png');
+    };
     } else {
         // Define photo dimensions for consistency
         const photoX = canvas.width - 470; // Position on the right side
@@ -489,11 +574,11 @@ function generateSuspectCard(data) {
     }
     
     function drawSuspectInfo() {
-        // Define info section dimensions
-        const infoX = 50;
+        // Define info section dimensions - reduced width to make more space for photo
+        const infoX = 40;
         const infoY = 180;
-        const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 700; // Reverted to original height as we're using horizontal layout
+        const infoWidth = canvas.width - 570; // More space for photo on the right
+        const infoHeight = 650; // Reduced height for more compact layout
         
         // Draw info section background with semi-transparent blue
         ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
@@ -509,35 +594,35 @@ function generateSuspectCard(data) {
         titleGradient.addColorStop(0, '#3498db');
         titleGradient.addColorStop(1, '#2980b9');
         ctx.fillStyle = titleGradient;
-        roundRect(ctx, infoX, infoY, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        roundRect(ctx, infoX, infoY, infoWidth, 50, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
         
         // Add section title
-        ctx.font = 'bold 32px Arial';
+        ctx.font = 'bold 28px Arial'; // Reduced font size
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 40);
+        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 35);
         
         // Add decorative elements
         ctx.fillStyle = '#f39c12';
         ctx.beginPath();
-        ctx.arc(infoX + infoWidth / 2, infoY + 70, 5, 0, Math.PI * 2, true);
+        ctx.arc(infoX + infoWidth / 2, infoY + 60, 4, 0, Math.PI * 2, true);
         ctx.fill();
         
         // Text settings
-        ctx.font = 'bold 28px Arial';
+        ctx.font = 'bold 24px Arial'; // Reduced font size
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = infoY + 120;
+        const startY = infoY + 100; // Reduced starting position
         
         // Reduced line height for more compact layout
-        const oldLineHeight = 45; // Smaller line height for original fields
-        const newLineHeight = 35; // Even smaller line height for new fields
+        const oldLineHeight = 40; // Smaller line height for original fields
+        const newLineHeight = 30; // Even smaller line height for new fields
         
         // Create a two-column layout for the main information
-        const col1X = 80;
-        const col2X = infoWidth / 2 + 30;
+        const col1X = 70;
+        const col2X = infoWidth / 2 + 20;
         
         // First column - main information
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, col1X);
@@ -550,74 +635,78 @@ function generateSuspectCard(data) {
         drawInfoBox('كارێ وی:', data.job, startY + oldLineHeight * 2, col2X);
         
         // Start position for the next section
-        let nextSectionY = startY + oldLineHeight * 3 + 10;
+        let nextSectionY = startY + oldLineHeight * 3 + 5; // Reduced spacing
         
         // Draw separator line
         ctx.fillStyle = '#888888';
-        ctx.fillRect(80, nextSectionY, infoWidth - 60, 2);
-        nextSectionY += 20;
+        ctx.fillRect(70, nextSectionY, infoWidth - 40, 1); // Thinner line
+        nextSectionY += 15; // Reduced spacing
         
-        // Draw conditional fields in a single row if possible
+        // Draw conditional fields in a grid layout (3 columns)
+        const conditionalColWidth = infoWidth / 3;
         let conditionalFieldsY = nextSectionY;
-        let currentX = col1X;
-        let currentCol = 1;
+        let conditionalCol = 0;
         
-        // Function to advance to next position
-        const advancePosition = () => {
-            if (currentCol === 1) {
-                currentX = col2X;
-                currentCol = 2;
-            } else {
-                currentX = col1X;
-                currentCol = 1;
-                conditionalFieldsY += oldLineHeight;
-            }
+        // Function to get X position for conditional fields
+        const getConditionalX = (col) => {
+            return 70 + (col * conditionalColWidth);
         };
         
         // Draw conditional fields in a grid layout
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, currentX);
-            advancePosition();
+            drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, getConditionalX(conditionalCol));
+            conditionalCol++;
+            if (conditionalCol >= 3) {
+                conditionalCol = 0;
+                conditionalFieldsY += oldLineHeight - 5; // Reduced spacing
+            }
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, currentX);
-            advancePosition();
+            drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, getConditionalX(conditionalCol));
+            conditionalCol++;
+            if (conditionalCol >= 3) {
+                conditionalCol = 0;
+                conditionalFieldsY += oldLineHeight - 5; // Reduced spacing
+            }
         }
         
-        // رەوانەكرن بـــو field has been moved to the new fields section
-        
-        // Ensure we're at the start of a new row
-        if (currentCol === 2) {
-            conditionalFieldsY += oldLineHeight;
-            currentCol = 1;
-            currentX = col1X;
+        // Ensure we're at the start of a new row if needed
+        if (conditionalCol > 0) {
+            conditionalFieldsY += oldLineHeight - 5; // Reduced spacing
+            conditionalCol = 0;
         }
         
         // Draw separator line for additional information
-        nextSectionY = conditionalFieldsY + 10;
+        nextSectionY = conditionalFieldsY + 5; // Reduced spacing
         ctx.fillStyle = '#888888';
-        ctx.fillRect(80, nextSectionY, infoWidth - 60, 2);
-        nextSectionY += 20;
+        ctx.fillRect(70, nextSectionY, infoWidth - 40, 1); // Thinner line
+        nextSectionY += 15; // Reduced spacing
         
         // Draw new fields section title
-        ctx.font = 'bold 24px Arial'; // Smaller font for title
+        ctx.font = 'bold 22px Arial'; // Smaller font for title
         ctx.fillStyle = '#777777';
         ctx.textAlign = 'center';
         ctx.fillText('معلومات إضافية', infoX + infoWidth / 2, nextSectionY);
-        nextSectionY += 30;
+        nextSectionY += 25; // Reduced spacing
         
-        // Draw new fields in a compact grid layout
-        // First row
-        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, nextSectionY, col1X, '#777777');
-        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, nextSectionY, col2X, '#777777');
+        // Draw new fields in a compact grid layout (3 columns)
+        const newFieldColWidth = infoWidth / 3;
+        let newFieldsRow = 0;
         
-        // Second row
-        drawInfoBox('ناڤێ شوفێری:', data.driverName, nextSectionY + newLineHeight, col1X, '#777777');
-        drawInfoBox('خالا:', data.point, nextSectionY + newLineHeight, col2X, '#777777');
+        // Function to get X position for new fields
+        const getNewFieldX = (col) => {
+            return 70 + (col * newFieldColWidth);
+        };
         
-        // Third row - رەوانەكرن بـــو field moved under driver name
-        drawInfoBox('رەوانەكرن بـــو:', data.sentTo, nextSectionY + newLineHeight * 2, col1X, '#777777');
+        // First row of new fields (3 columns)
+        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, nextSectionY, getNewFieldX(0), '#777777');
+        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, nextSectionY, getNewFieldX(1), '#777777');
+        drawInfoBox('خالا:', data.point, nextSectionY, getNewFieldX(2), '#777777');
+        
+        // Second row of new fields
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, nextSectionY + newLineHeight, getNewFieldX(0), '#777777');
+        drawInfoBox('رەوانەكرن بـــو:', data.sentTo, nextSectionY + newLineHeight, getNewFieldX(1), '#777777');
         
         // Add footer with timestamp - gradient background
         const footerY = nextSectionY + newLineHeight * 2 + 10; // Position footer based on content
@@ -627,19 +716,33 @@ function generateSuspectCard(data) {
         ctx.fillStyle = footerGradient;
         roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
         
+        // Add subtle pattern to footer for more elegant look
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        for (let i = 0; i < canvas.width - 40; i += 20) {
+            ctx.fillRect(20 + i, footerY, 10, 60);
+        }
+        
         // Add decorative line above footer
         ctx.fillStyle = '#f39c12';
         ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
         
-        // Add timestamp with shadow effect (adjusted for new footer position)
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 3;
+        // Add timestamp with enhanced shadow effect
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 4;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
-        ctx.font = 'italic 22px Arial'; // Slightly smaller font
+        ctx.font = 'italic bold 22px Arial'; // Bold italic for more elegant look
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 30);
+        
+        // Add decorative element in footer
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, footerY + 45, 3, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Reset shadow
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
@@ -649,29 +752,29 @@ function generateSuspectCard(data) {
     function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
         // Define info box dimensions based on the info section and whether it's old or new info
         const isNewInfo = labelColor === '#777777';
-        const boxHeight = isNewInfo ? 30 : 35; // Smaller height for all info boxes
-        const boxWidth = (canvas.width / 2) - 80; // Adjusted for the two-column layout
-        const fontSize = isNewInfo ? 18 : 20; // Smaller font for all info
-        const labelWidth = isNewInfo ? 140 : 160; // Smaller label width for all info
+        const boxHeight = isNewInfo ? 22 : 26; // Even smaller height for more compact layout
+        const boxWidth = (canvas.width / 2) - 100; // Adjusted for the two-column layout with more space for photo
+        const fontSize = isNewInfo ? 14 : 16; // Smaller font for more compact layout
+        const labelWidth = isNewInfo ? 110 : 130; // Smaller label width for more compact layout
         
         // Draw label box with semi-transparent background (blue or gray)
         const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
         ctx.fillStyle = labelBgColor;
-        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 5, bl: 5, tr: 0, br: 0}, true, false);
         
         // Draw value box with white or light gray background
         ctx.fillStyle = isNewInfo ? '#f5f5f5' : '#ffffff';
-        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
+        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 5, br: 5}, true, false);
         
         // Add decorative separator
         ctx.fillStyle = isNewInfo ? '#777777' : '#3498db';
-        ctx.fillRect(boxX + labelWidth - 3, y - boxHeight/2, 3, boxHeight);
+        ctx.fillRect(boxX + labelWidth - 1, y - boxHeight/2, 1, boxHeight); // Thinner separator
         
         // Draw label
         ctx.font = `bold ${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#555555' : '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.fillText(label, boxX + labelWidth/2, y);
+        ctx.fillText(label, boxX + labelWidth/2, y); // Slight vertical adjustment
         
         // Draw value - truncate if too long
         ctx.font = `${fontSize}px Arial`;
@@ -679,7 +782,7 @@ function generateSuspectCard(data) {
         ctx.textAlign = 'right';
         
         // Measure text width to check if it needs truncation
-        const maxValueWidth = boxWidth - labelWidth - 25; // Leave some padding
+        const maxValueWidth = boxWidth - labelWidth - 15; // Less padding for more text space
         const valueWidth = ctx.measureText(value).width;
         
         if (valueWidth > maxValueWidth) {
@@ -688,9 +791,9 @@ function generateSuspectCard(data) {
             while (ctx.measureText(truncatedValue + '...').width > maxValueWidth && truncatedValue.length > 0) {
                 truncatedValue = truncatedValue.slice(0, -1);
             }
-            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 15, y);
+            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 8, y); // Adjusted position
         } else {
-            ctx.fillText(value, boxX + boxWidth - 15, y);
+            ctx.fillText(value, boxX + boxWidth - 8, y); // Adjusted position
         }
         
         // Reset text alignment for other text
