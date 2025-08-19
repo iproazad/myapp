@@ -100,7 +100,7 @@ function generateSuspectCard(data) {
     const ctx = canvas.getContext('2d');
     
     // Set canvas dimensions
-    canvas.width = 800;
+    canvas.width = 1500;
     canvas.height = 1000;
     
     // Create gradient background
@@ -149,41 +149,45 @@ function generateSuspectCard(data) {
         const img = new Image();
         img.src = data.photo;
         
-        // Draw photo background and frame
+        // Draw rectangular photo background and frame
+        const photoX = canvas.width - 500; // Position on the right side
+        const photoY = 180;
+        const photoWidth = 400;
+        const photoHeight = 300;
+        
+        // Draw photo background
         ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
-        ctx.fill();
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
         
         // Add photo frame
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
-        ctx.stroke();
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
         
-        // Add decorative elements around photo
-        for (let i = 0; i < 8; i++) {
-            const angle = (i * Math.PI) / 4;
-            const x = canvas.width / 2 + Math.cos(angle) * 145;
-            const y = 220 + Math.sin(angle) * 145;
-            
+        // Add decorative elements around photo (corners)
+        const cornerPositions = [
+            {x: photoX - 5, y: photoY - 5}, // Top left
+            {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
+            {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
+            {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
+        ];
+        
+        cornerPositions.forEach(pos => {
             ctx.fillStyle = '#f39c12';
             ctx.beginPath();
-            ctx.arc(x, y, 8, 0, Math.PI * 2, true);
+            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
             ctx.fill();
-        }
+        });
         
-        // Draw circular photo
+        // Draw rectangular photo
         ctx.save();
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 120, 0, Math.PI * 2, true);
-        ctx.closePath();
+        roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
         ctx.clip();
         
         // Wait for image to load
         img.onload = function() {
-            ctx.drawImage(img, canvas.width / 2 - 120, 100, 240, 240);
+            ctx.drawImage(img, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
             ctx.restore();
             
             // Continue with drawing text after image loads
@@ -193,28 +197,49 @@ function generateSuspectCard(data) {
             currentSuspectData.cardImage = canvas.toDataURL('image/png');
         };
     } else {
+        // Define photo dimensions for consistency
+        const photoX = canvas.width - 500; // Position on the right side
+        const photoY = 180;
+        const photoWidth = 400;
+        const photoHeight = 300;
+        
         // No photo, draw a placeholder
         ctx.fillStyle = '#ecf0f1';
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 120, 0, Math.PI * 2, true);
-        ctx.fill();
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
         
         // Add photo frame
         ctx.strokeStyle = '#3498db';
         ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 220, 125, 0, Math.PI * 2, true);
-        ctx.stroke();
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+        
+        // Add decorative elements around photo (corners)
+        const cornerPositions = [
+            {x: photoX - 5, y: photoY - 5}, // Top left
+            {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
+            {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
+            {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
+        ];
+        
+        cornerPositions.forEach(pos => {
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
+            ctx.fill();
+        });
         
         // Draw user icon
         ctx.fillStyle = '#bdc3c7';
+        // Draw a simple user icon in the center of the photo area
+        const iconX = photoX + photoWidth / 2;
+        const iconY = photoY + photoHeight / 2 - 20;
+        
         // Head
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 200, 50, 0, Math.PI * 2, true);
+        ctx.arc(iconX, iconY, 50, 0, Math.PI * 2, true);
         ctx.fill();
         // Body
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, 320, 70, Math.PI, 0, true);
+        ctx.arc(iconX, iconY + 100, 70, Math.PI, 0, true);
         ctx.fill();
         
         // Continue with drawing text
@@ -223,19 +248,25 @@ function generateSuspectCard(data) {
     }
     
     function drawSuspectInfo() {
+        // Define info section dimensions
+        const infoX = 50;
+        const infoY = 180;
+        const infoWidth = canvas.width - 550; // Leave space for photo on the right
+        const infoHeight = 700;
+        
         // Draw info section background
         ctx.fillStyle = '#f8f9fa';
-        roundRect(ctx, 50, 350, canvas.width - 100, 550, 10, true, false);
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
         
         // Add section title
         ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#2980b9';
         ctx.textAlign = 'center';
-        ctx.fillText('زانیاریێن كەسی', canvas.width / 2, 390);
+        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 40);
         
         // Add decorative line under section title
         ctx.fillStyle = '#e74c3c';
-        ctx.fillRect(canvas.width / 2 - 100, 405, 200, 2);
+        ctx.fillRect(infoX + infoWidth / 2 - 100, infoY + 55, 200, 2);
         
         // Text settings
         ctx.font = 'bold 28px Arial';
@@ -243,7 +274,7 @@ function generateSuspectCard(data) {
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = 450;
+        const startY = infoY + 100;
         const lineHeight = 55;
         
         // Draw info boxes with labels and values
@@ -276,28 +307,32 @@ function generateSuspectCard(data) {
         
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
+        ctx.textAlign = 'right';
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width - 50, canvas.height - 40);
     }
     
     function drawInfoBox(label, value, y) {
+        // Define info box dimensions based on the info section
+        const boxX = 80;
+        const boxWidth = canvas.width - 600; // Adjusted for the new layout
+        
         // Draw box background
         ctx.fillStyle = '#ffffff';
-        roundRect(ctx, 80, y - 30, canvas.width - 160, 45, 8, true, false);
+        roundRect(ctx, boxX, y - 30, boxWidth, 45, 8, true, false);
         
         // Add left accent
         ctx.fillStyle = '#3498db';
-        roundRect(ctx, 80, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
         
         // Draw label
         ctx.font = 'bold 26px Arial';
         ctx.fillStyle = '#2c3e50';
-        ctx.fillText(label, canvas.width - 100, y);
+        ctx.fillText(label, boxX + boxWidth - 20, y);
         
         // Draw value
         ctx.font = '26px Arial';
         ctx.fillStyle = '#34495e';
-        ctx.fillText(value, canvas.width - 320, y);
+        ctx.fillText(value, boxX + boxWidth - 240, y);
     }
     
     // Keep old function for compatibility
