@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل التطبيق إلى APK</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #3498db;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .step {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .step h3 {
+            margin-top: 0;
+        }
+        ol {
+            padding-right: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .note {
+            background-color: #fffde7;
+            padding: 15px;
+            border-right: 4px solid #ffd600;
+            margin: 20px 0;
+        }
+        .service {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .service h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تحويل تطبيق تسجيل المتهم إلى ملف APK</h1>
+        <p>هذا الدليل يشرح كيفية تحويل تطبيق الويب الخاص بك إلى ملف APK يمكن تثبيته على أجهزة Android.</p>
+        
+        <div class="step">
+            <h2>الخطوات الأساسية</h2>
+            <ol>
+                <li>استضافة ملفات التطبيق على خدمة استضافة مواقع الويب</li>
+                <li>إنشاء أيقونات التطبيق بالأحجام المطلوبة</li>
+                <li>استخدام إحدى خدمات تحويل تطبيقات الويب إلى APK</li>
+                <li>تنزيل ملف APK وتثبيته على الجهاز</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h2>الخطوة 1: إنشاء أيقونات التطبيق</h2>
+            <p>قبل تحويل التطبيق إلى APK، تحتاج إلى إنشاء أيقونات التطبيق بالأحجام المطلوبة:</p>
+            <ol>
+                <li>افتح ملف <code>generate-icons.html</code> في متصفح الويب</li>
+                <li>انقر على زر "إنشاء الأيقونات"</li>
+                <li>قم بتنزيل الأيقونات بحجم 192×192 و 512×512</li>
+                <li>ضع الأيقونات في نفس مجلد التطبيق</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h2>الخطوة 2: استضافة ملفات التطبيق</h2>
+            <p>يمكنك استضافة ملفات التطبيق على إحدى خدمات الاستضافة المجانية التالية:</p>
+            
+            <div class="service">
+                <h3>GitHub Pages</h3>
+                <ol>
+                    <li>قم بإنشاء حساب على <a href="https://github.com" target="_blank">GitHub</a> إذا لم يكن لديك حساب</li>
+                    <li>قم بإنشاء مستودع (repository) جديد</li>
+                    <li>ارفع جميع ملفات التطبيق إلى المستودع</li>
+                    <li>قم بتفعيل خدمة GitHub Pages من إعدادات المستودع</li>
+                    <li>سيكون عنوان موقعك: <code>https://username.github.io/repository-name</code></li>
+                </ol>
+            </div>
+            
+            <div class="service">
+                <h3>Netlify</h3>
+                <ol>
+                    <li>قم بإنشاء حساب على <a href="https://www.netlify.com" target="_blank">Netlify</a></li>
+                    <li>اضغط على زر "New site from Git"</li>
+                    <li>اختر مزود Git الخاص بك (GitHub, GitLab, Bitbucket)</li>
+                    <li>اختر المستودع الذي يحتوي على ملفات التطبيق</li>
+                    <li>انقر على "Deploy site"</li>
+                    <li>سيتم منحك عنوان URL للموقع</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h2>الخطوة 3: تحويل التطبيق إلى APK</h2>
+            <p>يمكنك استخدام إحدى الخدمات التالية لتحويل تطبيق الويب إلى ملف APK:</p>
+            
+            <div class="service">
+                <h3>1. GoNative.io</h3>
+                <ol>
+                    <li>قم بزيارة موقع <a href="https://gonative.io" target="_blank">GoNative.io</a></li>
+                    <li>أدخل عنوان URL للتطبيق المستضاف</li>
+                    <li>قم بتخصيص إعدادات التطبيق (الاسم، الأيقونة، الوصف)</li>
+                    <li>اختر "Android" كمنصة</li>
+                    <li>انقر على "Build" لإنشاء ملف APK</li>
+                    <li>قم بتنزيل ملف APK بعد الانتهاء من البناء</li>
+                </ol>
+            </div>
+            
+            <div class="service">
+                <h3>2. PWA2APK</h3>
+                <ol>
+                    <li>قم بزيارة موقع <a href="https://pwa2apk.com" target="_blank">PWA2APK</a></li>
+                    <li>أدخل عنوان URL للتطبيق المستضاف</li>
+                    <li>قم بتخصيص معلومات التطبيق</li>
+                    <li>انقر على "Generate APK"</li>
+                    <li>قم بتنزيل ملف APK</li>
+                </ol>
+            </div>
+            
+            <div class="service">
+                <h3>3. WebViewGold</h3>
+                <ol>
+                    <li>قم بزيارة موقع <a href="https://webviewgold.com" target="_blank">WebViewGold</a></li>
+                    <li>اشترك في الخدمة (تتطلب دفع رسوم)</li>
+                    <li>اتبع التعليمات لتحويل موقع الويب إلى تطبيق Android</li>
+                    <li>قم بتنزيل ملف APK</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="step">
+            <h2>الخطوة 4: تثبيت التطبيق على الجهاز</h2>
+            <ol>
+                <li>انقل ملف APK إلى جهاز Android الخاص بك</li>
+                <li>افتح ملف APK على الجهاز</li>
+                <li>اتبع التعليمات لتثبيت التطبيق</li>
+                <li>قد تحتاج إلى تفعيل خيار "تثبيت من مصادر غير معروفة" في إعدادات الجهاز</li>
+            </ol>
+        </div>
+        
+        <div class="note">
+            <h3>ملاحظات هامة</h3>
+            <ul>
+                <li>تأكد من أن التطبيق يعمل بشكل صحيح في متصفح الويب قبل تحويله إلى APK</li>
+                <li>قد تختلف بعض الوظائف عند تشغيل التطبيق كـ APK مقارنة بتشغيله في المتصفح</li>
+                <li>بعض خدمات تحويل APK قد تتطلب دفع رسوم للحصول على ميزات إضافية</li>
+                <li>تأكد من اختبار التطبيق على عدة أجهزة Android للتأكد من توافقه</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
