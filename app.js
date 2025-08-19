@@ -315,30 +315,76 @@ function generateSuspectCard(data) {
         const oldLineHeight = 50; // Smaller line height for original fields
         const newLineHeight = 40; // Even smaller line height for new fields
         
-        // Draw original fields (top section) - more compact
-        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, 80);
-        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + oldLineHeight, 80);
-        drawInfoBox('ئاكنجی بوون:', data.address, startY + oldLineHeight * 2, 80);
-        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + oldLineHeight * 3, 80);
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + oldLineHeight * 4, 80);
-        drawInfoBox('كارێ وی:', data.job, startY + oldLineHeight * 5, 80);
+        // ترتيب الحقول الأصلية في أزواج أفقية لتوفير المساحة
+        const origCol1X = 80;
+        const origCol2X = canvas.width / 2;
         
-        // Draw conditional fields
-        let conditionalFieldsY = startY + oldLineHeight * 6;
+        // الصف الأول
+        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, origCol1X);
+        drawInfoBox('ژدایـــكبون:', data.birthdate, startY, origCol2X);
         
-        if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, 80);
+        // الصف الثاني
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + oldLineHeight, origCol1X);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + oldLineHeight, origCol2X);
+        
+        // الصف الثالث
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + oldLineHeight * 2, origCol1X);
+        drawInfoBox('كارێ وی:', data.job, startY + oldLineHeight * 2, origCol2X);
+        
+        // ترتيب الحقول الشرطية في أزواج أفقية لتوفير المساحة
+        let conditionalFieldsY = startY + oldLineHeight * 3;
+        let hasLeftField = false;
+        let hasRightField = false;
+        
+        // ترتيب الحقول الشرطية في صف واحد إذا كان هناك حقلان فقط
+        if (data.imprisonment && data.phone && !data.sentTo) {
+            drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, origCol1X);
+            drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, origCol2X);
             conditionalFieldsY += oldLineHeight;
-        }
-        
-        if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, 80);
+            hasLeftField = hasRightField = true;
+        } else if (data.imprisonment && !data.phone && data.sentTo) {
+            drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, origCol1X);
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, conditionalFieldsY, origCol2X);
             conditionalFieldsY += oldLineHeight;
-        }
-        
-        if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, conditionalFieldsY, 80);
+            hasLeftField = hasRightField = true;
+        } else if (!data.imprisonment && data.phone && data.sentTo) {
+            drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, origCol1X);
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, conditionalFieldsY, origCol2X);
             conditionalFieldsY += oldLineHeight;
+            hasLeftField = hasRightField = true;
+        } else {
+            // ترتيب الحقول الشرطية بشكل فردي إذا كان هناك حقل واحد أو ثلاثة حقول
+            if (data.imprisonment) {
+                drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, hasRightField ? origCol1X : (hasLeftField ? origCol2X : origCol1X));
+                if (hasLeftField && !hasRightField) {
+                    hasRightField = true;
+                    conditionalFieldsY += oldLineHeight;
+                } else if (!hasLeftField) {
+                    hasLeftField = true;
+                }
+            }
+            
+            if (data.phone) {
+                drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, hasRightField ? origCol1X : (hasLeftField ? origCol2X : origCol1X));
+                if (hasLeftField && !hasRightField) {
+                    hasRightField = true;
+                    conditionalFieldsY += oldLineHeight;
+                } else if (!hasLeftField) {
+                    hasLeftField = true;
+                }
+            }
+            
+            if (data.sentTo) {
+                drawInfoBox('رەوانەكرن بـــو:', data.sentTo, conditionalFieldsY, hasRightField ? origCol1X : (hasLeftField ? origCol2X : origCol1X));
+                if (hasLeftField && !hasRightField) {
+                    hasRightField = true;
+                } else if (!hasLeftField) {
+                    hasLeftField = true;
+                }
+                if (hasLeftField && hasRightField) {
+                    conditionalFieldsY += oldLineHeight;
+                }
+            }
         }
         
         // تنظيم الحقول الإضافية مباشرة بعد الحقول الأساسية دون فاصل
@@ -381,11 +427,11 @@ function generateSuspectCard(data) {
     }
     
     function drawInfoBox(label, value, y, boxX = 80) {
-        // توحيد قياسات جميع الحقول لتكون متناسقة
-        const boxHeight = 40; // توحيد ارتفاع جميع الحقول
-        const boxWidth = (canvas.width - 160) / 2 - 20; // عرض موحد لجميع الحقول
-        const fontSize = 20; // حجم خط موحد لجميع الحقول
-        const labelWidth = 150; // عرض موحد لمربع العنوان
+        // تقليل قياسات الحقول لتكون أصغر أفقياً
+        const boxHeight = 40; // ارتفاع الحقول
+        const boxWidth = (canvas.width / 2) - 60; // تقليل عرض الحقول
+        const fontSize = 18; // تقليل حجم الخط
+        const labelWidth = 120; // تقليل عرض مربع العنوان
         
         // Draw label box with semi-transparent background (blue)
         const labelBgColor = 'rgba(52, 152, 219, 0.2)';
