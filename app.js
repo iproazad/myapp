@@ -9,7 +9,6 @@ const defaultPhotoIcon = document.getElementById('default-photo-icon');
 const suspectForm = document.getElementById('suspect-form');
 const successModal = document.getElementById('success-modal');
 const shareWhatsappBtn = document.getElementById('share-whatsapp');
-const saveToDeviceBtn = document.getElementById('save-to-device');
 const newEntryBtn = document.getElementById('new-entry');
 
 // Current suspect data
@@ -45,11 +44,14 @@ function initApp() {
     suspectForm.addEventListener('submit', (event) => {
         event.preventDefault();
         saveSuspectData();
+        // حفظ الصورة تلقائياً عند النقر على زر "خەزنكرنا كارتێ"
+        setTimeout(() => {
+            saveImageToDevice();
+        }, 500); // تأخير قليل للتأكد من إنشاء الصورة أولاً
     });
 
     // Modal actions
     shareWhatsappBtn.addEventListener('click', shareViaWhatsapp);
-    saveToDeviceBtn.addEventListener('click', saveImageToDevice);
     newEntryBtn.addEventListener('click', resetForm);
 
     // Check for camera support
@@ -150,10 +152,10 @@ function generateSuspectCard(data) {
         img.src = data.photo;
         
         // Draw rectangular photo background and frame
-        const photoX = canvas.width - 500; // Position on the right side
+        const photoX = canvas.width - 550; // Position on the right side
         const photoY = 180;
-        const photoWidth = 400;
-        const photoHeight = 450; // زيادة طول الصورة العمودية
+        const photoWidth = 450;
+        const photoHeight = 600; // زيادة طول الصورة العمودية
         
         // Draw photo background
         ctx.fillStyle = '#ffffff';
@@ -198,10 +200,10 @@ function generateSuspectCard(data) {
         };
     } else {
         // Define photo dimensions for consistency
-        const photoX = canvas.width - 500; // Position on the right side
+        const photoX = canvas.width - 550; // Position on the right side
         const photoY = 180;
-        const photoWidth = 400;
-        const photoHeight = 450; // زيادة طول الصورة العمودية
+        const photoWidth = 450;
+        const photoHeight = 600; // زيادة طول الصورة العمودية
         
         // No photo, draw a placeholder
         ctx.fillStyle = '#ecf0f1';
@@ -422,10 +424,14 @@ function saveImageToDevice() {
         // Create a temporary link to download the image
         const tempLink = document.createElement('a');
         tempLink.href = currentSuspectData.cardImage;
-        tempLink.download = 'suspect_card_' + new Date().getTime() + '.png';
+        
+        // Use suspect name in the filename if available
+        const suspectName = currentSuspectData.fullname || 'suspect';
+        const fileName = 'بطاقة_' + suspectName + '_' + new Date().getTime() + '.png';
+        tempLink.download = fileName;
         
         // Explicitly set attributes for better compatibility
-        tempLink.setAttribute('download', 'suspect_card_' + new Date().getTime() + '.png');
+        tempLink.setAttribute('download', fileName);
         tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
         tempLink.setAttribute('target', '_blank');
         
@@ -436,7 +442,7 @@ function saveImageToDevice() {
         // Add a small delay before removing the link
         setTimeout(() => {
             document.body.removeChild(tempLink);
-            alert('كارت هاتە خەزنكرن ل جهازێ تە');
+            alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
         }, 100);
     } catch (error) {
         console.error('Error saving image:', error);
