@@ -22,7 +22,14 @@ function initApp() {
     // Photo capture/upload functionality
     photoButton.addEventListener('click', () => {
         photoInput.click();
+        console.log('تم النقر على زر التقاط الصورة');
     });
+    
+    // إضافة مستمع حدث للنقر المباشر على زر التقاط الصورة
+    photoButton.onclick = function() {
+        photoInput.click();
+        console.log('تم النقر المباشر على زر التقاط الصورة');
+    };
 
     photoInput.addEventListener('change', (event) => {
         if (event.target.files && event.target.files[0]) {
@@ -43,10 +50,18 @@ function initApp() {
     // Form submission
     suspectForm.addEventListener('submit', (event) => {
         event.preventDefault();
+        console.log('تم تقديم النموذج');
         saveSuspectData();
         // لا نحتاج إلى استخدام setTimeout لأن generateSuspectCard الآن يستخدم Promise
         // وسيتم استدعاء saveImageToDevice فقط بعد اكتمال إنشاء الصورة
     });
+    
+    // إضافة مستمع حدث للنقر المباشر على زر الحفظ
+    document.getElementById('save-button').onclick = function(event) {
+        event.preventDefault();
+        console.log('تم النقر المباشر على زر الحفظ');
+        saveSuspectData();
+    };
 
     // Modal actions
     shareWhatsappBtn.addEventListener('click', shareViaWhatsapp);
@@ -93,12 +108,15 @@ function saveSuspectData() {
     localStorage.setItem('suspectEntries', JSON.stringify(savedEntries));
 
     // Generate card image
+    console.log('جاري إنشاء بطاقة المعلومات...');
     generateSuspectCard(currentSuspectData)
         .then(() => {
+            console.log('تم إنشاء البطاقة بنجاح');
             // حفظ الصورة تلقائياً بعد إنشاء الكارت
             saveImageToDevice();
             // Show success modal
             successModal.style.display = 'flex';
+            console.log('تم عرض نافذة النجاح');
         })
         .catch(error => {
             console.error('Error generating card:', error);
@@ -108,6 +126,7 @@ function saveSuspectData() {
 
 // Generate suspect info card as an image
 function generateSuspectCard(data) {
+    console.log('بدء إنشاء بطاقة المعلومات...');
     return new Promise((resolve, reject) => {
         try {
             // Create a virtual canvas to generate the card image
@@ -645,6 +664,7 @@ function shareViaWhatsapp() {
 // Function to save image to device
 function saveImageToDevice() {
     try {
+        console.log('بدء حفظ الصورة...');
         // Check if card image exists
         if (!currentSuspectData.cardImage) {
             console.error('Card image not found');
@@ -652,6 +672,7 @@ function saveImageToDevice() {
             return;
         }
         
+        console.log('الصورة موجودة، جاري إنشاء رابط التنزيل...');
         // Create a temporary link to download the image
         const tempLink = document.createElement('a');
         tempLink.href = currentSuspectData.cardImage;
@@ -665,15 +686,22 @@ function saveImageToDevice() {
         tempLink.setAttribute('download', fileName);
         tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
         
+        console.log('جاري تنزيل الصورة...');
         // Append to body, click, and remove
         document.body.appendChild(tempLink);
-        tempLink.click();
         
-        // Add a small delay before removing the link
+        // إضافة تأخير قبل النقر على الرابط
         setTimeout(() => {
-            document.body.removeChild(tempLink);
-            alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
-        }, 300); // زيادة وقت الانتظار
+            tempLink.click();
+            console.log('تم النقر على رابط التنزيل');
+            
+            // Add a small delay before removing the link
+            setTimeout(() => {
+                document.body.removeChild(tempLink);
+                alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
+                console.log('تم إكمال عملية الحفظ');
+            }, 500); // زيادة وقت الانتظار
+        }, 300);
     } catch (error) {
         console.error('Error saving image:', error);
         alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
@@ -694,3 +722,8 @@ function resetForm() {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initApp);
+
+// تنفيذ الوظيفة مباشرة في حالة تم تحميل المستند بالفعل
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initApp();
+}
