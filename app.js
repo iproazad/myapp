@@ -152,9 +152,9 @@ function generateSuspectCard(data) {
         img.src = data.photo;
         
         // Draw rectangular photo background and frame
-        const photoX = canvas.width - 550; // Position on the right side
+        const photoX = canvas.width - 700; // Position on the right side
         const photoY = 180;
-        const photoWidth = 450;
+        const photoWidth = 420;
         const photoHeight = 600; // زيادة طول الصورة العمودية
         
         // Draw photo background
@@ -200,9 +200,9 @@ function generateSuspectCard(data) {
         };
     } else {
         // Define photo dimensions for consistency
-        const photoX = canvas.width - 550; // Position on the right side
+        const photoX = canvas.width - 700; // Position on the right side
         const photoY = 180;
-        const photoWidth = 450;
+        const photoWidth = 420;
         const photoHeight = 600; // زيادة طول الصورة العمودية
         
         // No photo, draw a placeholder
@@ -281,7 +281,7 @@ function generateSuspectCard(data) {
         
         // Draw info boxes with labels and values
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
-        drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
+        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight); // Display year directly
         drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
         drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
         drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
@@ -343,13 +343,23 @@ function generateSuspectCard(data) {
     }
 }
 
-// Format date to Gregorian format
+// Format date to show only year for birthdate
 function formatDate(dateString) {
     if (!dateString) return '';
     
-    const date = new Date(dateString);
-    // Using Gregorian calendar format (year-month-day)
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    // If dateString is just a year (number), return it directly
+    if (!isNaN(dateString) && dateString.length >= 4) {
+        return dateString; // Return the year as is
+    }
+    
+    // For backward compatibility with date objects
+    try {
+        const date = new Date(dateString);
+        // Using Gregorian calendar format (year-month-day)
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    } catch (e) {
+        return dateString; // Return as is if there's an error
+    }
 }
 
 // Function to draw rounded rectangles
