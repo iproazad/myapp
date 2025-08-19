@@ -6,10 +6,38 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
             .then(registration => {
                 console.log('Service Worker registered successfully:', registration.scope);
+                
+                // Wait for the service worker to be ready
+                if (registration.active) {
+                    // Service worker is already active, send message to precache main page
+                    registration.active.postMessage({
+                        type: 'PRECACHE_MAIN_PAGE'
+                    });
+                }
+                
+                // Listen for service worker state changes
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'activated') {
+                            // New service worker activated, send message to precache main page
+                            newWorker.postMessage({
+                                type: 'PRECACHE_MAIN_PAGE'
+                            });
+                        }
+                    });
+                });
             })
             .catch(error => {
                 console.log('Service Worker registration failed:', error);
             });
+    });
+    
+    // Listen for messages from the service worker
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'PRECACHE_COMPLETE') {
+            console.log('Main page precached successfully');
+        }
     });
 }
 
@@ -41,6 +69,12 @@ function initApp() {
     
     // Load any pending offline data
     loadOfflineData();
+    
+    // Ensure app resources are cached for offline use
+    ensureOfflineAvailability();
+    
+    // Check if this is the first time the app is loaded
+    checkAppStartupStatus();
     
     // Photo capture/upload functionality
     photoButton.addEventListener('click', () => {
@@ -120,6 +154,25 @@ function updateNetworkStatus() {
     }
 }
 
+// Check app startup status and show appropriate message
+function checkAppStartupStatus() {
+    const appLoadedBefore = localStorage.getItem('appLoadedBefore');
+    
+    // If this is the first time loading the app or we're offline
+    if (!navigator.onLine) {
+        if (!appLoadedBefore) {
+            // First time loading and offline - show a helpful message
+            showNotification('تم تحميل التطبيق للمرة الأولى. للاستخدام الكامل دون اتصال، يرجى فتح التطبيق مرة واحدة على الأقل مع وجود اتصال بالإنترنت.', 10000);
+        } else {
+            // Not first time, but offline - show offline mode message
+            showNotification('التطبيق يعمل حاليًا في وضع عدم الاتصال. جميع البيانات ستُحفظ محليًا.', 5000);
+        }
+    } else if (!appLoadedBefore) {
+        // First time loading with internet - show welcome message
+        showNotification('مرحبًا بك في تطبيق توماركرنا تومەتباری! التطبيق جاهز للعمل بدون إنترنت.', 5000);
+    }
+}
+
 // Load any pending offline data from localStorage
 function loadOfflineData() {
     try {
@@ -131,6 +184,85 @@ function loadOfflineData() {
     } catch (error) {
         console.error('Error loading offline data:', error);
     }
+}
+
+// Ensure application resources are available offline
+function ensureOfflineAvailability() {
+    // If Cache API is available, use it to cache critical resources
+    if ('caches' in window) {
+        // Open our cache
+        caches.open('misconduct-logger-v3').then(cache => {
+            // Cache critical resources
+            const resourcesToCache = [
+                './',
+                './index.html',
+                './style.css',
+                './app.js',
+                './manifest.json',
+                './icon.svg',
+                './icon-192.png',
+                './icon-512.png'
+            ];
+            
+            // Fetch and cache each resource
+            resourcesToCache.forEach(url => {
+                fetch(url, { cache: 'no-cache' })
+                    .then(response => {
+                        if (response.ok) {
+                            cache.put(url, response);
+                            console.log(`Cached resource: ${url}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(`Failed to cache ${url}:`, error);
+                    });
+            });
+        });
+    }
+    
+    // Store a flag in localStorage to indicate the app has been loaded at least once
+    localStorage.setItem('appLoadedBefore', 'true');
+    
+    // Also store the current timestamp of when the app was last loaded
+    localStorage.setItem('lastAppLoadTime', Date.now().toString());
+}
+
+// Show notification to user
+function showNotification(message, duration = 3000) {
+    // Create notification element if it doesn't exist
+    let notification = document.getElementById('app-notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'app-notification';
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.left = '50%';
+        notification.style.transform = 'translateX(-50%)';
+        notification.style.backgroundColor = '#333';
+        notification.style.color = 'white';
+        notification.style.padding = '10px 20px';
+        notification.style.borderRadius = '5px';
+        notification.style.zIndex = '1001';
+        notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+        notification.style.textAlign = 'center';
+        notification.style.maxWidth = '90%';
+        notification.style.transition = 'opacity 0.3s ease-in-out';
+        document.body.appendChild(notification);
+    }
+    
+    // Set message and show notification
+    notification.textContent = message;
+    notification.style.opacity = '1';
+    
+    // Hide after duration
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, duration);
 }
 
 // Save suspect data
