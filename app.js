@@ -74,6 +74,12 @@ function saveSuspectData() {
         imprisonment: document.getElementById('imprisonment').value,
         phone: document.getElementById('phone').value,
         sentTo: document.getElementById('sent-to').value,
+        // New fields
+        time: document.getElementById('time').value,
+        dayNight: document.querySelector('input[name="day-night"]:checked')?.value || '',
+        issueLocation: document.getElementById('issue-location').value,
+        driverName: document.getElementById('driver-name').value,
+        driverPoint: document.getElementById('driver-point').value,
         timestamp: new Date().toLocaleString('en-US')
     };
 
@@ -103,7 +109,7 @@ function generateSuspectCard(data) {
     
     // Set canvas dimensions
     canvas.width = 1500;
-    canvas.height = 1000;
+    canvas.height = 1300; // Increased height to accommodate additional cards
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -267,7 +273,7 @@ function generateSuspectCard(data) {
         const infoX = 50;
         const infoY = 180;
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 700;
+        const infoHeight = 350; // Reduced height for first card
         
         // Draw info section background with semi-transparent blue
         ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
@@ -311,35 +317,122 @@ function generateSuspectCard(data) {
         drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight); // Display year directly
         drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
         drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
-        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
+        
+        // Second info card for additional information
+        const info2Y = infoY + infoHeight + 30; // Position below first card with spacing
+        const info2Height = 350; // Height for second card
+        
+        // Draw second info section background with semi-transparent blue
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
+        roundRect(ctx, infoX, info2Y, infoWidth, info2Height, 10, true, false);
+        
+        // Add border to second info section
+        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+        ctx.lineWidth = 2;
+        roundRect(ctx, infoX, info2Y, infoWidth, info2Height, 10, false, true);
+        
+        // Add section title background for second card
+        const title2Gradient = ctx.createLinearGradient(infoX, info2Y, infoX + infoWidth, info2Y);
+        title2Gradient.addColorStop(0, '#f39c12'); // Different color for second card
+        title2Gradient.addColorStop(1, '#e67e22');
+        ctx.fillStyle = title2Gradient;
+        roundRect(ctx, infoX, info2Y, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        
+        // Add section title for second card
+        ctx.font = 'bold 32px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('معلومات إضافية', infoX + infoWidth / 2, info2Y + 40);
+        
+        // Add decorative elements for second card
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.arc(infoX + infoWidth / 2, info2Y + 70, 5, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Draw text info for second card
+        const start2Y = info2Y + 120;
+        
+        // Draw new fields in second card
+        let timeValue = data.time;
+        if (data.dayNight) {
+            timeValue += ' - ' + data.dayNight;
+        }
+        drawInfoBox('دەمژمێر:', timeValue, start2Y);
+        drawInfoBox('جهێ ئاریشێ:', data.issueLocation, start2Y + lineHeight);
+        
+        let driverInfo = data.driverName;
+        if (data.driverPoint) {
+            driverInfo += ' - خالا: ' + data.driverPoint;
+        }
+        drawInfoBox('ناڤێ شوفێری:', driverInfo, start2Y + lineHeight * 2);
+        
+        // Draw remaining fields from first card in second card
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, start2Y + lineHeight * 3);
+        drawInfoBox('كارێ وی:', data.job, start2Y + lineHeight * 4);
+        
+        // Third info card for remaining information if needed
+        const info3Y = info2Y + info2Height + 30; // Position below second card with spacing
+        const info3Height = 200; // Height for third card
+        
+        // Draw third info section background with semi-transparent blue
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
+        roundRect(ctx, infoX, info3Y, infoWidth, info3Height, 10, true, false);
+        
+        // Add border to third info section
+        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+        ctx.lineWidth = 2;
+        roundRect(ctx, infoX, info3Y, infoWidth, info3Height, 10, false, true);
+        
+        // Add section title background for third card
+        const title3Gradient = ctx.createLinearGradient(infoX, info3Y, infoX + infoWidth, info3Y);
+        title3Gradient.addColorStop(0, '#27ae60'); // Different color for third card
+        title3Gradient.addColorStop(1, '#2ecc71');
+        ctx.fillStyle = title3Gradient;
+        roundRect(ctx, infoX, info3Y, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        
+        // Add section title for third card
+        ctx.font = 'bold 32px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('معلومات أخرى', infoX + infoWidth / 2, info3Y + 40);
+        
+        // Add decorative elements for third card
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(infoX + infoWidth / 2, info3Y + 70, 5, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Draw text info for third card
+        const start3Y = info3Y + 120;
         
         let additionalFields = 0;
         
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('زیندانكرن:', data.imprisonment, start3Y);
             additionalFields++;
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('ژمارا موبایلی:', data.phone, start3Y + lineHeight * additionalFields);
             additionalFields++;
         }
         
         if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, start3Y + lineHeight * additionalFields);
         }
         
         // Add footer with timestamp - gradient background
-        const footerGradient = ctx.createLinearGradient(0, canvas.height - 80, canvas.width, canvas.height - 80);
+        const footerY = Math.max(info3Y + info3Height + 30, photoY + photoHeight + 30);
+        const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
         footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
         footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
         ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, canvas.height - 80, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
+        roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
         
         // Add decorative line above footer
         ctx.fillStyle = '#f39c12';
-        ctx.fillRect(50, canvas.height - 85, canvas.width - 100, 2);
+        ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
         
         // Add timestamp with shadow effect
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
@@ -349,7 +442,7 @@ function generateSuspectCard(data) {
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 40);
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
