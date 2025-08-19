@@ -574,55 +574,55 @@ if (data.photo) {
     }
     
     function drawSuspectInfo() {
-        // Define info section dimensions - reduced width to make more space for photo
-        const infoX = 40;
+        // Define info section dimensions - further reduced width to make more space for photo
+        const infoX = 30;
         const infoY = 180;
-        const infoWidth = canvas.width - 570; // More space for photo on the right
-        const infoHeight = 650; // Reduced height for more compact layout
+        const infoWidth = canvas.width - 600; // More space for photo on the right
+        const infoHeight = 600; // Further reduced height for more compact layout
         
         // Draw info section background with semi-transparent blue
         ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
-        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 8, true, false);
         
         // Add border to info section
         ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
-        ctx.lineWidth = 2;
-        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, false, true);
+        ctx.lineWidth = 1; // Thinner border
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 8, false, true);
         
         // Add section title background
         const titleGradient = ctx.createLinearGradient(infoX, infoY, infoX + infoWidth, infoY);
         titleGradient.addColorStop(0, '#3498db');
         titleGradient.addColorStop(1, '#2980b9');
         ctx.fillStyle = titleGradient;
-        roundRect(ctx, infoX, infoY, infoWidth, 50, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        roundRect(ctx, infoX, infoY, infoWidth, 40, {tl: 8, tr: 8, bl: 0, br: 0}, true, false);
         
         // Add section title
-        ctx.font = 'bold 28px Arial'; // Reduced font size
+        ctx.font = 'bold 24px Arial'; // Further reduced font size
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 35);
+        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 28);
         
         // Add decorative elements
         ctx.fillStyle = '#f39c12';
         ctx.beginPath();
-        ctx.arc(infoX + infoWidth / 2, infoY + 60, 4, 0, Math.PI * 2, true);
+        ctx.arc(infoX + infoWidth / 2, infoY + 50, 3, 0, Math.PI * 2, true);
         ctx.fill();
         
         // Text settings
-        ctx.font = 'bold 24px Arial'; // Reduced font size
+        ctx.font = 'bold 20px Arial'; // Further reduced font size
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = infoY + 100; // Reduced starting position
+        const startY = infoY + 80; // Further reduced starting position
         
-        // Reduced line height for more compact layout
-        const oldLineHeight = 40; // Smaller line height for original fields
-        const newLineHeight = 30; // Even smaller line height for new fields
+        // Further reduced line height for more compact layout
+        const oldLineHeight = 35; // Smaller line height for original fields
+        const newLineHeight = 25; // Even smaller line height for new fields
         
         // Create a two-column layout for the main information
-        const col1X = 70;
-        const col2X = infoWidth / 2 + 20;
+        const col1X = 60;
+        const col2X = infoWidth / 2 + 10;
         
         // First column - main information
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, col1X);
@@ -639,8 +639,8 @@ if (data.photo) {
         
         // Draw separator line
         ctx.fillStyle = '#888888';
-        ctx.fillRect(70, nextSectionY, infoWidth - 40, 1); // Thinner line
-        nextSectionY += 15; // Reduced spacing
+        ctx.fillRect(60, nextSectionY, infoWidth - 30, 1); // Thinner line
+        nextSectionY += 10; // Further reduced spacing
         
         // Draw conditional fields in a grid layout (3 columns)
         const conditionalColWidth = infoWidth / 3;
@@ -649,7 +649,7 @@ if (data.photo) {
         
         // Function to get X position for conditional fields
         const getConditionalX = (col) => {
-            return 70 + (col * conditionalColWidth);
+            return 60 + (col * conditionalColWidth);
         };
         
         // Draw conditional fields in a grid layout
@@ -658,7 +658,7 @@ if (data.photo) {
             conditionalCol++;
             if (conditionalCol >= 3) {
                 conditionalCol = 0;
-                conditionalFieldsY += oldLineHeight - 5; // Reduced spacing
+                conditionalFieldsY += oldLineHeight - 10; // Further reduced spacing
             }
         }
         
@@ -667,36 +667,35 @@ if (data.photo) {
             conditionalCol++;
             if (conditionalCol >= 3) {
                 conditionalCol = 0;
-                conditionalFieldsY += oldLineHeight - 5; // Reduced spacing
+                conditionalFieldsY += oldLineHeight - 10; // Further reduced spacing
             }
         }
         
         // Ensure we're at the start of a new row if needed
         if (conditionalCol > 0) {
-            conditionalFieldsY += oldLineHeight - 5; // Reduced spacing
+            conditionalFieldsY += oldLineHeight - 10; // Further reduced spacing
             conditionalCol = 0;
         }
         
         // Draw separator line for additional information
         nextSectionY = conditionalFieldsY + 5; // Reduced spacing
         ctx.fillStyle = '#888888';
-        ctx.fillRect(70, nextSectionY, infoWidth - 40, 1); // Thinner line
-        nextSectionY += 15; // Reduced spacing
+        ctx.fillRect(60, nextSectionY, infoWidth - 30, 1); // Thinner line
+        nextSectionY += 10; // Further reduced spacing
         
         // Draw new fields section title
-        ctx.font = 'bold 22px Arial'; // Smaller font for title
+        ctx.font = 'bold 18px Arial'; // Further reduced font size for title
         ctx.fillStyle = '#777777';
         ctx.textAlign = 'center';
         ctx.fillText('معلومات إضافية', infoX + infoWidth / 2, nextSectionY);
-        nextSectionY += 25; // Reduced spacing
+        nextSectionY += 20; // Further reduced spacing
         
         // Draw new fields in a compact grid layout (3 columns)
         const newFieldColWidth = infoWidth / 3;
-        let newFieldsRow = 0;
         
         // Function to get X position for new fields
         const getNewFieldX = (col) => {
-            return 70 + (col * newFieldColWidth);
+            return 60 + (col * newFieldColWidth);
         };
         
         // First row of new fields (3 columns)
@@ -752,29 +751,29 @@ if (data.photo) {
     function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
         // Define info box dimensions based on the info section and whether it's old or new info
         const isNewInfo = labelColor === '#777777';
-        const boxHeight = isNewInfo ? 22 : 26; // Even smaller height for more compact layout
-        const boxWidth = (canvas.width / 2) - 100; // Adjusted for the two-column layout with more space for photo
-        const fontSize = isNewInfo ? 14 : 16; // Smaller font for more compact layout
-        const labelWidth = isNewInfo ? 110 : 130; // Smaller label width for more compact layout
+        const boxHeight = isNewInfo ? 16 : 18; // Further reduced height for more compact layout
+        const boxWidth = (canvas.width / 2) - 150; // Further reduced width to fit within the info section
+        const fontSize = isNewInfo ? 10 : 12; // Further reduced font for more compact layout
+        const labelWidth = isNewInfo ? 80 : 90; // Further reduced label width for more compact layout
         
         // Draw label box with semi-transparent background (blue or gray)
         const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
         ctx.fillStyle = labelBgColor;
-        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 5, bl: 5, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 3, bl: 3, tr: 0, br: 0}, true, false);
         
         // Draw value box with white or light gray background
         ctx.fillStyle = isNewInfo ? '#f5f5f5' : '#ffffff';
-        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 5, br: 5}, true, false);
+        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 3, br: 3}, true, false);
         
         // Add decorative separator
         ctx.fillStyle = isNewInfo ? '#777777' : '#3498db';
-        ctx.fillRect(boxX + labelWidth - 1, y - boxHeight/2, 1, boxHeight); // Thinner separator
+        ctx.fillRect(boxX + labelWidth - 1, y - boxHeight/2, 0.5, boxHeight); // Even thinner separator
         
         // Draw label
         ctx.font = `bold ${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#555555' : '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.fillText(label, boxX + labelWidth/2, y); // Slight vertical adjustment
+        ctx.fillText(label, boxX + labelWidth/2, y + 1); // Slight vertical adjustment
         
         // Draw value - truncate if too long
         ctx.font = `${fontSize}px Arial`;
@@ -782,7 +781,7 @@ if (data.photo) {
         ctx.textAlign = 'right';
         
         // Measure text width to check if it needs truncation
-        const maxValueWidth = boxWidth - labelWidth - 15; // Less padding for more text space
+        const maxValueWidth = boxWidth - labelWidth - 8; // Even less padding for more text space
         const valueWidth = ctx.measureText(value).width;
         
         if (valueWidth > maxValueWidth) {
@@ -791,9 +790,9 @@ if (data.photo) {
             while (ctx.measureText(truncatedValue + '...').width > maxValueWidth && truncatedValue.length > 0) {
                 truncatedValue = truncatedValue.slice(0, -1);
             }
-            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 8, y); // Adjusted position
+            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 4, y + 1); // Adjusted position
         } else {
-            ctx.fillText(value, boxX + boxWidth - 8, y); // Adjusted position
+            ctx.fillText(value, boxX + boxWidth - 4, y + 1); // Adjusted position
         }
         
         // Reset text alignment for other text
