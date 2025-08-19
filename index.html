@@ -98,6 +98,50 @@
                         <input type="text" id="imprisonment" name="imprisonment">
                     </div>
 
+                    <div class="form-group time-input-container">
+                        <label for="time">دەمژمێر (الوقت)</label>
+                        <input type="text" id="time" name="time" placeholder="مثال: 2:00 الى 3:00" required>
+                        <div class="time-options">
+                            <label class="radio-label">
+                                <input type="radio" name="day-night" value="روژ" checked> روژ (نهار)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="day-night" value="شەڤ"> شەڤ (ليل)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="problem-location">جهێ ئاریشێ (مكان المشكلة)</label>
+                        <input type="text" id="problem-location" name="problem-location" required>
+                    </div>
+
+                    <div class="driver-point-group">
+                        <div class="form-group driver-input">
+                            <label for="driver-name">ناڤێ شوفێری (اسم السائق)</label>
+                            <input type="text" id="driver-name" name="driver-name" required>
+                        </div>
+
+                        <div class="form-group point-input">
+                            <label for="point">خالا (النقطة)</label>
+                            <select id="point" name="point" required>
+                                <option value="" disabled selected>اختر النقطة</option>
+                                <option value="100">100</option>
+                                <option value="101">101</option>
+                                <option value="102">102</option>
+                                <option value="103">103</option>
+                                <option value="105">105</option>
+                                <option value="106">106</option>
+                                <option value="107">107</option>
+                                <option value="108">108</option>
+                                <option value="109">109</option>
+                                <option value="110">110</option>
+                                <option value="111">111</option>
+                                <option value="112">112</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="phone">ژمارا موبایلی</label>
                         <input type="tel" id="phone" name="phone">
@@ -127,41 +171,7 @@
                         </select>
                     </div>
 
-                    <hr class="section-divider">
-                    <h3 class="section-title">معلومات إضافية</h3>
-
-                    <div class="form-group time-group">
-                        <label for="time">دەمژمێر (الوقت)</label>
-                        <div class="time-input-container">
-                            <input type="text" id="time" name="time">
-                            <div class="time-options">
-                                <label class="radio-label">
-                                    <input type="radio" name="day-night" value="روژ"> روژ (نهار)
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="day-night" value="شەڤ"> شەڤ (ليل)
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="problem-location">جهێ ئاریشێ (مكان المشكلة)</label>
-                        <input type="text" id="problem-location" name="problem-location">
-                    </div>
-
-                    <div class="form-group driver-point-group">
-                        <div class="driver-input">
-                            <label for="driver-name">ناڤێ شوفێری (اسم السائق)</label>
-                            <input type="text" id="driver-name" name="driver-name">
-                        </div>
-                        <div class="point-input">
-                            <label for="point">خالا (النقطة)</label>
-                            <input type="number" id="point" name="point" min="0" max="100">
-                        </div>
-                    </div>
-
-                    <button type="button" id="save-button" class="primary-button">
+                    <button type="submit" id="save-button" class="primary-button">
                         <i class="fas fa-save"></i> خەزنكرنا كارتێ
                     </button>
                 </form>
