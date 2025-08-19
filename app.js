@@ -311,40 +311,53 @@ function generateSuspectCard(data) {
         const startY = infoY + 120; // زيادة المسافة بعد العنوان
         const lineHeight = 65; // زيادة المسافة بين الأسطر
         
-        // Draw info boxes with labels and values - Left column (original fields)
-        const leftColumnX = 80;
-        const rightColumnX = canvas.width / 2 + 20;
+        // Draw original fields (top section)
+        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, 80);
+        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight, 80); // Display year directly
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2, 80);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3, 80);
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4, 80);
+        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5, 80);
         
-        // Left column - original fields
-        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, leftColumnX);
-        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight, leftColumnX); // Display year directly
-        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2, leftColumnX);
-        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3, leftColumnX);
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4, leftColumnX);
-        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5, leftColumnX);
-        
-        // Right column - new fields
-        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, startY, rightColumnX);
-        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, startY + lineHeight, rightColumnX);
-        drawInfoBox('ناڤێ شوفێری:', data.driverName, startY + lineHeight * 2, rightColumnX);
-        drawInfoBox('خالا:', data.point, startY + lineHeight * 3, rightColumnX);
-        
-        // Additional fields below in left column
-        let additionalFieldsY = startY + lineHeight * 6;
+        // Draw conditional fields
+        let conditionalFieldsY = startY + lineHeight * 6;
         
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, additionalFieldsY, leftColumnX);
-            additionalFieldsY += lineHeight;
+            drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, 80);
+            conditionalFieldsY += lineHeight;
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, additionalFieldsY, leftColumnX);
-            additionalFieldsY += lineHeight;
+            drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, 80);
+            conditionalFieldsY += lineHeight;
         }
         
         if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, additionalFieldsY, leftColumnX);
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, conditionalFieldsY, 80);
+            conditionalFieldsY += lineHeight;
         }
+        
+        // Draw separator line
+        ctx.fillStyle = '#888888';
+        ctx.fillRect(80, conditionalFieldsY + 10, canvas.width - 160, 2);
+        
+        // Draw new fields section title
+        ctx.font = 'bold 28px Arial';
+        ctx.fillStyle = '#555555';
+        ctx.textAlign = 'center';
+        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 50);
+        
+        // Draw new fields in horizontal layout
+        const newFieldsY = conditionalFieldsY + 80;
+        const col1X = 80;
+        const col2X = canvas.width / 2 - 100;
+        const col3X = canvas.width - 380;
+        
+        // Draw new fields horizontally
+        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, col1X, '#777777');
+        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY, col2X, '#777777');
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY + lineHeight, col1X, '#777777');
+        drawInfoBox('خالا:', data.point, newFieldsY + lineHeight, col2X, '#777777');
         
         // Add footer with timestamp - gradient background
         const footerGradient = ctx.createLinearGradient(0, canvas.height - 80, canvas.width, canvas.height - 80);
@@ -372,31 +385,32 @@ function generateSuspectCard(data) {
         ctx.shadowOffsetY = 0;
     }
     
-    function drawInfoBox(label, value, y, boxX = 80) {
+    function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
         // Define info box dimensions based on the info section
         const boxWidth = canvas.width / 2 - 60; // Adjusted for the two-column layout
         
-        // Draw label box with semi-transparent blue background
-        ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
+        // Draw label box with semi-transparent background (blue or gray)
+        const labelBgColor = labelColor === '#777777' ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
+        ctx.fillStyle = labelBgColor;
         roundRect(ctx, boxX, y - 30, 180, 45, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
         
-        // Draw value box with white background
-        ctx.fillStyle = '#ffffff';
+        // Draw value box with white or light gray background
+        ctx.fillStyle = labelColor === '#777777' ? '#f5f5f5' : '#ffffff';
         roundRect(ctx, boxX + 180, y - 30, boxWidth - 180, 45, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
         
         // Add decorative separator
-        ctx.fillStyle = '#3498db';
+        ctx.fillStyle = labelColor === '#777777' ? '#777777' : '#3498db';
         ctx.fillRect(boxX + 180 - 3, y - 30, 3, 45);
         
         // Draw label
         ctx.font = 'bold 24px Arial';
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = labelColor === '#777777' ? '#555555' : '#2c3e50';
         ctx.textAlign = 'center';
         ctx.fillText(label, boxX + 90, y);
         
         // Draw value
         ctx.font = '24px Arial';
-        ctx.fillStyle = '#34495e';
+        ctx.fillStyle = labelColor === '#777777' ? '#666666' : '#34495e';
         ctx.textAlign = 'right';
         ctx.fillText(value, boxX + boxWidth - 20, y);
         
