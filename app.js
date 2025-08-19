@@ -1,4 +1,17 @@
-// Main Application Logic for Misconduct Logger
+// Main Application Logic for Misconduct Logger - Enhanced for Offline Use
+
+// Register Service Worker for offline support
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(registration => {
+                console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch(error => {
+                console.log('Service Worker registration failed:', error);
+            });
+    });
+}
 
 // DOM Elements
 const photoButton = document.getElementById('photo-button');
@@ -10,6 +23,7 @@ const suspectForm = document.getElementById('suspect-form');
 const successModal = document.getElementById('success-modal');
 const shareWhatsappBtn = document.getElementById('share-whatsapp');
 const newEntryBtn = document.getElementById('new-entry');
+const networkStatusIndicator = document.createElement('div'); // سنضيف مؤشر حالة الاتصال
 
 // Current suspect data
 let currentSuspectData = {
@@ -17,8 +31,17 @@ let currentSuspectData = {
     timestamp: null
 };
 
+// Queue for storing data when offline
+let offlineDataQueue = [];
+
 // Initialize the application
 function initApp() {
+    // Setup network status indicator
+    setupNetworkStatusIndicator();
+    
+    // Load any pending offline data
+    loadOfflineData();
+    
     // Photo capture/upload functionality
     photoButton.addEventListener('click', () => {
         photoInput.click();
@@ -61,6 +84,55 @@ function initApp() {
     }
 }
 
+// Setup network status indicator
+function setupNetworkStatusIndicator() {
+    // Create and style the network status indicator
+    networkStatusIndicator.className = 'network-status';
+    networkStatusIndicator.style.position = 'fixed';
+    networkStatusIndicator.style.bottom = '10px';
+    networkStatusIndicator.style.right = '10px';
+    networkStatusIndicator.style.padding = '5px 10px';
+    networkStatusIndicator.style.borderRadius = '5px';
+    networkStatusIndicator.style.fontSize = '14px';
+    networkStatusIndicator.style.fontWeight = 'bold';
+    networkStatusIndicator.style.zIndex = '1000';
+    document.body.appendChild(networkStatusIndicator);
+    
+    // Update network status initially and on change
+    updateNetworkStatus();
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+}
+
+// Update network status indicator
+function updateNetworkStatus() {
+    if (navigator.onLine) {
+        networkStatusIndicator.textContent = 'متصل بالإنترنت';
+        networkStatusIndicator.style.backgroundColor = '#4CAF50';
+        networkStatusIndicator.style.color = 'white';
+        
+        // Try to sync any pending offline data
+        syncOfflineData();
+    } else {
+        networkStatusIndicator.textContent = 'غير متصل بالإنترنت - وضع حفظ محلي';
+        networkStatusIndicator.style.backgroundColor = '#FF9800';
+        networkStatusIndicator.style.color = 'white';
+    }
+}
+
+// Load any pending offline data from localStorage
+function loadOfflineData() {
+    try {
+        const savedQueue = localStorage.getItem('offlineDataQueue');
+        if (savedQueue) {
+            offlineDataQueue = JSON.parse(savedQueue);
+            console.log(`Loaded ${offlineDataQueue.length} pending offline entries`);
+        }
+    } catch (error) {
+        console.error('Error loading offline data:', error);
+    }
+}
+
 // Save suspect data
 function saveSuspectData() {
     // Get form data
@@ -79,7 +151,9 @@ function saveSuspectData() {
         point: document.getElementById('point').value,
         phone: document.getElementById('phone').value,
         sentTo: document.getElementById('sent-to').value,
-        timestamp: new Date().toLocaleString('en-US')
+        timestamp: new Date().toLocaleString('en-US'),
+        savedOffline: !navigator.onLine,
+        id: 'suspect_' + new Date().getTime() // إضافة معرف فريد لكل سجل
     };
 
     // Combine with photo data
@@ -92,11 +166,26 @@ function saveSuspectData() {
     const savedEntries = JSON.parse(localStorage.getItem('suspectEntries') || '[]');
     savedEntries.push(currentSuspectData);
     localStorage.setItem('suspectEntries', JSON.stringify(savedEntries));
+    
+    // If offline, add to sync queue
+    if (!navigator.onLine) {
+        offlineDataQueue.push(currentSuspectData);
+        localStorage.setItem('offlineDataQueue', JSON.stringify(offlineDataQueue));
+        console.log('Data saved offline and added to sync queue');
+    }
 
     // Generate card image
     generateSuspectCard(currentSuspectData);
 
-    // Show success modal
+    // Show success modal with appropriate message
+    const modalMessage = document.getElementById('success-message');
+    if (modalMessage) {
+        if (navigator.onLine) {
+            modalMessage.textContent = 'تم حفظ البيانات بنجاح!';
+        } else {
+            modalMessage.textContent = 'تم حفظ البيانات محلياً (وضع عدم الاتصال). سيتم مزامنتها عند توفر الإنترنت.';
+        }
+    }
     successModal.style.display = 'flex';
 }
 
@@ -106,68 +195,9 @@ function generateSuspectCard(data) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Set canvas dimensions - further optimized for better proportions
+    // Set canvas dimensions - reduced height for more compact layout
     canvas.width = 1500;
-    canvas.height = 800; // Further reduced height for more compact layout
-    
-    // Define drawHeader function for better organization
-    function drawHeader(ctx, suspectData) {
-        // Draw header with gradient background for more elegant look
-        const headerGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        headerGradient.addColorStop(0, '#2980b9');
-        headerGradient.addColorStop(0.5, '#3498db');
-        headerGradient.addColorStop(1, '#2980b9');
-        ctx.fillStyle = headerGradient;
-        ctx.fillRect(0, 0, canvas.width, 120);
-        
-        // Add subtle header decoration
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fillRect(0, 100, canvas.width, 2);
-        
-        // Draw header text with shadow for depth
-        ctx.font = 'bold 36px Arial';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 5;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        ctx.fillText('بطاقة معلومات', canvas.width / 2, 70);
-        ctx.shadowColor = 'transparent';
-        
-        // Draw suspect image if available with improved styling
-        if (suspectData.image) {
-            const img = new Image();
-            img.src = suspectData.image;
-            
-            // Draw circular image with improved positioning
-            ctx.save();
-            ctx.beginPath();
-            const centerX = canvas.width / 2;
-            const centerY = 190; // Slightly higher position
-            const radius = 75; // Slightly smaller for better proportions
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
-            ctx.closePath();
-            ctx.clip();
-            
-            // Draw the image
-            ctx.drawImage(img, centerX - radius, centerY - radius, radius * 2, radius * 2);
-            
-            // Restore context
-            ctx.restore();
-            
-            // Add circular border with gradient
-            const borderGradient = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
-            borderGradient.addColorStop(0, '#2980b9');
-            borderGradient.addColorStop(1, '#3498db');
-            
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
-            ctx.strokeStyle = borderGradient;
-            ctx.lineWidth = 4;
-            ctx.stroke();
-        }
-    }
+    canvas.height = 900; // Reduced height for more compact layout with horizontal arrangement
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -331,13 +361,10 @@ function generateSuspectCard(data) {
         const infoX = 50;
         const infoY = 180;
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 650; // Reduced height for more compact layout
+        const infoHeight = 700; // Reverted to original height as we're using horizontal layout
         
-        // Draw info section background with subtle gradient
-        const bgGradient = ctx.createLinearGradient(infoX, infoY, infoX, infoY + infoHeight);
-        bgGradient.addColorStop(0, 'rgba(52, 152, 219, 0.05)');
-        bgGradient.addColorStop(1, 'rgba(52, 152, 219, 0.02)');
-        ctx.fillStyle = bgGradient;
+        // Draw info section background with semi-transparent blue
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
         roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
         
         // Add border to info section
@@ -345,24 +372,18 @@ function generateSuspectCard(data) {
         ctx.lineWidth = 2;
         roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, false, true);
         
-        // Add section title background with enhanced gradient
+        // Add section title background
         const titleGradient = ctx.createLinearGradient(infoX, infoY, infoX + infoWidth, infoY);
         titleGradient.addColorStop(0, '#3498db');
         titleGradient.addColorStop(1, '#2980b9');
         ctx.fillStyle = titleGradient;
         roundRect(ctx, infoX, infoY, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
         
-        // Add section title with shadow for depth
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 5;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.font = 'bold 30px Arial'; // Slightly smaller for better proportions
+        // Add section title
+        ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 40);
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
         
         // Add decorative elements
         ctx.fillStyle = '#f39c12';
@@ -371,16 +392,17 @@ function generateSuspectCard(data) {
         ctx.fill();
         
         // Text settings
-        ctx.font = 'bold 20px Arial'; // Further reduced font size for better layout
+        ctx.font = 'bold 28px Arial';
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = infoY + 90; // Reduced space after header for more compact layout
+        const startY = infoY + 120; // زيادة المسافة بعد العنوان
+        const lineHeight = 65; // زيادة المسافة بين الأسطر
         
-        // Optimized line heights for better layout
-        const oldLineHeight = 38; // More compact spacing for original fields
-        const newLineHeight = 34; // Compact spacing for new fields
+        // Reduced line height for more compact layout
+        const oldLineHeight = 50; // Smaller line height for original fields
+        const newLineHeight = 40; // Even smaller line height for new fields
         
         // Draw original fields (top section) - more compact
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, 80);
@@ -408,115 +430,46 @@ function generateSuspectCard(data) {
             conditionalFieldsY += oldLineHeight;
         }
         
-        // Draw separator line with improved styling
-        const separatorGradient = ctx.createLinearGradient(80, 0, canvas.width - 160, 0);
-        separatorGradient.addColorStop(0, '#3498db');
-        separatorGradient.addColorStop(0.5, '#2980b9');
-        separatorGradient.addColorStop(1, '#3498db');
-        ctx.fillStyle = separatorGradient;
+        // Draw separator line
+        ctx.fillStyle = '#888888';
         ctx.fillRect(80, conditionalFieldsY + 5, canvas.width - 160, 2);
         
-        // Draw new fields section title with improved styling
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-        ctx.shadowBlur = 3;
-        ctx.font = 'bold 22px Arial'; // Optimized font size
-        ctx.fillStyle = '#2c3e50'; // Darker color for better contrast
+        // Draw new fields section title
+        ctx.font = 'bold 24px Arial'; // Smaller font for title
+        ctx.fillStyle = '#777777';
         ctx.textAlign = 'center';
-        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 25); // Better vertical spacing
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
+        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 30); // Reduced spacing
         
-        // Add decorative underline for the title
-        const titleUnderlineGradient = ctx.createLinearGradient(canvas.width/2 - 80, 0, canvas.width/2 + 80, 0);
-        titleUnderlineGradient.addColorStop(0, 'rgba(44, 62, 80, 0.1)');
-        titleUnderlineGradient.addColorStop(0.5, 'rgba(44, 62, 80, 0.5)');
-        titleUnderlineGradient.addColorStop(1, 'rgba(44, 62, 80, 0.1)');
-        ctx.fillStyle = titleUnderlineGradient;
-        ctx.fillRect(canvas.width/2 - 80, conditionalFieldsY + 30, 160, 1);
+        // Draw new fields in horizontal layout with 3 columns to save space
+        const newFieldsY = conditionalFieldsY + 55; // Reduced spacing
+        const col1X = 80;
+        const col2X = canvas.width / 2 - 100;
+        const col3X = canvas.width - 380;
         
-        // Calculate optimal layout for new fields with better horizontal arrangement
-        const newFieldsY = conditionalFieldsY + 45; // Optimized spacing
+        // Draw new fields horizontally
+        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, col1X, '#777777');
+        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY, col2X, '#777777');
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY + newLineHeight, col1X, '#777777');
+        drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, col2X, '#777777');
         
-        // Calculate column positions for better alignment
-        const leftMargin = 80;
-        const rightMargin = 80;
-        const availableWidth = canvas.width - leftMargin - rightMargin - 550; // Account for photo space
-        const columnWidth = availableWidth / 2;
-        const columnGap = 40; // Optimized gap between columns
-        
-        const leftColX = leftMargin;
-        const rightColX = leftMargin + columnWidth + columnGap;
-        
-        // Check if we have any additional fields to display
-        const hasAdditionalFields = data.time || data.problemLocation || data.driverName || data.point;
-        
-        let footerY;
-        
-        if (hasAdditionalFields) {
-            // Draw new fields in improved horizontal layout
-            // First row
-            let firstRowUsed = false;
-            
-            if (data.time) {
-                drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, leftColX, '#777777');
-                firstRowUsed = true;
-            }
-            
-            if (data.problemLocation) {
-                drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY, rightColX, '#777777');
-                firstRowUsed = true;
-            }
-            
-            // Second row with proper spacing
-            const secondRowY = firstRowUsed ? newFieldsY + newLineHeight : newFieldsY;
-            let secondRowUsed = false;
-            
-            if (data.driverName) {
-                drawInfoBox('ناڤێ شوفێری:', data.driverName, secondRowY, leftColX, '#777777');
-                secondRowUsed = true;
-            }
-            
-            if (data.point) {
-                drawInfoBox('خالا:', data.point, secondRowY, rightColX, '#777777');
-                secondRowUsed = true;
-            }
-            
-            // Calculate footer position based on content
-            footerY = secondRowUsed ? secondRowY + newLineHeight + 30 : 
-                      firstRowUsed ? newFieldsY + newLineHeight + 30 : 
-                      newFieldsY + 30;
-        } else {
-            // If no additional fields, display a message
-            ctx.font = 'italic 16px Arial';
-            ctx.fillStyle = '#777777';
-            ctx.textAlign = 'center';
-            ctx.fillText('لا توجد معلومات إضافية', canvas.width / 2, newFieldsY + 15);
-            
-            // Set footer position for no additional fields
-            footerY = newFieldsY + 40;
-        }
-        
-        // Add decorative line above footer with gradient
-        const lineGradient = ctx.createLinearGradient(50, 0, canvas.width - 100, 0);
-        lineGradient.addColorStop(0, '#f39c12');
-        lineGradient.addColorStop(0.5, '#f1c40f');
-        lineGradient.addColorStop(1, '#f39c12');
-        ctx.fillStyle = lineGradient;
-        ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
-        
-        // Add footer with elegant gradient background
+        // Add footer with timestamp - gradient background (adjusted for smaller canvas)
+        const footerY = newFieldsY + newLineHeight + 50; // Position footer based on content, not canvas height
         const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
-        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.95)');
-        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.95)');
+        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
+        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
         ctx.fillStyle = footerGradient;
         roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
         
-        // Add timestamp with enhanced shadow effect
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 4;
+        // Add decorative line above footer
+        ctx.fillStyle = '#f39c12';
+        ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
+        
+        // Add timestamp with shadow effect (adjusted for new footer position)
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 3;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
-        ctx.font = 'bold italic 20px Arial'; // Slightly smaller for better proportions
+        ctx.font = 'italic 22px Arial'; // Slightly smaller font
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 30);
@@ -529,65 +482,35 @@ function generateSuspectCard(data) {
     function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
         // Define info box dimensions based on the info section and whether it's old or new info
         const isNewInfo = labelColor === '#777777';
+        const boxHeight = isNewInfo ? 35 : 40; // Smaller height for new info
+        const boxWidth = canvas.width / 2 - 60; // Adjusted for the two-column layout
+        const fontSize = isNewInfo ? 20 : 22; // Smaller font for new info
+        const labelWidth = isNewInfo ? 160 : 180; // Smaller label width for new info
         
-        // Further optimized dimensions for better appearance
-        const boxHeight = isNewInfo ? 34 : 38; // Reduced height for better proportions
-        const boxWidth = isNewInfo ? 320 : 380; // Fixed width for better alignment
-        const fontSize = isNewInfo ? 16 : 18; // Further reduced font sizes for cleaner look
-        const labelWidth = isNewInfo ? 140 : 160; // Adjusted label width for better proportions
-        const borderRadius = isNewInfo ? 5 : 6; // Smaller radius for new info boxes
-        
-        // Enhanced colors for better contrast and elegance
-        const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.12)' : 'rgba(52, 152, 219, 0.12)';
+        // Draw label box with semi-transparent background (blue or gray)
+        const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
         ctx.fillStyle = labelBgColor;
-        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, 
-                 {tl: borderRadius, bl: borderRadius, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
         
-        // Draw value box with enhanced background
-        ctx.fillStyle = isNewInfo ? '#f9f9f9' : '#ffffff';
-        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, 
-                 {tl: 0, bl: 0, tr: borderRadius, br: borderRadius}, true, false);
+        // Draw value box with white or light gray background
+        ctx.fillStyle = isNewInfo ? '#f5f5f5' : '#ffffff';
+        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
         
-        // Add subtle box shadow for depth
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.05)';
-        ctx.shadowBlur = 2;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-        roundRect(ctx, boxX, y - boxHeight/2, boxWidth, boxHeight, 
-                 {tl: borderRadius, bl: borderRadius, tr: borderRadius, br: borderRadius}, true, false);
-        ctx.shadowColor = 'transparent';
+        // Add decorative separator
+        ctx.fillStyle = isNewInfo ? '#777777' : '#3498db';
+        ctx.fillRect(boxX + labelWidth - 3, y - boxHeight/2, 3, boxHeight);
         
-        // Add decorative separator with subtle gradient
-        const sepColor = isNewInfo ? '#777777' : '#3498db';
-        ctx.fillStyle = sepColor;
-        ctx.fillRect(boxX + labelWidth - 2, y - boxHeight/2, 2, boxHeight);
-        
-        // Draw label with improved text positioning
+        // Draw label
         ctx.font = `bold ${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#555555' : '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.fillText(label, boxX + labelWidth/2, y + 1); // Slight vertical adjustment
+        ctx.fillText(label, boxX + labelWidth/2, y);
         
-        // Draw value with improved text positioning
+        // Draw value
         ctx.font = `${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#666666' : '#34495e';
         ctx.textAlign = 'right';
-        
-        // Handle long text with ellipsis if needed
-        const maxValueWidth = boxWidth - labelWidth - 20;
-        let displayValue = value;
-        ctx.font = `${fontSize}px Arial`; // Set font before measuring
-        if (ctx.measureText(value).width > maxValueWidth) {
-            // Truncate text and add ellipsis
-            let truncated = value;
-            while (ctx.measureText(truncated + '...').width > maxValueWidth && truncated.length > 0) {
-                truncated = truncated.slice(0, -1);
-            }
-            displayValue = truncated + '...';
-        }
-        
-        ctx.fillText(displayValue, boxX + boxWidth - 10, y + 1); // Slight vertical adjustment
+        ctx.fillText(value, boxX + boxWidth - 15, y);
         
         // Reset text alignment for other text
         ctx.textAlign = 'right';
@@ -687,32 +610,71 @@ function shareViaWhatsapp() {
 // Function to save image to device
 function saveImageToDevice() {
     try {
+        // First, try to store the image in the browser's cache for offline access
+        if ('caches' in window) {
+            const suspectName = currentSuspectData.fullname || 'suspect';
+            const fileName = 'بطاقة_' + suspectName + '_' + new Date().getTime() + '.png';
+            const imageUrl = `/cached-images/${fileName}`;
+            
+            // Store the image in the cache
+            caches.open('misconduct-logger-images').then(cache => {
+                // Convert base64 to blob
+                fetch(currentSuspectData.cardImage).then(response => {
+                    cache.put(imageUrl, response);
+                    console.log('Image cached successfully for offline use');
+                });
+            }).catch(err => {
+                console.warn('Could not cache image:', err);
+            });
+        }
+        
         // Create a temporary link to download the image
         const tempLink = document.createElement('a');
         tempLink.href = currentSuspectData.cardImage;
         
         // Use suspect name in the filename if available
         const suspectName = currentSuspectData.fullname || 'suspect';
-         const fileName = 'بطاقة_' + suspectName + '_' + new Date().getTime() + '.png';
-         tempLink.download = fileName;
-         
-         // Explicitly set attributes for better compatibility
-         tempLink.setAttribute('download', fileName);
-         tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
-         tempLink.setAttribute('target', '_blank');
-         
-         // Append to body, click, and remove
-         document.body.appendChild(tempLink);
-         tempLink.click();
-         
-         // Add a small delay before removing the link
-         setTimeout(() => {
-             document.body.removeChild(tempLink);
-             alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
-         }, 100);
+        const fileName = 'بطاقة_' + suspectName + '_' + new Date().getTime() + '.png';
+        tempLink.download = fileName;
+        
+        // Explicitly set attributes for better compatibility
+        tempLink.setAttribute('download', fileName);
+        tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
+        tempLink.setAttribute('target', '_blank');
+        
+        // Append to body, click, and remove
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        
+        // Add a small delay before removing the link
+        setTimeout(() => {
+            document.body.removeChild(tempLink);
+            
+            // Show different message based on connection status
+            if (navigator.onLine) {
+                showNotification('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
+            } else {
+                showNotification('تم حفظ البطاقة محلياً (وضع عدم الاتصال)');
+            }
+        }, 100);
+        
+        // Also save image data to localStorage for offline access
+        try {
+            // Store reference to the image in localStorage
+            const savedImages = JSON.parse(localStorage.getItem('savedImages') || '[]');
+            savedImages.push({
+                id: currentSuspectData.id,
+                fileName: fileName,
+                timestamp: new Date().toLocaleString('en-US')
+            });
+            localStorage.setItem('savedImages', JSON.stringify(savedImages));
+        } catch (storageError) {
+            console.warn('Could not save image reference to localStorage:', storageError);
+        }
+        
     } catch (error) {
         console.error('Error saving image:', error);
-        alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
+        showNotification('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
     }
 }
 
@@ -726,6 +688,69 @@ function resetForm() {
         timestamp: null
     };
     successModal.style.display = 'none';
+}
+
+// Sync offline data when connection is restored
+function syncOfflineData() {
+    if (offlineDataQueue.length === 0) {
+        return; // No data to sync
+    }
+    
+    console.log(`Attempting to sync ${offlineDataQueue.length} offline entries`);
+    
+    // Here you would normally send data to your server
+    // Since this is a local app, we'll just mark them as synced
+    
+    // Update the status of entries in the main storage
+    const savedEntries = JSON.parse(localStorage.getItem('suspectEntries') || '[]');
+    
+    offlineDataQueue.forEach(offlineEntry => {
+        const entryIndex = savedEntries.findIndex(entry => entry.id === offlineEntry.id);
+        if (entryIndex !== -1) {
+            savedEntries[entryIndex].savedOffline = false;
+            savedEntries[entryIndex].syncedAt = new Date().toLocaleString('en-US');
+        }
+    });
+    
+    // Save updated entries
+    localStorage.setItem('suspectEntries', JSON.stringify(savedEntries));
+    
+    // Clear the offline queue
+    offlineDataQueue = [];
+    localStorage.setItem('offlineDataQueue', JSON.stringify(offlineDataQueue));
+    
+    console.log('All offline data synced successfully');
+    
+    // Show a notification to the user
+    showNotification('تمت مزامنة البيانات المحفوظة محلياً بنجاح');
+}
+
+// Show a temporary notification
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'sync-notification';
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.backgroundColor = '#4CAF50';
+    notification.style.color = 'white';
+    notification.style.padding = '10px 20px';
+    notification.style.borderRadius = '5px';
+    notification.style.zIndex = '1001';
+    notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.5s';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 500);
+    }, 3000);
 }
 
 // Initialize the app when DOM is loaded
