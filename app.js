@@ -72,6 +72,12 @@ function saveSuspectData() {
         imprisonment: document.getElementById('imprisonment').value,
         phone: document.getElementById('phone').value,
         sentTo: document.getElementById('sent-to').value,
+        // الحقول الجديدة
+        time: document.getElementById('time').value,
+        dayNight: document.querySelector('input[name="day-night"]:checked')?.value || '',
+        problemLocation: document.getElementById('problem-location').value,
+        driverName: document.getElementById('driver-name').value,
+        point: document.getElementById('point').value,
         timestamp: new Date().toLocaleString('en-US')
     };
 
@@ -108,9 +114,9 @@ function generateSuspectCard(data) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            // Set canvas dimensions
+            // Set canvas dimensions - زيادة الارتفاع لاستيعاب البطاقات الثلاث
             canvas.width = 1500;
-            canvas.height = 1000;
+            canvas.height = 1800;
             
             // Create gradient background
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -178,7 +184,7 @@ function generateSuspectCard(data) {
                 const photoX = canvas.width - 470; // Position on the right side
                 const photoY = 180;
                 const photoWidth = 420;
-                const photoHeight = 600; // زيادة طول الصورة العمودية
+                const photoHeight = 1000; // زيادة طول الصورة العمودية لتتناسب مع البطاقات الثلاث
                 
                 // Draw photo background
                 ctx.fillStyle = '#ffffff';
@@ -244,7 +250,7 @@ function generateSuspectCard(data) {
                 const photoX = canvas.width - 470; // Position on the right side
                 const photoY = 180;
                 const photoWidth = 420;
-                const photoHeight = 600; // زيادة طول الصورة العمودية
+                const photoHeight = 1000; // زيادة طول الصورة العمودية لتتناسب مع البطاقات الثلاث
                 
                 // No photo, draw a placeholder
                 ctx.fillStyle = '#ecf0f1';
@@ -294,14 +300,47 @@ function generateSuspectCard(data) {
             console.error('Error generating card:', error);
             reject(error);
         }
-    }
+    });
     
     function drawSuspectInfo() {
+        // تقسيم المعلومات إلى ثلاث بطاقات منفصلة
+        drawFirstCard();
+        drawSecondCard();
+        drawThirdCard();
+        
+        // Add footer with timestamp - gradient background
+        const footerGradient = ctx.createLinearGradient(0, canvas.height - 80, canvas.width, canvas.height - 80);
+        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
+        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
+        ctx.fillStyle = footerGradient;
+        roundRect(ctx, 20, canvas.height - 80, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
+        
+        // Add decorative line above footer
+        ctx.fillStyle = '#f39c12';
+        ctx.fillRect(50, canvas.height - 85, canvas.width - 100, 2);
+        
+        // Add timestamp with shadow effect
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        ctx.font = 'italic 24px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+    }
+    
+    // البطاقة الأولى: المعلومات الأساسية
+    function drawFirstCard() {
         // Define info section dimensions
         const infoX = 50;
         const infoY = 180;
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 700;
+        const infoHeight = 500;
         
         // Draw info section background with semi-transparent blue
         ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
@@ -337,57 +376,146 @@ function generateSuspectCard(data) {
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = infoY + 120; // زيادة المسافة بعد العنوان
-        const lineHeight = 65; // زيادة المسافة بين الأسطر
+        const startY = infoY + 120;
+        const lineHeight = 65;
         
         // Draw info boxes with labels and values
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
-        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight); // Display year directly
+        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight);
         drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
         drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
         drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
-        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
+    }
+    
+    // البطاقة الثانية: المعلومات الإضافية الجديدة
+    function drawSecondCard() {
+        // Define info section dimensions
+        const infoX = 50;
+        const infoY = 720; // بعد البطاقة الأولى
+        const infoWidth = canvas.width - 550; // Leave space for photo on the right
+        const infoHeight = 500;
         
-        let additionalFields = 0;
+        // Draw info section background with semi-transparent green
+        ctx.fillStyle = 'rgba(46, 204, 113, 0.05)';
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
+        
+        // Add border to info section
+        ctx.strokeStyle = 'rgba(46, 204, 113, 0.3)';
+        ctx.lineWidth = 2;
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, false, true);
+        
+        // Add section title background
+        const titleGradient = ctx.createLinearGradient(infoX, infoY, infoX + infoWidth, infoY);
+        titleGradient.addColorStop(0, '#27ae60');
+        titleGradient.addColorStop(1, '#2ecc71');
+        ctx.fillStyle = titleGradient;
+        roundRect(ctx, infoX, infoY, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        
+        // Add section title
+        ctx.font = 'bold 32px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('زانیاریێن ئاریشێ', infoX + infoWidth / 2, infoY + 40);
+        
+        // Add decorative elements
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(infoX + infoWidth / 2, infoY + 70, 5, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Text settings
+        ctx.font = 'bold 28px Arial';
+        ctx.fillStyle = '#333333';
+        ctx.textAlign = 'right';
+        
+        // Draw text info
+        const startY = infoY + 120;
+        const lineHeight = 65;
+        
+        // Draw info boxes with labels and values for new fields
+        drawInfoBox('كارێ وی:', data.job, startY);
+        
+        // الحقول الجديدة
+        let row = 1;
+        if (data.time) {
+            const timeValue = data.time + (data.dayNight ? ` (${data.dayNight})` : '');
+            drawInfoBox('دەمژمێر:', timeValue, startY + lineHeight * row);
+            row++;
+        }
+        
+        if (data.problemLocation) {
+            drawInfoBox('جهێ ئاریشێ:', data.problemLocation, startY + lineHeight * row);
+            row++;
+        }
+        
+        if (data.driverName) {
+            const driverValue = data.driverName + (data.point ? ` - خالا: ${data.point}` : '');
+            drawInfoBox('ناڤێ شوفێری:', driverValue, startY + lineHeight * row);
+            row++;
+        }
+    }
+    
+    // البطاقة الثالثة: معلومات أخرى
+    function drawThirdCard() {
+        // Define info section dimensions
+        const infoX = 50;
+        const infoY = 1260; // بعد البطاقة الثانية
+        const infoWidth = canvas.width - 550; // Leave space for photo on the right
+        const infoHeight = 400;
+        
+        // Draw info section background with semi-transparent orange
+        ctx.fillStyle = 'rgba(230, 126, 34, 0.05)';
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
+        
+        // Add border to info section
+        ctx.strokeStyle = 'rgba(230, 126, 34, 0.3)';
+        ctx.lineWidth = 2;
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, false, true);
+        
+        // Add section title background
+        const titleGradient = ctx.createLinearGradient(infoX, infoY, infoX + infoWidth, infoY);
+        titleGradient.addColorStop(0, '#e67e22');
+        titleGradient.addColorStop(1, '#d35400');
+        ctx.fillStyle = titleGradient;
+        roundRect(ctx, infoX, infoY, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        
+        // Add section title
+        ctx.font = 'bold 32px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('زانیاریێن دیتر', infoX + infoWidth / 2, infoY + 40);
+        
+        // Add decorative elements
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.arc(infoX + infoWidth / 2, infoY + 70, 5, 0, Math.PI * 2, true);
+        ctx.fill();
+        
+        // Text settings
+        ctx.font = 'bold 28px Arial';
+        ctx.fillStyle = '#333333';
+        ctx.textAlign = 'right';
+        
+        // Draw text info
+        const startY = infoY + 120;
+        const lineHeight = 65;
+        
+        // Draw info boxes with labels and values
+        let row = 0;
         
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
-            additionalFields++;
+            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * row);
+            row++;
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
-            additionalFields++;
+            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * row);
+            row++;
         }
         
         if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * row);
         }
-        
-        // Add footer with timestamp - gradient background
-        const footerGradient = ctx.createLinearGradient(0, canvas.height - 80, canvas.width, canvas.height - 80);
-        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
-        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
-        ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, canvas.height - 80, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
-        
-        // Add decorative line above footer
-        ctx.fillStyle = '#f39c12';
-        ctx.fillRect(50, canvas.height - 85, canvas.width - 100, 2);
-        
-        // Add timestamp with shadow effect
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.font = 'italic 24px Arial';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
     }
     
     function drawInfoBox(label, value, y) {

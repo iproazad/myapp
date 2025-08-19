@@ -222,6 +222,60 @@ select {
     opacity: 0.9;
 }
 
+/* Section Divider and Title */
+.section-divider {
+    margin: 30px 0 20px;
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(52, 152, 219, 0.75), rgba(0, 0, 0, 0));
+}
+
+.section-title {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+/* Time Input Styles */
+.time-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.time-options {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    width: auto;
+    margin-right: 5px;
+}
+
+/* Driver and Point Group */
+.driver-point-group {
+    display: flex;
+    gap: 15px;
+}
+
+.driver-input {
+    flex: 3;
+}
+
+.point-input {
+    flex: 1;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 600px) {
     .app-container {
@@ -239,5 +293,10 @@ select {
     
     .primary-button {
         padding: 10px 20px;
+    }
+    
+    .driver-point-group {
+        flex-direction: column;
+        gap: 20px;
     }
 }

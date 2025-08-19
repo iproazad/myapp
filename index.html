@@ -127,6 +127,40 @@
                         </select>
                     </div>
 
+                    <hr class="section-divider">
+                    <h3 class="section-title">معلومات إضافية</h3>
+
+                    <div class="form-group time-group">
+                        <label for="time">دەمژمێر (الوقت)</label>
+                        <div class="time-input-container">
+                            <input type="text" id="time" name="time">
+                            <div class="time-options">
+                                <label class="radio-label">
+                                    <input type="radio" name="day-night" value="روژ"> روژ (نهار)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="day-night" value="شەڤ"> شەڤ (ليل)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="problem-location">جهێ ئاریشێ (مكان المشكلة)</label>
+                        <input type="text" id="problem-location" name="problem-location">
+                    </div>
+
+                    <div class="form-group driver-point-group">
+                        <div class="driver-input">
+                            <label for="driver-name">ناڤێ شوفێری (اسم السائق)</label>
+                            <input type="text" id="driver-name" name="driver-name">
+                        </div>
+                        <div class="point-input">
+                            <label for="point">خالا (النقطة)</label>
+                            <input type="number" id="point" name="point" min="0" max="100">
+                        </div>
+                    </div>
+
                     <button type="submit" id="save-button" class="primary-button">
                         <i class="fas fa-save"></i> خەزنكرنا كارتێ
                     </button>
