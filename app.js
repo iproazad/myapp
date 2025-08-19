@@ -106,9 +106,9 @@ function generateSuspectCard(data) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Set canvas dimensions - increased height for new fields
+    // Set canvas dimensions - reduced height for more compact layout
     canvas.width = 1500;
-    canvas.height = 1000; // Reverted to original height as we're using horizontal layout
+    canvas.height = 900; // Reduced height for more compact layout with horizontal arrangement
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -311,44 +311,48 @@ function generateSuspectCard(data) {
         const startY = infoY + 120; // زيادة المسافة بعد العنوان
         const lineHeight = 65; // زيادة المسافة بين الأسطر
         
-        // Draw original fields (top section)
+        // Reduced line height for more compact layout
+        const oldLineHeight = 50; // Smaller line height for original fields
+        const newLineHeight = 40; // Even smaller line height for new fields
+        
+        // Draw original fields (top section) - more compact
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, 80);
-        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight, 80); // Display year directly
-        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2, 80);
-        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3, 80);
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4, 80);
-        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5, 80);
+        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + oldLineHeight, 80);
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + oldLineHeight * 2, 80);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + oldLineHeight * 3, 80);
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + oldLineHeight * 4, 80);
+        drawInfoBox('كارێ وی:', data.job, startY + oldLineHeight * 5, 80);
         
         // Draw conditional fields
-        let conditionalFieldsY = startY + lineHeight * 6;
+        let conditionalFieldsY = startY + oldLineHeight * 6;
         
         if (data.imprisonment) {
             drawInfoBox('زیندانكرن:', data.imprisonment, conditionalFieldsY, 80);
-            conditionalFieldsY += lineHeight;
+            conditionalFieldsY += oldLineHeight;
         }
         
         if (data.phone) {
             drawInfoBox('ژمارا موبایلی:', data.phone, conditionalFieldsY, 80);
-            conditionalFieldsY += lineHeight;
+            conditionalFieldsY += oldLineHeight;
         }
         
         if (data.sentTo) {
             drawInfoBox('رەوانەكرن بـــو:', data.sentTo, conditionalFieldsY, 80);
-            conditionalFieldsY += lineHeight;
+            conditionalFieldsY += oldLineHeight;
         }
         
         // Draw separator line
         ctx.fillStyle = '#888888';
-        ctx.fillRect(80, conditionalFieldsY + 10, canvas.width - 160, 2);
+        ctx.fillRect(80, conditionalFieldsY + 5, canvas.width - 160, 2);
         
         // Draw new fields section title
-        ctx.font = 'bold 28px Arial';
-        ctx.fillStyle = '#555555';
+        ctx.font = 'bold 24px Arial'; // Smaller font for title
+        ctx.fillStyle = '#777777';
         ctx.textAlign = 'center';
-        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 50);
+        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 30); // Reduced spacing
         
-        // Draw new fields in horizontal layout
-        const newFieldsY = conditionalFieldsY + 80;
+        // Draw new fields in horizontal layout with 3 columns to save space
+        const newFieldsY = conditionalFieldsY + 55; // Reduced spacing
         const col1X = 80;
         const col2X = canvas.width / 2 - 100;
         const col3X = canvas.width - 380;
@@ -356,29 +360,30 @@ function generateSuspectCard(data) {
         // Draw new fields horizontally
         drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, col1X, '#777777');
         drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY, col2X, '#777777');
-        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY + lineHeight, col1X, '#777777');
-        drawInfoBox('خالا:', data.point, newFieldsY + lineHeight, col2X, '#777777');
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY + newLineHeight, col1X, '#777777');
+        drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, col2X, '#777777');
         
-        // Add footer with timestamp - gradient background
-        const footerGradient = ctx.createLinearGradient(0, canvas.height - 80, canvas.width, canvas.height - 80);
+        // Add footer with timestamp - gradient background (adjusted for smaller canvas)
+        const footerY = newFieldsY + newLineHeight + 50; // Position footer based on content, not canvas height
+        const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
         footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
         footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
         ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, canvas.height - 80, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
+        roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
         
         // Add decorative line above footer
         ctx.fillStyle = '#f39c12';
-        ctx.fillRect(50, canvas.height - 85, canvas.width - 100, 2);
+        ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
         
-        // Add timestamp with shadow effect
+        // Add timestamp with shadow effect (adjusted for new footer position)
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
         ctx.shadowBlur = 3;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
-        ctx.font = 'italic 24px Arial';
+        ctx.font = 'italic 22px Arial'; // Slightly smaller font
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 30);
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
@@ -386,33 +391,37 @@ function generateSuspectCard(data) {
     }
     
     function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
-        // Define info box dimensions based on the info section
+        // Define info box dimensions based on the info section and whether it's old or new info
+        const isNewInfo = labelColor === '#777777';
+        const boxHeight = isNewInfo ? 35 : 40; // Smaller height for new info
         const boxWidth = canvas.width / 2 - 60; // Adjusted for the two-column layout
+        const fontSize = isNewInfo ? 20 : 22; // Smaller font for new info
+        const labelWidth = isNewInfo ? 160 : 180; // Smaller label width for new info
         
         // Draw label box with semi-transparent background (blue or gray)
-        const labelBgColor = labelColor === '#777777' ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
+        const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
         ctx.fillStyle = labelBgColor;
-        roundRect(ctx, boxX, y - 30, 180, 45, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
         
         // Draw value box with white or light gray background
-        ctx.fillStyle = labelColor === '#777777' ? '#f5f5f5' : '#ffffff';
-        roundRect(ctx, boxX + 180, y - 30, boxWidth - 180, 45, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
+        ctx.fillStyle = isNewInfo ? '#f5f5f5' : '#ffffff';
+        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
         
         // Add decorative separator
-        ctx.fillStyle = labelColor === '#777777' ? '#777777' : '#3498db';
-        ctx.fillRect(boxX + 180 - 3, y - 30, 3, 45);
+        ctx.fillStyle = isNewInfo ? '#777777' : '#3498db';
+        ctx.fillRect(boxX + labelWidth - 3, y - boxHeight/2, 3, boxHeight);
         
         // Draw label
-        ctx.font = 'bold 24px Arial';
-        ctx.fillStyle = labelColor === '#777777' ? '#555555' : '#2c3e50';
+        ctx.font = `bold ${fontSize}px Arial`;
+        ctx.fillStyle = isNewInfo ? '#555555' : '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.fillText(label, boxX + 90, y);
+        ctx.fillText(label, boxX + labelWidth/2, y);
         
         // Draw value
-        ctx.font = '24px Arial';
-        ctx.fillStyle = labelColor === '#777777' ? '#666666' : '#34495e';
+        ctx.font = `${fontSize}px Arial`;
+        ctx.fillStyle = isNewInfo ? '#666666' : '#34495e';
         ctx.textAlign = 'right';
-        ctx.fillText(value, boxX + boxWidth - 20, y);
+        ctx.fillText(value, boxX + boxWidth - 15, y);
         
         // Reset text alignment for other text
         ctx.textAlign = 'right';
