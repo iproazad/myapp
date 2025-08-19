@@ -152,7 +152,7 @@ function generateSuspectCard(data) {
         img.src = data.photo;
         
         // Draw rectangular photo background and frame
-        const photoX = canvas.width - 700; // Position on the right side
+        const photoX = canvas.width - 460; // Position on the right side
         const photoY = 180;
         const photoWidth = 420;
         const photoHeight = 600; // زيادة طول الصورة العمودية
@@ -200,7 +200,7 @@ function generateSuspectCard(data) {
         };
     } else {
         // Define photo dimensions for consistency
-        const photoX = canvas.width - 700; // Position on the right side
+        const photoX = canvas.width - 460; // Position on the right side
         const photoY = 180;
         const photoWidth = 420;
         const photoHeight = 600; // زيادة طول الصورة العمودية
