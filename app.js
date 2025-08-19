@@ -99,18 +99,9 @@ function generateSuspectCard(data) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Set canvas dimensions - portrait by default
-    let canvasWidth = 800;
-    let canvasHeight = 1000;
-    
-    // Check if we need landscape orientation
-    if (data.orientation === 'landscape') {
-        canvasWidth = 1500; // Increased width for landscape mode (was 1200)
-        canvasHeight = 800;
-    }
-    
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    // Set canvas dimensions
+    canvas.width = 800;
+    canvas.height = 1000;
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
