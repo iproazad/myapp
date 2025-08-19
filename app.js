@@ -106,9 +106,49 @@ function generateSuspectCard(data) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Set canvas dimensions - reduced height for more compact layout
+    // Set canvas dimensions - optimized for better proportions
     canvas.width = 1500;
-    canvas.height = 900; // Reduced height for more compact layout with horizontal arrangement
+    canvas.height = 850; // Further optimized height for better proportions with horizontal arrangement
+    
+    // Define drawInfoSection function for better organization
+    function drawInfoSection(ctx, suspectData) {
+        // Draw info section with subtle gradient background for more elegant look
+        const infoY = 270; // Slightly higher position
+        const infoGradient = ctx.createLinearGradient(0, infoY, 0, canvas.height);
+        infoGradient.addColorStop(0, '#ffffff');
+        infoGradient.addColorStop(1, '#f9f9f9');
+        ctx.fillStyle = infoGradient;
+        ctx.fillRect(0, infoY, canvas.width, canvas.height - infoY - 60);
+        
+        // Add subtle decorative elements
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
+        ctx.fillRect(40, infoY + 10, canvas.width - 80, canvas.height - infoY - 80);
+        
+        // Draw info section title with improved styling
+        ctx.font = 'bold 30px Arial'; // Slightly smaller for better proportions
+        ctx.fillStyle = '#2980b9'; // Slightly darker blue for better contrast
+        ctx.textAlign = 'center';
+        
+        // Add subtle shadow to title
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        ctx.fillText('معلومات المشتبه به', canvas.width / 2, infoY + 45);
+        ctx.shadowColor = 'transparent'; // Reset shadow
+        
+        // Add decorative underline
+        const titleWidth = ctx.measureText('معلومات المشتبه به').width;
+        const underlineGradient = ctx.createLinearGradient(
+            canvas.width/2 - titleWidth/2, infoY + 50,
+            canvas.width/2 + titleWidth/2, infoY + 50
+        );
+        underlineGradient.addColorStop(0, 'rgba(52, 152, 219, 0.3)');
+        underlineGradient.addColorStop(0.5, 'rgba(52, 152, 219, 0.7)');
+        underlineGradient.addColorStop(1, 'rgba(52, 152, 219, 0.3)');
+        ctx.fillStyle = underlineGradient;
+        ctx.fillRect(canvas.width/2 - titleWidth/2, infoY + 50, titleWidth, 2);
+    }
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -303,17 +343,16 @@ function generateSuspectCard(data) {
         ctx.fill();
         
         // Text settings
-        ctx.font = 'bold 28px Arial';
+        ctx.font = 'bold 24px Arial'; // Further reduced font size for better layout
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'right';
         
         // Draw text info
-        const startY = infoY + 120; // زيادة المسافة بعد العنوان
-        const lineHeight = 65; // زيادة المسافة بين الأسطر
+        const startY = infoY + 90; // Reduced space after header for more compact layout
         
-        // Reduced line height for more compact layout
-        const oldLineHeight = 50; // Smaller line height for original fields
-        const newLineHeight = 40; // Even smaller line height for new fields
+        // Optimized line heights for better layout
+        const oldLineHeight = 42; // More compact spacing for original fields
+        const newLineHeight = 38; // Compact spacing for new fields
         
         // Draw original fields (top section) - more compact
         drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, 80);
@@ -341,46 +380,50 @@ function generateSuspectCard(data) {
             conditionalFieldsY += oldLineHeight;
         }
         
-        // Draw separator line
-        ctx.fillStyle = '#888888';
+        // Draw separator line with improved styling
+        ctx.fillStyle = '#3498db';
         ctx.fillRect(80, conditionalFieldsY + 5, canvas.width - 160, 2);
         
-        // Draw new fields section title
-        ctx.font = 'bold 24px Arial'; // Smaller font for title
-        ctx.fillStyle = '#777777';
+        // Draw new fields section title with improved styling
+        ctx.font = 'bold 22px Arial'; // Smaller font for title
+        ctx.fillStyle = '#555555'; // Darker gray for better readability
         ctx.textAlign = 'center';
-        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 30); // Reduced spacing
+        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 25); // Further reduced spacing
         
-        // Draw new fields in horizontal layout with 3 columns to save space
-        const newFieldsY = conditionalFieldsY + 55; // Reduced spacing
-        const col1X = 80;
-        const col2X = canvas.width / 2 - 100;
-        const col3X = canvas.width - 380;
+        // Calculate optimal layout for new fields with better horizontal arrangement
+        const newFieldsY = conditionalFieldsY + 50; // Reduced spacing
+        const columnGap = 30; // Gap between columns
+        const leftColX = 80;
+        const rightColX = canvas.width / 2 - 50; // Better positioned right column
         
-        // Draw new fields horizontally
-        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, col1X, '#777777');
-        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY, col2X, '#777777');
-        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY + newLineHeight, col1X, '#777777');
-        drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, col2X, '#777777');
+        // Draw new fields in improved horizontal layout
+        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, leftColX, '#777777');
+        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY, rightColX, '#777777');
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY + newLineHeight, leftColX, '#777777');
+        drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, rightColX, '#777777');
         
-        // Add footer with timestamp - gradient background (adjusted for smaller canvas)
+        // Add footer with elegant gradient background (adjusted for smaller canvas)
         const footerY = newFieldsY + newLineHeight + 50; // Position footer based on content, not canvas height
         const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
-        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
-        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
+        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.95)');
+        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.95)');
         ctx.fillStyle = footerGradient;
         roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
         
-        // Add decorative line above footer
-        ctx.fillStyle = '#f39c12';
+        // Add decorative line above footer with gradient
+        const lineGradient = ctx.createLinearGradient(50, 0, canvas.width - 100, 0);
+        lineGradient.addColorStop(0, '#f39c12');
+        lineGradient.addColorStop(0.5, '#f1c40f');
+        lineGradient.addColorStop(1, '#f39c12');
+        ctx.fillStyle = lineGradient;
         ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
         
-        // Add timestamp with shadow effect (adjusted for new footer position)
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 3;
+        // Add timestamp with enhanced shadow effect
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 4;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
-        ctx.font = 'italic 22px Arial'; // Slightly smaller font
+        ctx.font = 'bold italic 22px Arial'; // Bold italic for more elegant look
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 30);
@@ -393,35 +436,55 @@ function generateSuspectCard(data) {
     function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
         // Define info box dimensions based on the info section and whether it's old or new info
         const isNewInfo = labelColor === '#777777';
-        const boxHeight = isNewInfo ? 35 : 40; // Smaller height for new info
-        const boxWidth = canvas.width / 2 - 60; // Adjusted for the two-column layout
-        const fontSize = isNewInfo ? 20 : 22; // Smaller font for new info
-        const labelWidth = isNewInfo ? 160 : 180; // Smaller label width for new info
         
-        // Draw label box with semi-transparent background (blue or gray)
-        const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
+        // Optimized dimensions for better appearance
+        const boxHeight = isNewInfo ? 36 : 42; // Balanced height for better proportions
+        const boxWidth = canvas.width / 2 - 70; // Slightly narrower for better alignment
+        const fontSize = isNewInfo ? 18 : 20; // Reduced font sizes for cleaner look
+        const labelWidth = isNewInfo ? 150 : 170; // Adjusted label width for better proportions
+        const borderRadius = isNewInfo ? 6 : 8; // Smaller radius for new info boxes
+        
+        // Enhanced colors for better contrast
+        const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.15)' : 'rgba(52, 152, 219, 0.15)';
         ctx.fillStyle = labelBgColor;
-        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, 
+                 {tl: borderRadius, bl: borderRadius, tr: 0, br: 0}, true, false);
         
-        // Draw value box with white or light gray background
-        ctx.fillStyle = isNewInfo ? '#f5f5f5' : '#ffffff';
-        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
+        // Draw value box with enhanced background
+        ctx.fillStyle = isNewInfo ? '#f8f8f8' : '#ffffff';
+        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, 
+                 {tl: 0, bl: 0, tr: borderRadius, br: borderRadius}, true, false);
         
-        // Add decorative separator
-        ctx.fillStyle = isNewInfo ? '#777777' : '#3498db';
-        ctx.fillRect(boxX + labelWidth - 3, y - boxHeight/2, 3, boxHeight);
+        // Add decorative separator with subtle gradient
+        const sepColor = isNewInfo ? '#777777' : '#3498db';
+        ctx.fillStyle = sepColor;
+        ctx.fillRect(boxX + labelWidth - 2, y - boxHeight/2, 2, boxHeight);
         
-        // Draw label
+        // Draw label with improved text positioning
         ctx.font = `bold ${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#555555' : '#2c3e50';
         ctx.textAlign = 'center';
         ctx.fillText(label, boxX + labelWidth/2, y);
         
-        // Draw value
+        // Draw value with improved text positioning
         ctx.font = `${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#666666' : '#34495e';
         ctx.textAlign = 'right';
-        ctx.fillText(value, boxX + boxWidth - 15, y);
+        
+        // Handle long text with ellipsis if needed
+        const maxValueWidth = boxWidth - labelWidth - 25;
+        let displayValue = value;
+        ctx.font = `${fontSize}px Arial`; // Set font before measuring
+        if (ctx.measureText(value).width > maxValueWidth) {
+            // Truncate text and add ellipsis
+            let truncated = value;
+            while (ctx.measureText(truncated + '...').width > maxValueWidth && truncated.length > 0) {
+                truncated = truncated.slice(0, -1);
+            }
+            displayValue = truncated + '...';
+        }
+        
+        ctx.fillText(displayValue, boxX + boxWidth - 12, y);
         
         // Reset text alignment for other text
         ctx.textAlign = 'right';
@@ -527,23 +590,23 @@ function saveImageToDevice() {
         
         // Use suspect name in the filename if available
         const suspectName = currentSuspectData.fullname || 'suspect';
-        const fileName = 'بطاقة_' + suspectName + '_' + new Date().getTime() + '.png';
-        tempLink.download = fileName;
-        
-        // Explicitly set attributes for better compatibility
-        tempLink.setAttribute('download', fileName);
-        tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
-        tempLink.setAttribute('target', '_blank');
-        
-        // Append to body, click, and remove
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        
-        // Add a small delay before removing the link
-        setTimeout(() => {
-            document.body.removeChild(tempLink);
-            alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
-        }, 100);
+         const fileName = 'بطاقة_' + suspectName + '_' + new Date().getTime() + '.png';
+         tempLink.download = fileName;
+         
+         // Explicitly set attributes for better compatibility
+         tempLink.setAttribute('download', fileName);
+         tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
+         tempLink.setAttribute('target', '_blank');
+         
+         // Append to body, click, and remove
+         document.body.appendChild(tempLink);
+         tempLink.click();
+         
+         // Add a small delay before removing the link
+         setTimeout(() => {
+             document.body.removeChild(tempLink);
+             alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
+         }, 100);
     } catch (error) {
         console.error('Error saving image:', error);
         alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
