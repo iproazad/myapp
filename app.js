@@ -369,20 +369,23 @@ function generateSuspectCard(data) {
     
     // Function to draw the photo with frame and decorations
     function drawPhoto() {
-        // Draw photo background with gradient
-        const photoBgGradient = ctx.createLinearGradient(photoX, photoY, photoX + photoWidth, photoY);
+        // Draw photo background with enhanced gradient
+        const photoBgGradient = ctx.createLinearGradient(photoX, photoY, photoX + photoWidth, photoY + photoHeight);
         photoBgGradient.addColorStop(0, '#f5f9ff');
-        photoBgGradient.addColorStop(1, '#e8f4ff');
+        photoBgGradient.addColorStop(1, '#e1f0ff');
         ctx.fillStyle = photoBgGradient;
         roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 12, true, false);
         
-        // Add elegant photo frame
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 2.5;
+        // Add elegant photo frame with gradient
+        const frameGradient = ctx.createLinearGradient(photoX, photoY, photoX, photoY + photoHeight);
+        frameGradient.addColorStop(0, '#3498db');
+        frameGradient.addColorStop(1, '#2980b9');
+        ctx.strokeStyle = frameGradient;
+        ctx.lineWidth = 3;
         roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 12, false, true);
         
         // Add decorative elements around photo (corners)
-        const cornerSize = 7;
+        const cornerSize = 8;
         const cornerPositions = [
             {x: photoX - 3, y: photoY - 3}, // Top left
             {x: photoX + photoWidth + 3, y: photoY - 3}, // Top right
@@ -391,16 +394,32 @@ function generateSuspectCard(data) {
         ];
         
         cornerPositions.forEach(pos => {
+            // Add glow effect
+            ctx.shadowColor = 'rgba(243, 156, 18, 0.5)';
+            ctx.shadowBlur = 5;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
             ctx.fillStyle = '#f39c12';
             ctx.beginPath();
             ctx.arc(pos.x, pos.y, cornerSize, 0, Math.PI * 2, true);
             ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
         });
         
-        // Add decorative inner border
-        ctx.strokeStyle = 'rgba(52, 152, 219, 0.2)';
-        ctx.lineWidth = 1;
+        // Add decorative inner border with pattern
+        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+        ctx.lineWidth = 2;
         roundRect(ctx, photoX + 8, photoY + 8, photoWidth - 16, photoHeight - 16, 8, false, true);
+        
+        // Add subtle pattern inside photo area
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        for (let i = 0; i < photoWidth - 16; i += 20) {
+            ctx.fillRect(photoX + 8 + i, photoY + 8, 10, photoHeight - 16);
+        }
         
         // Add photo or placeholder
         if (data.photo) {
@@ -1063,7 +1082,6 @@ function generateSuspectCard(data) {
     function drawTextLine(label, value, y) {
         drawInfoBox(label, value, y);
     }
-}
 
 // Format date to show only year for birthdate
 function formatDate(dateString) {
