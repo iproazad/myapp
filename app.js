@@ -44,10 +44,8 @@ function initApp() {
     suspectForm.addEventListener('submit', (event) => {
         event.preventDefault();
         saveSuspectData();
-        // حفظ الصورة تلقائياً عند النقر على زر "خەزنكرنا كارتێ"
-        setTimeout(() => {
-            saveImageToDevice();
-        }, 500); // تأخير قليل للتأكد من إنشاء الصورة أولاً
+        // لا نحتاج إلى استخدام setTimeout لأن generateSuspectCard الآن يستخدم Promise
+        // وسيتم استدعاء saveImageToDevice فقط بعد اكتمال إنشاء الصورة
     });
 
     // Modal actions
@@ -74,12 +72,6 @@ function saveSuspectData() {
         imprisonment: document.getElementById('imprisonment').value,
         phone: document.getElementById('phone').value,
         sentTo: document.getElementById('sent-to').value,
-        // New fields
-        time: document.getElementById('time').value,
-        dayNight: document.querySelector('input[name="day-night"]:checked')?.value || '',
-        issueLocation: document.getElementById('issue-location').value,
-        driverName: document.getElementById('driver-name').value,
-        driverPoint: document.getElementById('driver-point').value,
         timestamp: new Date().toLocaleString('en-US')
     };
 
@@ -95,177 +87,213 @@ function saveSuspectData() {
     localStorage.setItem('suspectEntries', JSON.stringify(savedEntries));
 
     // Generate card image
-    generateSuspectCard(currentSuspectData);
-
-    // Show success modal
-    successModal.style.display = 'flex';
+    generateSuspectCard(currentSuspectData)
+        .then(() => {
+            // حفظ الصورة تلقائياً بعد إنشاء الكارت
+            saveImageToDevice();
+            // Show success modal
+            successModal.style.display = 'flex';
+        })
+        .catch(error => {
+            console.error('Error generating card:', error);
+            alert('هەلەك چێبوو دەمێ دروستكرنا كارتێ. تكایە دووبارە هەول بدە.');
+        });
 }
 
 // Generate suspect info card as an image
 function generateSuspectCard(data) {
-    // Create a virtual canvas to generate the card image
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Set canvas dimensions
-    canvas.width = 1500;
-    canvas.height = 1300; // Increased height to accommodate additional cards
-    
-    // Create gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#f5f7fa');
-    gradient.addColorStop(1, '#e4e8f0');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Add rounded rectangle background with subtle gradient
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    bgGradient.addColorStop(0, '#ffffff');
-    bgGradient.addColorStop(1, '#f8f9fa');
-    ctx.fillStyle = bgGradient;
-    roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 15, true, false);
-    
-    // Add double border effect
-    ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
-    ctx.lineWidth = 5;
-    roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 15, false, true);
-    
-    ctx.strokeStyle = '#3498db';
-    ctx.lineWidth = 2;
-    roundRect(ctx, 25, 25, canvas.width - 50, canvas.height - 50, 12, false, true);
-    
-    // Add header with gradient
-    const headerGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-    headerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
-    headerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
-    ctx.fillStyle = headerGradient;
-    roundRect(ctx, 25, 25, canvas.width - 50, 100, {tl: 12, tr: 12, bl: 0, br: 0}, true, false);
-    
-    // Add decorative pattern to header
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    for (let i = 0; i < canvas.width; i += 40) {
-        ctx.fillRect(i, 25, 20, 100);
-    }
-    
-    // Add decorative line under header
-    ctx.fillStyle = '#f39c12';
-    ctx.fillRect(50, 130, canvas.width - 100, 3);
-    
-    // Add title with shadow
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-    ctx.shadowBlur = 5;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.font = 'bold 42px Arial';
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.fillText('كارتا زانیاریێن تومەتباری', canvas.width / 2, 80);
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    
-    // Add photo if available
-    if (data.photo) {
-        const img = new Image();
-        img.src = data.photo;
-        
-        // Draw rectangular photo background and frame
-        const photoX = canvas.width - 470; // Position on the right side
-        const photoY = 180;
-        const photoWidth = 420;
-        const photoHeight = 600; // زيادة طول الصورة العمودية
-        
-        // Draw photo background
-        ctx.fillStyle = '#ffffff';
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
-        
-        // Add photo frame
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 5;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
-        
-        // Add decorative elements around photo (corners)
-        const cornerPositions = [
-            {x: photoX - 5, y: photoY - 5}, // Top left
-            {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
-            {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
-            {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
-        ];
-        
-        cornerPositions.forEach(pos => {
-            ctx.fillStyle = '#f39c12';
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
-            ctx.fill();
-        });
-        
-        // Draw rectangular photo
-        ctx.save();
-        ctx.beginPath();
-        roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
-        ctx.clip();
-        
-        // Wait for image to load
-        img.onload = function() {
-            ctx.drawImage(img, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
-            ctx.restore();
+    return new Promise((resolve, reject) => {
+        try {
+            // Create a virtual canvas to generate the card image
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
             
-            // Continue with drawing text after image loads
-            drawSuspectInfo();
+            // Set canvas dimensions
+            canvas.width = 1500;
+            canvas.height = 1000;
             
-            // Save the final image
-            currentSuspectData.cardImage = canvas.toDataURL('image/png');
-        };
-    } else {
-        // Define photo dimensions for consistency
-        const photoX = canvas.width - 470; // Position on the right side
-        const photoY = 180;
-        const photoWidth = 420;
-        const photoHeight = 600; // زيادة طول الصورة العمودية
-        
-        // No photo, draw a placeholder
-        ctx.fillStyle = '#ecf0f1';
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
-        
-        // Add photo frame
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 5;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
-        
-        // Add decorative elements around photo (corners)
-        const cornerPositions = [
-            {x: photoX - 5, y: photoY - 5}, // Top left
-            {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
-            {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
-            {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
-        ];
-        
-        cornerPositions.forEach(pos => {
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#f5f7fa');
+            gradient.addColorStop(1, '#e4e8f0');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add rounded rectangle background with subtle gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#ffffff');
+            bgGradient.addColorStop(1, '#f8f9fa');
+            ctx.fillStyle = bgGradient;
+            roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 15, true, false);
+            
+            // Add double border effect
+            ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+            ctx.lineWidth = 5;
+            roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 15, false, true);
+            
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 2;
+            roundRect(ctx, 25, 25, canvas.width - 50, canvas.height - 50, 12, false, true);
+            
+            // Add header with gradient
+            const headerGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            headerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
+            headerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
+            ctx.fillStyle = headerGradient;
+            roundRect(ctx, 25, 25, canvas.width - 50, 100, {tl: 12, tr: 12, bl: 0, br: 0}, true, false);
+            
+            // Add decorative pattern to header
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.fillRect(i, 25, 20, 100);
+            }
+            
+            // Add decorative line under header
             ctx.fillStyle = '#f39c12';
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
-            ctx.fill();
-        });
-        
-        // Draw user icon
-        ctx.fillStyle = '#bdc3c7';
-        // Draw a simple user icon in the center of the photo area
-        const iconX = photoX + photoWidth / 2;
-        const iconY = photoY + photoHeight / 2 - 20;
-        
-        // Head
-        ctx.beginPath();
-        ctx.arc(iconX, iconY, 50, 0, Math.PI * 2, true);
-        ctx.fill();
-        // Body
-        ctx.beginPath();
-        ctx.arc(iconX, iconY + 100, 70, Math.PI, 0, true);
-        ctx.fill();
-        
-        // Continue with drawing text
-        drawSuspectInfo();
-        currentSuspectData.cardImage = canvas.toDataURL('image/png');
+            ctx.fillRect(50, 130, canvas.width - 100, 3);
+            
+            // Add title with shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 5;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.font = 'bold 42px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.fillText('كارتا زانیاریێن تومەتباری', canvas.width / 2, 80);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Add photo if available
+            if (data.photo) {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous'; // Try to avoid CORS issues
+                img.src = data.photo;
+                
+                // Draw rectangular photo background and frame
+                const photoX = canvas.width - 470; // Position on the right side
+                const photoY = 180;
+                const photoWidth = 420;
+                const photoHeight = 600; // زيادة طول الصورة العمودية
+                
+                // Draw photo background
+                ctx.fillStyle = '#ffffff';
+                roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
+                
+                // Add photo frame
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 5;
+                roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+                
+                // Add decorative elements around photo (corners)
+                const cornerPositions = [
+                    {x: photoX - 5, y: photoY - 5}, // Top left
+                    {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
+                    {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
+                    {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
+                ];
+                
+                cornerPositions.forEach(pos => {
+                    ctx.fillStyle = '#f39c12';
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
+                    ctx.fill();
+                });
+                
+                // Draw rectangular photo
+                ctx.save();
+                ctx.beginPath();
+                roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
+                ctx.clip();
+                
+                // Wait for image to load
+                img.onload = function() {
+                    try {
+                        ctx.drawImage(img, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
+                        ctx.restore();
+                        
+                        // Continue with drawing text after image loads
+                        drawSuspectInfo();
+                        
+                        // Save the final image
+                        currentSuspectData.cardImage = canvas.toDataURL('image/png');
+                        resolve();
+                    } catch (err) {
+                        console.error('Error drawing image:', err);
+                        ctx.restore(); // Make sure to restore context even if there's an error
+                        drawSuspectInfo();
+                        currentSuspectData.cardImage = canvas.toDataURL('image/png');
+                        resolve();
+                    }
+                };
+                
+                img.onerror = function() {
+                    console.error('Error loading image');
+                    ctx.restore(); // Make sure to restore context even if there's an error
+                    drawSuspectInfo();
+                    currentSuspectData.cardImage = canvas.toDataURL('image/png');
+                    resolve();
+                };
+            }
+            } else {
+                // Define photo dimensions for consistency
+                const photoX = canvas.width - 470; // Position on the right side
+                const photoY = 180;
+                const photoWidth = 420;
+                const photoHeight = 600; // زيادة طول الصورة العمودية
+                
+                // No photo, draw a placeholder
+                ctx.fillStyle = '#ecf0f1';
+                roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
+                
+                // Add photo frame
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 5;
+                roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+                
+                // Add decorative elements around photo (corners)
+                const cornerPositions = [
+                    {x: photoX - 5, y: photoY - 5}, // Top left
+                    {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
+                    {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
+                    {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
+                ];
+                
+                cornerPositions.forEach(pos => {
+                    ctx.fillStyle = '#f39c12';
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
+                    ctx.fill();
+                });
+                
+                // Draw user icon
+                ctx.fillStyle = '#bdc3c7';
+                // Draw a simple user icon in the center of the photo area
+                const iconX = photoX + photoWidth / 2;
+                const iconY = photoY + photoHeight / 2 - 20;
+                
+                // Head
+                ctx.beginPath();
+                ctx.arc(iconX, iconY, 50, 0, Math.PI * 2, true);
+                ctx.fill();
+                // Body
+                ctx.beginPath();
+                ctx.arc(iconX, iconY + 100, 70, Math.PI, 0, true);
+                ctx.fill();
+                
+                // Continue with drawing text
+                drawSuspectInfo();
+                currentSuspectData.cardImage = canvas.toDataURL('image/png');
+                resolve();
+            }
+        } catch (error) {
+            console.error('Error generating card:', error);
+            reject(error);
+        }
     }
     
     function drawSuspectInfo() {
@@ -273,7 +301,7 @@ function generateSuspectCard(data) {
         const infoX = 50;
         const infoY = 180;
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 350; // Reduced height for first card
+        const infoHeight = 700;
         
         // Draw info section background with semi-transparent blue
         ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
@@ -317,122 +345,35 @@ function generateSuspectCard(data) {
         drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight); // Display year directly
         drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
         drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
-        
-        // Second info card for additional information
-        const info2Y = infoY + infoHeight + 30; // Position below first card with spacing
-        const info2Height = 350; // Height for second card
-        
-        // Draw second info section background with semi-transparent blue
-        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
-        roundRect(ctx, infoX, info2Y, infoWidth, info2Height, 10, true, false);
-        
-        // Add border to second info section
-        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
-        ctx.lineWidth = 2;
-        roundRect(ctx, infoX, info2Y, infoWidth, info2Height, 10, false, true);
-        
-        // Add section title background for second card
-        const title2Gradient = ctx.createLinearGradient(infoX, info2Y, infoX + infoWidth, info2Y);
-        title2Gradient.addColorStop(0, '#f39c12'); // Different color for second card
-        title2Gradient.addColorStop(1, '#e67e22');
-        ctx.fillStyle = title2Gradient;
-        roundRect(ctx, infoX, info2Y, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
-        
-        // Add section title for second card
-        ctx.font = 'bold 32px Arial';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText('معلومات إضافية', infoX + infoWidth / 2, info2Y + 40);
-        
-        // Add decorative elements for second card
-        ctx.fillStyle = '#3498db';
-        ctx.beginPath();
-        ctx.arc(infoX + infoWidth / 2, info2Y + 70, 5, 0, Math.PI * 2, true);
-        ctx.fill();
-        
-        // Draw text info for second card
-        const start2Y = info2Y + 120;
-        
-        // Draw new fields in second card
-        let timeValue = data.time;
-        if (data.dayNight) {
-            timeValue += ' - ' + data.dayNight;
-        }
-        drawInfoBox('دەمژمێر:', timeValue, start2Y);
-        drawInfoBox('جهێ ئاریشێ:', data.issueLocation, start2Y + lineHeight);
-        
-        let driverInfo = data.driverName;
-        if (data.driverPoint) {
-            driverInfo += ' - خالا: ' + data.driverPoint;
-        }
-        drawInfoBox('ناڤێ شوفێری:', driverInfo, start2Y + lineHeight * 2);
-        
-        // Draw remaining fields from first card in second card
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, start2Y + lineHeight * 3);
-        drawInfoBox('كارێ وی:', data.job, start2Y + lineHeight * 4);
-        
-        // Third info card for remaining information if needed
-        const info3Y = info2Y + info2Height + 30; // Position below second card with spacing
-        const info3Height = 200; // Height for third card
-        
-        // Draw third info section background with semi-transparent blue
-        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
-        roundRect(ctx, infoX, info3Y, infoWidth, info3Height, 10, true, false);
-        
-        // Add border to third info section
-        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
-        ctx.lineWidth = 2;
-        roundRect(ctx, infoX, info3Y, infoWidth, info3Height, 10, false, true);
-        
-        // Add section title background for third card
-        const title3Gradient = ctx.createLinearGradient(infoX, info3Y, infoX + infoWidth, info3Y);
-        title3Gradient.addColorStop(0, '#27ae60'); // Different color for third card
-        title3Gradient.addColorStop(1, '#2ecc71');
-        ctx.fillStyle = title3Gradient;
-        roundRect(ctx, infoX, info3Y, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
-        
-        // Add section title for third card
-        ctx.font = 'bold 32px Arial';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText('معلومات أخرى', infoX + infoWidth / 2, info3Y + 40);
-        
-        // Add decorative elements for third card
-        ctx.fillStyle = '#f39c12';
-        ctx.beginPath();
-        ctx.arc(infoX + infoWidth / 2, info3Y + 70, 5, 0, Math.PI * 2, true);
-        ctx.fill();
-        
-        // Draw text info for third card
-        const start3Y = info3Y + 120;
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
+        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
         
         let additionalFields = 0;
         
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, start3Y);
+            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
             additionalFields++;
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, start3Y + lineHeight * additionalFields);
+            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
             additionalFields++;
         }
         
         if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, start3Y + lineHeight * additionalFields);
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
         }
         
         // Add footer with timestamp - gradient background
-        const footerY = Math.max(info3Y + info3Height + 30, photoY + photoHeight + 30);
-        const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
+        const footerGradient = ctx.createLinearGradient(0, canvas.height - 80, canvas.width, canvas.height - 80);
         footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
         footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
         ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
+        roundRect(ctx, 20, canvas.height - 80, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
         
         // Add decorative line above footer
         ctx.fillStyle = '#f39c12';
-        ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
+        ctx.fillRect(50, canvas.height - 85, canvas.width - 100, 2);
         
         // Add timestamp with shadow effect
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
@@ -442,7 +383,7 @@ function generateSuspectCard(data) {
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 40);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
@@ -576,6 +517,13 @@ function shareViaWhatsapp() {
 // Function to save image to device
 function saveImageToDevice() {
     try {
+        // Check if card image exists
+        if (!currentSuspectData.cardImage) {
+            console.error('Card image not found');
+            alert('هەلەك چێبوو: وێنەی كارتێ نەهاتە دیتن. تكایە دووبارە هەول بدە.');
+            return;
+        }
+        
         // Create a temporary link to download the image
         const tempLink = document.createElement('a');
         tempLink.href = currentSuspectData.cardImage;
@@ -588,7 +536,6 @@ function saveImageToDevice() {
         // Explicitly set attributes for better compatibility
         tempLink.setAttribute('download', fileName);
         tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
-        tempLink.setAttribute('target', '_blank');
         
         // Append to body, click, and remove
         document.body.appendChild(tempLink);
@@ -598,7 +545,7 @@ function saveImageToDevice() {
         setTimeout(() => {
             document.body.removeChild(tempLink);
             alert('تم حفظ البطاقة تلقائياً في مجلد التنزيلات بصيغة PNG');
-        }, 100);
+        }, 300); // زيادة وقت الانتظار
     } catch (error) {
         console.error('Error saving image:', error);
         alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
