@@ -108,7 +108,7 @@ function generateSuspectCard(data) {
     
     // Set canvas dimensions - increased height for new fields
     canvas.width = 1500;
-    canvas.height = 1300;
+    canvas.height = 1000; // Reverted to original height as we're using horizontal layout
     
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -272,7 +272,7 @@ function generateSuspectCard(data) {
         const infoX = 50;
         const infoY = 180;
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 1000; // Increased height for new fields
+        const infoHeight = 700; // Reverted to original height as we're using horizontal layout
         
         // Draw info section background with semi-transparent blue
         ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
@@ -311,38 +311,39 @@ function generateSuspectCard(data) {
         const startY = infoY + 120; // زيادة المسافة بعد العنوان
         const lineHeight = 65; // زيادة المسافة بين الأسطر
         
-        // Draw info boxes with labels and values
-        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
-        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight); // Display year directly
-        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
-        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
-        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
-        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
+        // Draw info boxes with labels and values - Left column (original fields)
+        const leftColumnX = 80;
+        const rightColumnX = canvas.width / 2 + 20;
         
-        // Draw separator line
-        ctx.fillStyle = '#f39c12';
-        ctx.fillRect(80, startY + lineHeight * 6, canvas.width - 600, 2);
+        // Left column - original fields
+        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, leftColumnX);
+        drawInfoBox('ژدایـــكبون:', data.birthdate, startY + lineHeight, leftColumnX); // Display year directly
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2, leftColumnX);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3, leftColumnX);
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4, leftColumnX);
+        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5, leftColumnX);
         
-        // Draw new fields
-        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, startY + lineHeight * 6.5);
-        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, startY + lineHeight * 7.5);
-        drawInfoBox('ناڤێ شوفێری:', data.driverName, startY + lineHeight * 8.5);
-        drawInfoBox('خالا:', data.point, startY + lineHeight * 9.5);
+        // Right column - new fields
+        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, startY, rightColumnX);
+        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, startY + lineHeight, rightColumnX);
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, startY + lineHeight * 2, rightColumnX);
+        drawInfoBox('خالا:', data.point, startY + lineHeight * 3, rightColumnX);
         
-        let additionalFields = 0;
+        // Additional fields below in left column
+        let additionalFieldsY = startY + lineHeight * 6;
         
         if (data.imprisonment) {
-            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (10.5 + additionalFields));
-            additionalFields++;
+            drawInfoBox('زیندانكرن:', data.imprisonment, additionalFieldsY, leftColumnX);
+            additionalFieldsY += lineHeight;
         }
         
         if (data.phone) {
-            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (10.5 + additionalFields));
-            additionalFields++;
+            drawInfoBox('ژمارا موبایلی:', data.phone, additionalFieldsY, leftColumnX);
+            additionalFieldsY += lineHeight;
         }
         
         if (data.sentTo) {
-            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (10.5 + additionalFields));
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, additionalFieldsY, leftColumnX);
         }
         
         // Add footer with timestamp - gradient background
@@ -371,31 +372,30 @@ function generateSuspectCard(data) {
         ctx.shadowOffsetY = 0;
     }
     
-    function drawInfoBox(label, value, y) {
+    function drawInfoBox(label, value, y, boxX = 80) {
         // Define info box dimensions based on the info section
-        const boxX = 80;
-        const boxWidth = canvas.width - 600; // Adjusted for the new layout
+        const boxWidth = canvas.width / 2 - 60; // Adjusted for the two-column layout
         
         // Draw label box with semi-transparent blue background
         ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
-        roundRect(ctx, boxX, y - 30, 220, 45, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
+        roundRect(ctx, boxX, y - 30, 180, 45, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
         
         // Draw value box with white background
         ctx.fillStyle = '#ffffff';
-        roundRect(ctx, boxX + 220, y - 30, boxWidth - 220, 45, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
+        roundRect(ctx, boxX + 180, y - 30, boxWidth - 180, 45, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
         
         // Add decorative separator
         ctx.fillStyle = '#3498db';
-        ctx.fillRect(boxX + 220 - 3, y - 30, 3, 45);
+        ctx.fillRect(boxX + 180 - 3, y - 30, 3, 45);
         
         // Draw label
-        ctx.font = 'bold 26px Arial';
+        ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.fillText(label, boxX + 110, y);
+        ctx.fillText(label, boxX + 90, y);
         
         // Draw value
-        ctx.font = '26px Arial';
+        ctx.font = '24px Arial';
         ctx.fillStyle = '#34495e';
         ctx.textAlign = 'right';
         ctx.fillText(value, boxX + boxWidth - 20, y);

@@ -98,53 +98,83 @@
                         <input type="text" id="imprisonment" name="imprisonment">
                     </div>
 
-                    <div class="form-group time-input-container">
-                        <label for="time">دەمژمێر (الوقت)</label>
-                        <input type="text" id="time" name="time" placeholder="مثال: 2:00 الى 3:00" required>
-                        <div class="time-options">
-                            <label class="radio-label">
-                                <input type="radio" name="day-night" value="روژ" checked> روژ (نهار)
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="day-night" value="شەڤ"> شەڤ (ليل)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="problem-location">جهێ ئاریشێ (مكان المشكلة)</label>
-                        <input type="text" id="problem-location" name="problem-location" required>
-                    </div>
-
-                    <div class="driver-point-group">
-                        <div class="form-group driver-input">
-                            <label for="driver-name">ناڤێ شوفێری (اسم السائق)</label>
-                            <input type="text" id="driver-name" name="driver-name" required>
-                        </div>
-
-                        <div class="form-group point-input">
-                            <label for="point">خالا (النقطة)</label>
-                            <select id="point" name="point" required>
-                                <option value="" disabled selected>اختر النقطة</option>
-                                <option value="100">100</option>
-                                <option value="101">101</option>
-                                <option value="102">102</option>
-                                <option value="103">103</option>
-                                <option value="105">105</option>
-                                <option value="106">106</option>
-                                <option value="107">107</option>
-                                <option value="108">108</option>
-                                <option value="109">109</option>
-                                <option value="110">110</option>
-                                <option value="111">111</option>
-                                <option value="112">112</option>
-                            </select>
-                        </div>
-                    </div>
-
                     <div class="form-group">
                         <label for="phone">ژمارا موبایلی</label>
                         <input type="tel" id="phone" name="phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sent-to">رەوانەكرن بـــو</label>
+                        <select id="sent-to" name="sent-to">
+                            <option value="" disabled selected>اختر الجهة</option>
+                            <option value="بنگەهێ پولیسێن كارێز">بنگەهێ پولیسێن كارێز</option>
+                            <option value="بنگەهێ پولیسێن زاخو">بنگەهێ پولیسێن زاخو</option>
+                            <option value="بنگەهێ پولیسێن سێمالكا">بنگەهێ پولیسێن سێمالكا</option>
+                            <option value="بنگەهێ پولیسێن دەلال">بنگەهێ پولیسێن دەلال</option>
+                            <option value="بنگەهێ پولیسێن بێدارێ">بنگەهێ پولیسێن بێدارێ</option>
+                            <option value="بنگەهێ پولیسێن نیو زاخو">بنگەهێ پولیسێن نیو زاخو</option>
+                            <option value="بنگەهێ پولیسێن رزگاری">بنگەهێ پولیسێن رزگاری</option>
+                            <option value="رێڤەبەریا پولیسێن زاخو">رێڤەبەریا پولیسێن زاخو</option>
+                            <option value="توندوتیژیا زاخو">توندوتیژیا زاخو</option>
+                            <option value="نەخوشخانا زاخو">نەخوشخانا زاخو</option>
+                            <option value="دەستێ سەمیانا">دەستێ سەمیانا</option>
+                            <option value="مكافحا زاخو">مكافحا زاخو</option>
+                            <option value="مكافحا بێدارێ">مكافحا بێدارێ</option>
+                            <option value="ئاسايشا زاخو">ئاسايشا زاخو</option>
+                            <option value="ئاگرڤەمراندنا زاخو">ئاگرڤەمراندنا زاخو</option>
+                            <option value="گرتیخانا زاخو">گرتیخانا زاخو</option>
+                            <option value="هاتوچووا زاخو">هاتوچووا زاخو</option>
+                        </select>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <div class="new-fields-section">
+                        <h3 class="section-title">معلومات إضافية</h3>
+
+                        <div class="form-group time-input-container">
+                            <label for="time">دەمژمێر (الوقت)</label>
+                            <input type="text" id="time" name="time" placeholder="مثال: 2:00 الى 3:00" required>
+                            <div class="time-options">
+                                <label class="radio-label">
+                                    <input type="radio" name="day-night" value="روژ" checked> روژ (نهار)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="day-night" value="شەڤ"> شەڤ (ليل)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="problem-location">جهێ ئاریشێ (مكان المشكلة)</label>
+                            <input type="text" id="problem-location" name="problem-location" required>
+                        </div>
+
+                        <div class="driver-point-group">
+                            <div class="form-group driver-input">
+                                <label for="driver-name">ناڤێ شوفێری (اسم السائق)</label>
+                                <input type="text" id="driver-name" name="driver-name" required>
+                            </div>
+
+                            <div class="form-group point-input">
+                                <label for="point">خالا (النقطة)</label>
+                                <select id="point" name="point" required>
+                                    <option value="" disabled selected>اختر النقطة</option>
+                                    <option value="100">100</option>
+                                    <option value="101">101</option>
+                                    <option value="102">102</option>
+                                    <option value="103">103</option>
+                                    <option value="105">105</option>
+                                    <option value="106">106</option>
+                                    <option value="107">107</option>
+                                    <option value="108">108</option>
+                                    <option value="109">109</option>
+                                    <option value="110">110</option>
+                                    <option value="111">111</option>
+                                    <option value="112">112</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">

@@ -150,6 +150,30 @@ select {
     font-size: 1.1rem;
 }
 
+/* Section Divider */
+.section-divider {
+    margin: 25px 0;
+    border: 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.new-fields-section {
+    background-color: #f5f9fc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.section-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    text-align: center;
+    font-weight: 600;
+}
+
 /* Time Input Styles */
 .time-input-container {
     margin-bottom: 25px;
