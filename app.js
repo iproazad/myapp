@@ -341,30 +341,20 @@ function generateSuspectCard(data) {
             conditionalFieldsY += oldLineHeight;
         }
         
-        // Draw separator line
-        ctx.fillStyle = '#888888';
-        ctx.fillRect(80, conditionalFieldsY + 5, canvas.width - 160, 2);
-        
-        // Draw new fields section title
-        ctx.font = 'bold 24px Arial'; // Smaller font for title
-        ctx.fillStyle = '#3498db'; // تغيير لون العنوان ليتناسق مع باقي العناوين
-        ctx.textAlign = 'center';
-        ctx.fillText('معلومات إضافية', canvas.width / 2, conditionalFieldsY + 20); // رفع العنوان للأعلى
-        
-        // تنظيم الحقول في شكل شبكة 2×2 لتكون أقصر أفقياً
-        const newFieldsY = conditionalFieldsY + 55; // Reduced spacing
+        // تنظيم الحقول الإضافية مباشرة بعد الحقول الأساسية دون فاصل
+        const newFieldsY = conditionalFieldsY + 10; // مسافة صغيرة بعد الحقول الأساسية
         const colWidth = (canvas.width - 160) / 2; // تقسيم العرض المتاح إلى عمودين متساويين
         const col1X = 80;
         const col2X = 80 + colWidth;
         
-        // رسم الحقول في شكل شبكة 2×2 مع تقليل العرض الأفقي
-        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, col1X, '#777777');
-        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY, col2X, '#777777');
-        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY + newLineHeight, col1X, '#777777');
-        drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, col2X, '#777777');
+        // رسم الحقول في شكل شبكة 2×2 بنفس أسلوب الحقول الأساسية
+        drawInfoBox('دەمژمێر:', data.time + ' - ' + data.dayNight, newFieldsY, col1X);
+        drawInfoBox('ناڤێ شوفێری:', data.driverName, newFieldsY, col2X);
+        drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY + newLineHeight, col1X);
+        drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, col2X);
         
         // Add footer with timestamp - gradient background (adjusted for smaller canvas)
-        const footerY = newFieldsY + newLineHeight + 30; // تقليل المسافة بين الحقول والتذييل
+        const footerY = newFieldsY + newLineHeight * 2 + 20; // تعديل موضع التذييل ليتناسب مع الحقول المدمجة
         const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
         footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
         footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
@@ -390,36 +380,35 @@ function generateSuspectCard(data) {
         ctx.shadowOffsetY = 0;
     }
     
-    function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db') {
-        // Define info box dimensions based on the info section and whether it's old or new info
-        const isNewInfo = labelColor === '#777777';
-        const boxHeight = isNewInfo ? 35 : 40; // Smaller height for new info
-        const boxWidth = (canvas.width - 160) / 2 - 20; // تقليل العرض لتناسب النافذة الصغيرة
-        const fontSize = isNewInfo ? 18 : 22; // تقليل حجم الخط للمعلومات الإضافية
-        const labelWidth = isNewInfo ? 120 : 180; // تقليل عرض مربع العنوان للمعلومات الإضافية
+    function drawInfoBox(label, value, y, boxX = 80) {
+        // توحيد قياسات جميع الحقول لتكون متناسقة
+        const boxHeight = 40; // توحيد ارتفاع جميع الحقول
+        const boxWidth = (canvas.width - 160) / 2 - 20; // عرض موحد لجميع الحقول
+        const fontSize = 20; // حجم خط موحد لجميع الحقول
+        const labelWidth = 150; // عرض موحد لمربع العنوان
         
-        // Draw label box with semi-transparent background (blue or gray)
-        const labelBgColor = isNewInfo ? 'rgba(119, 119, 119, 0.2)' : 'rgba(52, 152, 219, 0.2)';
+        // Draw label box with semi-transparent background (blue)
+        const labelBgColor = 'rgba(52, 152, 219, 0.2)';
         ctx.fillStyle = labelBgColor;
         roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
         
-        // Draw value box with white or light gray background
-        ctx.fillStyle = isNewInfo ? '#f5f5f5' : '#ffffff';
+        // Draw value box with white background
+        ctx.fillStyle = '#ffffff';
         roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
         
         // Add decorative separator
-        ctx.fillStyle = isNewInfo ? '#777777' : '#3498db';
+        ctx.fillStyle = '#3498db';
         ctx.fillRect(boxX + labelWidth - 3, y - boxHeight/2, 3, boxHeight);
         
         // Draw label
         ctx.font = `bold ${fontSize}px Arial`;
-        ctx.fillStyle = isNewInfo ? '#555555' : '#2c3e50';
+        ctx.fillStyle = '#2c3e50';
         ctx.textAlign = 'center';
-        ctx.fillText(label, boxX + labelWidth/2, y);
+        ctx.fillText(label, boxX + labelWidth/2, y + boxHeight/4);
         
         // Draw value with truncation for long text
         ctx.font = `${fontSize}px Arial`;
-        ctx.fillStyle = isNewInfo ? '#666666' : '#34495e';
+        ctx.fillStyle = '#34495e';
         ctx.textAlign = 'right';
         
         // قياس عرض النص للتأكد من أنه يناسب المساحة المتاحة
@@ -433,9 +422,9 @@ function generateSuspectCard(data) {
             while (ctx.measureText(truncatedValue + '...').width > valueWidth && truncatedValue.length > 0) {
                 truncatedValue = truncatedValue.slice(0, -1);
             }
-            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 10, y);
+            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 10, y + boxHeight/4);
         } else {
-            ctx.fillText(displayValue, boxX + boxWidth - 10, y);
+            ctx.fillText(displayValue, boxX + boxWidth - 10, y + boxHeight/4);
         }
         
         // Reset text alignment for other text
