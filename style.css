@@ -98,51 +98,6 @@ header h2 {
 }
 
 .primary-button i {
-    margin-left: 5px;
-}
-
-/* Orientation toggle styles */
-.orientation-toggle {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.orientation-toggle span {
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.toggle-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.toggle-button {
-    padding: 8px 15px;
-    border: 1px solid var(--border-color);
-    background-color: white;
-    border-radius: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s;
-}
-
-.toggle-button.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.toggle-button:hover:not(.active) {
-    background-color: #f0f0f0;
-}
-
-.toggle-button i {
     font-size: 1.2rem;
 }
 

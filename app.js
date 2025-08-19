@@ -15,8 +15,7 @@ const newEntryBtn = document.getElementById('new-entry');
 // Current suspect data
 let currentSuspectData = {
     photo: null,
-    timestamp: null,
-    orientation: 'portrait' // Default orientation is portrait
+    timestamp: null
 };
 
 // Initialize the application
@@ -52,22 +51,6 @@ function initApp() {
     shareWhatsappBtn.addEventListener('click', shareViaWhatsapp);
     saveToDeviceBtn.addEventListener('click', saveImageToDevice);
     newEntryBtn.addEventListener('click', resetForm);
-    
-    // Orientation toggle buttons
-    const portraitBtn = document.getElementById('portrait-orientation');
-    const landscapeBtn = document.getElementById('landscape-orientation');
-    
-    portraitBtn.addEventListener('click', () => {
-        setOrientation('portrait');
-        portraitBtn.classList.add('active');
-        landscapeBtn.classList.remove('active');
-    });
-    
-    landscapeBtn.addEventListener('click', () => {
-        setOrientation('landscape');
-        landscapeBtn.classList.add('active');
-        portraitBtn.classList.remove('active');
-    });
 
     // Check for camera support
     if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
@@ -122,7 +105,7 @@ function generateSuspectCard(data) {
     
     // Check if we need landscape orientation
     if (data.orientation === 'landscape') {
-        canvasWidth = 1200; // Increased width for landscape mode
+        canvasWidth = 1500; // Increased width for landscape mode (was 1200)
         canvasHeight = 800;
     }
     
@@ -249,123 +232,51 @@ function generateSuspectCard(data) {
     }
     
     function drawSuspectInfo() {
-        // Adjust layout based on orientation
-        let infoSectionY, infoSectionHeight, photoY;
-        let startY, lineHeight;
-        
-        if (data.orientation === 'landscape') {
-            // Landscape layout - photo on left, info on right
-            photoY = canvas.height / 2;
-            infoSectionY = 50;
-            infoSectionHeight = canvas.height - 100;
-            startY = 120;
-            lineHeight = 45;
-            
-            // Draw info section background - takes right side of canvas
-            ctx.fillStyle = '#f8f9fa';
-            roundRect(ctx, canvas.width / 2 - 50, infoSectionY, canvas.width / 2, infoSectionHeight, 10, true, false);
-            
-            // Reposition photo to left side
-            if (data.photo) {
-                // Redraw photo on left side
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(canvas.width / 4, photoY, 150, 0, Math.PI * 2, true);
-                ctx.closePath();
-                ctx.clip();
-                
-                const img = new Image();
-                img.src = data.photo;
-                img.onload = function() {
-                    ctx.drawImage(img, canvas.width / 4 - 150, photoY - 150, 300, 300);
-                    ctx.restore();
-                };
-            }
-        } else {
-            // Portrait layout - original layout
-            infoSectionY = 350;
-            infoSectionHeight = 550;
-            startY = 450;
-            lineHeight = 55;
-            
-            // Draw info section background
-            ctx.fillStyle = '#f8f9fa';
-            roundRect(ctx, 50, infoSectionY, canvas.width - 100, infoSectionHeight, 10, true, false);
-        }
+        // Draw info section background
+        ctx.fillStyle = '#f8f9fa';
+        roundRect(ctx, 50, 350, canvas.width - 100, 550, 10, true, false);
         
         // Add section title
         ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#2980b9';
         ctx.textAlign = 'center';
+        ctx.fillText('زانیاریێن كەسی', canvas.width / 2, 390);
         
-        if (data.orientation === 'landscape') {
-            ctx.fillText('زانیاریێن كەسی', canvas.width * 0.75, infoSectionY + 50);
-            // Add decorative line under section title
-            ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(canvas.width * 0.75 - 100, infoSectionY + 65, 200, 2);
-        } else {
-            ctx.fillText('زانیاریێن كەسی', canvas.width / 2, 390);
-            // Add decorative line under section title
-            ctx.fillStyle = '#e74c3c';
-            ctx.fillRect(canvas.width / 2 - 100, 405, 200, 2);
-        }
+        // Add decorative line under section title
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(canvas.width / 2 - 100, 405, 200, 2);
         
         // Text settings
         ctx.font = 'bold 28px Arial';
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'right';
         
+        // Draw text info
+        const startY = 450;
+        const lineHeight = 55;
+        
         // Draw info boxes with labels and values
-        if (data.orientation === 'landscape') {
-            // Adjust position for landscape mode
-            const infoX = canvas.width - 80; // Right align position
-            
-            drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY, infoX);
-            drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight, infoX);
-            drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2, infoX);
-            drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3, infoX);
-            drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4, infoX);
-            drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5, infoX);
-            
-            let additionalFields = 0;
-            
-            if (data.imprisonment) {
-                drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields), infoX);
-                additionalFields++;
-            }
-            
-            if (data.phone) {
-                drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields), infoX);
-                additionalFields++;
-            }
-            
-            if (data.sentTo) {
-                drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields), infoX);
-            }
-        } else {
-            // Original portrait layout
-            drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
-            drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
-            drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
-            drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
-            drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
-            drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
-            
-            let additionalFields = 0;
-            
-            if (data.imprisonment) {
-                drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
-                additionalFields++;
-            }
-            
-            if (data.phone) {
-                drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
-                additionalFields++;
-            }
-            
-            if (data.sentTo) {
-                drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
-            }
+        drawInfoBox('ناڤێ تومەتباری:', data.fullname, startY);
+        drawInfoBox('ژدایـــكبون:', formatDate(data.birthdate), startY + lineHeight);
+        drawInfoBox('ئاكنجی بوون:', data.address, startY + lineHeight * 2);
+        drawInfoBox('جورێ ئاریشێ:', data.issueType, startY + lineHeight * 3);
+        drawInfoBox('بارێ خێزانی:', data.familyStatus, startY + lineHeight * 4);
+        drawInfoBox('كارێ وی:', data.job, startY + lineHeight * 5);
+        
+        let additionalFields = 0;
+        
+        if (data.imprisonment) {
+            drawInfoBox('زیندانكرن:', data.imprisonment, startY + lineHeight * (6 + additionalFields));
+            additionalFields++;
+        }
+        
+        if (data.phone) {
+            drawInfoBox('ژمارا موبایلی:', data.phone, startY + lineHeight * (6 + additionalFields));
+            additionalFields++;
+        }
+        
+        if (data.sentTo) {
+            drawInfoBox('رەوانەكرن بـــو:', data.sentTo, startY + lineHeight * (6 + additionalFields));
         }
         
         // Add footer with timestamp
@@ -378,39 +289,24 @@ function generateSuspectCard(data) {
         ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
     }
     
-    function drawInfoBox(label, value, y, rightX) {
-        // Set default rightX if not provided (for portrait mode)
-        rightX = rightX || (canvas.width - 100);
-        
-        // Calculate box width based on orientation
-        let boxWidth;
-        let boxX;
-        
-        if (data.orientation === 'landscape') {
-            boxWidth = canvas.width / 2 - 80;
-            boxX = canvas.width / 2 - 30;
-        } else {
-            boxWidth = canvas.width - 160;
-            boxX = 80;
-        }
-        
+    function drawInfoBox(label, value, y) {
         // Draw box background
         ctx.fillStyle = '#ffffff';
-        roundRect(ctx, boxX, y - 30, boxWidth, 45, 8, true, false);
+        roundRect(ctx, 80, y - 30, canvas.width - 160, 45, 8, true, false);
         
         // Add left accent
         ctx.fillStyle = '#3498db';
-        roundRect(ctx, boxX, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
+        roundRect(ctx, 80, y - 30, 10, 45, {tl: 4, bl: 4, tr: 0, br: 0}, true, false);
         
         // Draw label
         ctx.font = 'bold 26px Arial';
         ctx.fillStyle = '#2c3e50';
-        ctx.fillText(label, rightX, y);
+        ctx.fillText(label, canvas.width - 100, y);
         
         // Draw value
         ctx.font = '26px Arial';
         ctx.fillStyle = '#34495e';
-        ctx.fillText(value, rightX - 220, y);
+        ctx.fillText(value, canvas.width - 320, y);
     }
     
     // Keep old function for compatibility
@@ -500,14 +396,10 @@ function saveImageToDevice() {
         // Create a temporary link to download the image
         const tempLink = document.createElement('a');
         tempLink.href = currentSuspectData.cardImage;
-        
-        // Set filename with suspect name for better organization
-        const suspectName = currentSuspectData.fullname || 'suspect';
-        const fileName = 'بطاقة_' + suspectName.replace(/\s+/g, '_') + '_' + new Date().getTime() + '.png';
-        tempLink.download = fileName;
+        tempLink.download = 'suspect_card_' + new Date().getTime() + '.png';
         
         // Explicitly set attributes for better compatibility
-        tempLink.setAttribute('download', fileName);
+        tempLink.setAttribute('download', 'suspect_card_' + new Date().getTime() + '.png');
         tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
         tempLink.setAttribute('target', '_blank');
         
@@ -526,11 +418,6 @@ function saveImageToDevice() {
     }
 }
 
-// Set card orientation
-function setOrientation(orientation) {
-    currentSuspectData.orientation = orientation;
-}
-
 // Reset form for new entry
 function resetForm() {
     suspectForm.reset();
@@ -538,14 +425,9 @@ function resetForm() {
     defaultPhotoIcon.style.display = 'block';
     currentSuspectData = {
         photo: null,
-        timestamp: null,
-        orientation: 'portrait' // Reset to default portrait orientation
+        timestamp: null
     };
     successModal.style.display = 'none';
-    
-    // Reset orientation buttons
-    document.getElementById('portrait-orientation').classList.add('active');
-    document.getElementById('landscape-orientation').classList.remove('active');
 }
 
 // Initialize the app when DOM is loaded
