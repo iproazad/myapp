@@ -221,18 +221,37 @@ function generateSuspectCard(data) {
         const photoX = canvas.width - 470; // Position on the right side
         const photoY = 180;
         const photoWidth = 420;
-        const photoHeight = 600; // زيادة طول الصورة العمودية
+        const photoHeight = 600; // طول الصورة العمودية
         
-        // No photo, draw a placeholder
-        ctx.fillStyle = '#ecf0f1';
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
+        // إضافة تأثير الظل للصورة
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetX = 5;
+        ctx.shadowOffsetY = 5;
         
-        // Add photo frame
-        ctx.strokeStyle = '#3498db';
+        // رسم خلفية الصورة بتدرج لوني
+        const photoBgGradient = ctx.createLinearGradient(photoX, photoY, photoX, photoY + photoHeight);
+        photoBgGradient.addColorStop(0, '#f5f7fa');
+        photoBgGradient.addColorStop(1, '#e4e7eb');
+        ctx.fillStyle = photoBgGradient;
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 15, true, false);
+        
+        // إضافة إطار للصورة بتدرج لوني
+        const frameBorderGradient = ctx.createLinearGradient(photoX, photoY, photoX, photoY + photoHeight);
+        frameBorderGradient.addColorStop(0, '#3498db');
+        frameBorderGradient.addColorStop(0.5, '#2980b9');
+        frameBorderGradient.addColorStop(1, '#1a5276');
+        ctx.strokeStyle = frameBorderGradient;
         ctx.lineWidth = 5;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 15, false, true);
         
-        // Add decorative elements around photo (corners)
+        // إيقاف تأثير الظل
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // إضافة زخارف على زوايا الصورة
         const cornerPositions = [
             {x: photoX - 5, y: photoY - 5}, // Top left
             {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
@@ -241,26 +260,56 @@ function generateSuspectCard(data) {
         ];
         
         cornerPositions.forEach(pos => {
-            ctx.fillStyle = '#f39c12';
+            // إضافة دائرة ذهبية في كل زاوية
+            const cornerGradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 10);
+            cornerGradient.addColorStop(0, '#f1c40f');
+            cornerGradient.addColorStop(1, '#f39c12');
+            ctx.fillStyle = cornerGradient;
             ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
+            ctx.arc(pos.x, pos.y, 10, 0, Math.PI * 2, true);
             ctx.fill();
+            
+            // إضافة حدود للدائرة
+            ctx.strokeStyle = '#e67e22';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 10, 0, Math.PI * 2, true);
+            ctx.stroke();
         });
         
-        // Draw user icon
-        ctx.fillStyle = '#bdc3c7';
-        // Draw a simple user icon in the center of the photo area
+        // رسم أيقونة المستخدم بشكل أكثر جاذبية
         const iconX = photoX + photoWidth / 2;
-        const iconY = photoY + photoHeight / 2 - 20;
+        const iconY = photoY + photoHeight / 2 - 50;
         
-        // Head
+        // رسم خلفية دائرية للرأس
+        const headGradient = ctx.createRadialGradient(iconX, iconY, 0, iconX, iconY, 70);
+        headGradient.addColorStop(0, '#95a5a6');
+        headGradient.addColorStop(1, '#7f8c8d');
+        ctx.fillStyle = headGradient;
         ctx.beginPath();
-        ctx.arc(iconX, iconY, 50, 0, Math.PI * 2, true);
+        ctx.arc(iconX, iconY, 70, 0, Math.PI * 2, true);
         ctx.fill();
-        // Body
+        
+        // رسم الجسم بتدرج لوني
+        const bodyGradient = ctx.createRadialGradient(iconX, iconY + 150, 0, iconX, iconY + 150, 100);
+        bodyGradient.addColorStop(0, '#95a5a6');
+        bodyGradient.addColorStop(1, '#7f8c8d');
+        ctx.fillStyle = bodyGradient;
         ctx.beginPath();
-        ctx.arc(iconX, iconY + 100, 70, Math.PI, 0, true);
+        ctx.arc(iconX, iconY + 150, 100, Math.PI, 0, true);
         ctx.fill();
+        
+        // إضافة تفاصيل للوجه
+        ctx.fillStyle = '#ecf0f1';
+        ctx.beginPath();
+        ctx.arc(iconX, iconY + 20, 20, 0, Math.PI, true);
+        ctx.fill();
+        
+        // إضافة نص تحت الصورة
+        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = '#34495e';
+        ctx.textAlign = 'center';
+        ctx.fillText('وێنێ تومەتباری', iconX, photoY + photoHeight - 30);
         
         // Continue with drawing text
         drawSuspectInfo();
@@ -272,29 +321,39 @@ function generateSuspectCard(data) {
         const infoX = 50;
         const infoY = 180;
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 700; // Reverted to original height as we're using horizontal layout
+        // سنحدد ارتفاع الإطار لاحقاً بناءً على موضع التذييل
+        let infoHeight;
         
-        // Draw info section background with semi-transparent blue
-        ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
-        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, true, false);
+        // سيتم رسم الإطار لاحقاً بعد حساب الارتفاع الديناميكي
         
-        // Add border to info section
-        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
-        ctx.lineWidth = 2;
-        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 10, false, true);
+        // إضافة تأثير الظل للعنوان
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
         
-        // Add section title background
-        const titleGradient = ctx.createLinearGradient(infoX, infoY, infoX + infoWidth, infoY);
-        titleGradient.addColorStop(0, '#3498db');
-        titleGradient.addColorStop(1, '#2980b9');
+        // Add section title background with modern gradient
+        const titleGradient = ctx.createLinearGradient(infoX, infoY, infoX, infoY + 70);
+        titleGradient.addColorStop(0, '#1a5276'); // أزرق داكن
+        titleGradient.addColorStop(0.5, '#2980b9'); // أزرق متوسط
+        titleGradient.addColorStop(1, '#3498db'); // أزرق فاتح
         ctx.fillStyle = titleGradient;
-        roundRect(ctx, infoX, infoY, infoWidth, 60, {tl: 10, tr: 10, bl: 0, br: 0}, true, false);
+        roundRect(ctx, infoX, infoY, infoWidth, 70, {tl: 15, tr: 15, bl: 0, br: 0}, true, false);
         
-        // Add section title
-        ctx.font = 'bold 32px Arial';
+        // إضافة زخرفة على العنوان بتدرج لوني ذهبي
+        const decorLineGradient = ctx.createLinearGradient(infoX + 30, infoY + 60, infoX + infoWidth - 30, infoY + 60);
+        decorLineGradient.addColorStop(0, '#f1c40f');
+        decorLineGradient.addColorStop(0.5, '#f39c12');
+        decorLineGradient.addColorStop(1, '#e67e22');
+        ctx.fillStyle = decorLineGradient;
+        ctx.fillRect(infoX + 30, infoY + 60, infoWidth - 60, 3);
+        
+        // Add section title with shadow for better visibility
+        ctx.font = 'bold 36px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 40);
+        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 45);
+        ctx.shadowColor = 'transparent'; // إيقاف تأثير الظل
         
         // Add decorative elements
         ctx.fillStyle = '#f39c12';
@@ -399,27 +458,67 @@ function generateSuspectCard(data) {
         drawInfoBox('جهێ ئاریشێ:', data.problemLocation, newFieldsY + newLineHeight, col1X);
         drawInfoBox('خالا:', data.point, newFieldsY + newLineHeight, col2X);
         
-        // Add footer with timestamp - gradient background (adjusted for smaller canvas)
-        const footerY = newFieldsY + newLineHeight * 2 + 20; // تعديل موضع التذييل ليتناسب مع الحقول المدمجة
-        const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
-        footerGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
-        footerGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
-        ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, footerY, canvas.width - 40, 50, {tl: 0, tr: 0, bl: 15, br: 15}, true, false);
+        // Add footer with timestamp - modern gradient background
+        const footerY = newFieldsY + newLineHeight * 2 + 30; // زيادة المسافة قبل التذييل
         
-        // Add decorative line above footer
+        // حساب ارتفاع الإطار ديناميكياً بناءً على موضع التذييل
+        infoHeight = footerY + 70 - infoY; // إضافة مساحة للتذييل (60 للتذييل + 10 هامش)
+        
+        // إعادة رسم الإطار بالارتفاع الجديد مع تدرج لوني خفيف
+        const bgGradient = ctx.createLinearGradient(infoX, infoY, infoX, infoY + infoHeight);
+        bgGradient.addColorStop(0, 'rgba(236, 240, 241, 0.5)');
+        bgGradient.addColorStop(1, 'rgba(225, 238, 250, 0.5)');
+        ctx.fillStyle = bgGradient;
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 15, true, false);
+        
+        // إعادة رسم حدود الإطار بتدرج لوني
+        const borderGradient = ctx.createLinearGradient(infoX, infoY, infoX, infoY + infoHeight);
+        borderGradient.addColorStop(0, 'rgba(52, 152, 219, 0.4)');
+        borderGradient.addColorStop(0.5, 'rgba(41, 128, 185, 0.5)');
+        borderGradient.addColorStop(1, 'rgba(52, 152, 219, 0.4)');
+        ctx.strokeStyle = borderGradient;
+        ctx.lineWidth = 2;
+        roundRect(ctx, infoX, infoY, infoWidth, infoHeight, 15, false, true);
+        
+        // إضافة زخرفة قبل التذييل
         ctx.fillStyle = '#f39c12';
-        ctx.fillRect(50, footerY - 5, canvas.width - 100, 2);
+        for (let i = 0; i < 5; i++) {
+            const dotX = infoX + infoWidth / 2 - 40 + i * 20;
+            ctx.beginPath();
+            ctx.arc(dotX, footerY - 15, 3, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
         
-        // Add timestamp with shadow effect (adjusted for new footer position)
+        // رسم خلفية التذييل بتدرج لوني أكثر جاذبية
+        const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
+        footerGradient.addColorStop(0, 'rgba(26, 82, 118, 0.95)');
+        footerGradient.addColorStop(0.5, 'rgba(41, 128, 185, 0.95)');
+        footerGradient.addColorStop(1, 'rgba(52, 152, 219, 0.95)');
+        ctx.fillStyle = footerGradient;
+        
+        // إضافة تأثير الظل للتذييل
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 5;
+        roundRect(ctx, 20, footerY, canvas.width - 40, 60, {tl: 0, tr: 0, bl: 20, br: 20}, true, false);
+        
+        // إضافة زخرفة داخل التذييل
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(40, footerY + 10, canvas.width - 80, 2);
+        
+        // إضافة الطابع الزمني مع تأثير الظل
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
         ctx.shadowBlur = 3;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
-        ctx.font = 'italic 22px Arial'; // Slightly smaller font
+        ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 30);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 35);
+        
+        // إيقاف تأثير الظل
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
@@ -427,32 +526,63 @@ function generateSuspectCard(data) {
     }
     
     function drawInfoBox(label, value, y, boxX = 80) {
-        // تقليل قياسات الحقول لتكون أصغر أفقياً
-        const boxHeight = 40; // ارتفاع الحقول
-        const boxWidth = (canvas.width / 2) - 60; // تقليل عرض الحقول
-        const fontSize = 18; // تقليل حجم الخط
-        const labelWidth = 120; // تقليل عرض مربع العنوان
+        // تحسين قياسات الحقول لتكون أكثر جاذبية
+        const boxHeight = 50; // زيادة ارتفاع الحقول لمظهر أفضل
+        const boxWidth = (canvas.width / 2) - 60; // عرض الحقول
+        const fontSize = 18; // حجم الخط
+        const labelWidth = 150; // زيادة عرض مربع العنوان للنصوص الطويلة
         
-        // Draw label box with semi-transparent background (blue)
-        const labelBgColor = 'rgba(52, 152, 219, 0.2)';
-        ctx.fillStyle = labelBgColor;
-        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 8, bl: 8, tr: 0, br: 0}, true, false);
+        // إضافة تأثير الظل للحقول
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
         
-        // Draw value box with white background
-        ctx.fillStyle = '#ffffff';
-        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 8, br: 8}, true, false);
+        // رسم خلفية مربع العنوان بتدرج لوني أكثر وضوحاً
+        const labelGradient = ctx.createLinearGradient(boxX, y - boxHeight/2, boxX + labelWidth, y - boxHeight/2);
+        labelGradient.addColorStop(0, 'rgba(52, 152, 219, 0.9)');
+        labelGradient.addColorStop(1, 'rgba(41, 128, 185, 0.9)');
+        ctx.fillStyle = labelGradient;
+        roundRect(ctx, boxX, y - boxHeight/2, labelWidth, boxHeight, {tl: 10, bl: 10, tr: 0, br: 0}, true, false);
         
-        // Add decorative separator
-        ctx.fillStyle = '#3498db';
+        // رسم خلفية مربع القيمة بلون أبيض مع تدرج خفيف
+        const valueGradient = ctx.createLinearGradient(boxX + labelWidth, y - boxHeight/2, boxX + boxWidth, y - boxHeight/2);
+        valueGradient.addColorStop(0, '#ffffff');
+        valueGradient.addColorStop(1, '#f8f9fa');
+        ctx.fillStyle = valueGradient;
+        roundRect(ctx, boxX + labelWidth, y - boxHeight/2, boxWidth - labelWidth, boxHeight, {tl: 0, bl: 0, tr: 10, br: 10}, true, false);
+        
+        // إيقاف تأثير الظل
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // إضافة فاصل زخرفي بتدرج لوني ذهبي
+        const separatorGradient = ctx.createLinearGradient(boxX + labelWidth - 3, y - boxHeight/2, boxX + labelWidth - 3, y + boxHeight/2);
+        separatorGradient.addColorStop(0, '#f1c40f');
+        separatorGradient.addColorStop(0.5, '#f39c12');
+        separatorGradient.addColorStop(1, '#e67e22');
+        ctx.fillStyle = separatorGradient;
         ctx.fillRect(boxX + labelWidth - 3, y - boxHeight/2, 3, boxHeight);
         
-        // Draw label
+        // إضافة حدود خفيفة للحقول
+        ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, boxX, y - boxHeight/2, boxWidth, boxHeight, {tl: 10, bl: 10, tr: 10, br: 10}, false, true);
+        
+        // رسم العنوان بخط غامق وظل خفيف
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
         ctx.font = `bold ${fontSize}px Arial`;
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.fillText(label, boxX + labelWidth/2, y + boxHeight/4);
         
-        // Draw value with truncation for long text
+        // رسم القيمة مع اقتطاع النص الطويل
+        ctx.shadowColor = 'transparent';
         ctx.font = `${fontSize}px Arial`;
         ctx.fillStyle = '#34495e';
         ctx.textAlign = 'right';
@@ -468,12 +598,12 @@ function generateSuspectCard(data) {
             while (ctx.measureText(truncatedValue + '...').width > valueWidth && truncatedValue.length > 0) {
                 truncatedValue = truncatedValue.slice(0, -1);
             }
-            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 10, y + boxHeight/4);
+            ctx.fillText(truncatedValue + '...', boxX + boxWidth - 15, y + boxHeight/4);
         } else {
-            ctx.fillText(displayValue, boxX + boxWidth - 10, y + boxHeight/4);
+            ctx.fillText(displayValue, boxX + boxWidth - 15, y + boxHeight/4);
         }
         
-        // Reset text alignment for other text
+        // إعادة ضبط محاذاة النص للنصوص الأخرى
         ctx.textAlign = 'right';
     }
     
