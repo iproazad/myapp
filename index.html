@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق تسجيل المخالفات</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="تسجيل المخالفات">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>تطبيق تسجيل المخالفات</h1>
+        </header>
+
+        <main>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="new-record">سجل جديد</button>
+                <button class="tab-btn" data-tab="records-list">قائمة السجلات</button>
+            </div>
+
+            <div class="tab-content active" id="new-record">
+                <form id="record-form">
+                    <div class="form-section">
+                        <h2>🧍‍♂️ زانیاری کەسی</h2>
+                        
+                        <div class="form-group">
+                            <label for="name">ناڤێ تومەتباری</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="birthdate">ژدایـــكبون</label>
+                            <input type="date" id="birthdate" name="birthdate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="residence">ئاكنجی بوون</label>
+                            <input type="text" id="residence" name="residence" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="problem-type">جورێ ئاریشێ</label>
+                            <select id="problem-type" name="problem-type" required>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="ئاریشا خێزانی">ئاریشا خێزانی</option>
+                                <option value="خازوك">خازوك</option>
+                                <option value="شـــەر">شـــەر</option>
+                                <option value="سەرخوش">سەرخوش</option>
+                                <option value="رویدانا ترومبێلێ">رویدانا ترومبێلێ</option>
+                                <option value="مخەدەر">مخەدەر</option>
+                                <option value="دزی">دزی</option>
+                                <option value="بەرزەبون">بەرزەبون</option>
+                                <option value="ازعــاج">ازعــاج</option>
+                                <option value="داخازكری">داخازكری</option>
+                                <option value="گومانلێكری">گومانلێكری</option>
+                                <option value="هەولا خوكوشتنێ">هەولا خوكوشتنێ</option>
+                                <option value="خوكوشتن">خوكوشتن</option>
+                                <option value="كوشتن">كوشتن</option>
+                                <option value="گیان ژدەستدان">گیان ژدەستدان</option>
+                                <option value="بێ سەمیان">بێ سەمیان</option>
+                                <option value="كێشانا سكوتینێ">كێشانا سكوتینێ</option>
+                                <option value="فیلبازی تشقلە">فیلبازی تشقلە</option>
+                                <option value="ترومبيلا بي خودان">ترومبيلا بي خودان</option>
+                                <option value="ئاگر بەربون">ئاگر بەربون</option>
+                                <option value="تەقەكرن">تەقەكرن</option>
+                                <option value="مەلەڤاني جهی قەدەغە">مەلەڤاني جهی قەدەغە</option>
+                                <option value="تێكدەر">تێكدەر</option>
+                                <option value="خەندقین">خەندقین</option>
+                                <option value="گەفكرن">گەفكرن</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="marital-status">بارێ خێزانی</label>
+                            <select id="marital-status" name="marital-status" required>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="خێزاندەرە">خێزاندەرە</option>
+                                <option value="نە خێزاندارە">نە خێزاندارە</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="job">كارێ وی</label>
+                            <input type="text" id="job" name="job">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="imprisoned">زیندانكرن</label>
+                            <select id="imprisoned" name="imprisoned" required>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="بەلی">بەلی</option>
+                                <option value="نەخێر">نەخێر</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">ژمارا موبایلی</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>⏰ دەمژمێر</h2>
+                        
+                        <div class="form-group">
+                            <label for="time-from">من</label>
+                            <input type="time" id="time-from" name="time-from" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="time-to">إلى</label>
+                            <input type="time" id="time-to" name="time-to" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>الوقت</label>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="day-time" value="روژ" checked>
+                                    روژ (نهار)
+                                </label>
+                                <label>
+                                    <input type="radio" name="day-time" value="شەڤ">
+                                    شەڤ (ليل)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>📍 معلومات إضافية</h2>
+                        
+                        <div class="form-group">
+                            <label for="location">جهێ ئاریشێ</label>
+                            <input type="text" id="location" name="location" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="driver-name">ناڤێ شوفێری</label>
+                            <input type="text" id="driver-name" name="driver-name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="send-to">رەوانەكرن بـــو</label>
+                            <select id="send-to" name="send-to" required>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="بنگەهێ پولیسێن كارێز">بنگەهێ پولیسێن كارێز</option>
+                                <option value="بنگەهێ پولیسێن زاخو">بنگەهێ پولیسێن زاخو</option>
+                                <option value="بنگەهێ پولیسێن سێمالكا">بنگەهێ پولیسێن سێمالكا</option>
+                                <option value="بنگەهێ پولیسێن دەلال">بنگەهێ پولیسێن دەلال</option>
+                                <option value="بنگەهێ پولیسێن بێدارێ">بنگەهێ پولیسێن بێدارێ</option>
+                                <option value="بنگەهێ پولیسێن نیو زاخو">بنگەهێ پولیسێن نیو زاخو</option>
+                                <option value="بنگەهێ پولیسێن رزگاری">بنگەهێ پولیسێن رزگاری</option>
+                                <option value="رێڤەبەریا پولیسێن زاخو">رێڤەبەریا پولیسێن زاخو</option>
+                                <option value="توندوتیژیا زاخو">توندوتیژیا زاخو</option>
+                                <option value="نەخوشخانا زاخو">نەخوشخانا زاخو</option>
+                                <option value="دەستێ سەمیانا">دەستێ سەمیانا</option>
+                                <option value="مكافحا زاخو">مكافحا زاخو</option>
+                                <option value="مكافحا بێدارێ">مكافحا بێدارێ</option>
+                                <option value="ئاسايشا زاخو">ئاسايشا زاخو</option>
+                                <option value="ئاگرڤەمراندنا زاخو">ئاگرڤەمراندنا زاخو</option>
+                                <option value="گرتیخانا زاخو">گرتیخانا زاخو</option>
+                                <option value="هاتوچووا زاخو">هاتوچووا زاخو</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="point">خالا</label>
+                            <select id="point" name="point" required>
+                                <option value="" disabled selected>اختر...</option>
+                                <option value="101">101</option>
+                                <option value="102">102</option>
+                                <option value="103">103</option>
+                                <option value="104">104</option>
+                                <option value="105">105</option>
+                                <option value="106">106</option>
+                                <option value="107">107</option>
+                                <option value="108">108</option>
+                                <option value="109">109</option>
+                                <option value="110">110</option>
+                                <option value="111">111</option>
+                                <option value="112">112</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h2>🖼️ وێنە</h2>
+                        <div class="photo-container">
+                            <div class="photo-preview" id="photo-preview">
+                                <i class="fas fa-user-circle placeholder-icon"></i>
+                            </div>
+                            <div class="photo-buttons">
+                                <button type="button" id="camera-btn" class="btn"><i class="fas fa-camera"></i> الكاميرا</button>
+                                <button type="button" id="gallery-btn" class="btn"><i class="fas fa-images"></i> المعرض</button>
+                            </div>
+                            <input type="file" id="photo-input" accept="image/*" hidden>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">خەزنكرنا كارتێ</button>
+                </form>
+            </div>
+
+            <div class="tab-content" id="records-list">
+                <div class="records-container" id="records-container">
+                    <!-- Records will be populated here -->
+                    <div class="empty-records">لا توجد سجلات حتى الآن</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Card Preview Modal -->
+    <div class="modal" id="card-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>بطاقة المعلومات</h2>
+            <div class="card-preview" id="card-preview"></div>
+            <div class="modal-buttons">
+                <button id="share-btn" class="btn"><i class="fas fa-share-alt"></i> مشاركة</button>
+                <button id="download-btn" class="btn"><i class="fas fa-download"></i> تحميل</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+<script>
+    // Register Service Worker for PWA support
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered successfully:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        });
+    }
+</script>
+</body>
+</html>
