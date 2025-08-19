@@ -14,12 +14,6 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Preload critical resources -->
-    <link rel="preload" href="style.css" as="style">
-    <link rel="preload" href="app.js" as="script">
-    <link rel="preload" href="icon.svg" as="image">
-    <link rel="preload" href="icon-192.png" as="image">
 </head>
 <body>
     <div class="app-container">
@@ -139,30 +133,6 @@
                                 <input type="text" id="driver-name" name="driver-name" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="sent-to">رەوانەكرن بـــو</label>
-                                <select id="sent-to" name="sent-to">
-                                    <option value="" disabled selected>اختر الجهة</option>
-                                    <option value="بنگەهێ پولیسێن كارێز">بنگەهێ پولیسێن كارێز</option>
-                                    <option value="بنگەهێ پولیسێن زاخو">بنگەهێ پولیسێن زاخو</option>
-                                    <option value="بنگەهێ پولیسێن سێمالكا">بنگەهێ پولیسێن سێمالكا</option>
-                                    <option value="بنگەهێ پولیسێن دەلال">بنگەهێ پولیسێن دەلال</option>
-                                    <option value="بنگەهێ پولیسێن بێدارێ">بنگەهێ پولیسێن بێدارێ</option>
-                                    <option value="بنگەهێ پولیسێن نیو زاخو">بنگەهێ پولیسێن نیو زاخو</option>
-                                    <option value="بنگەهێ پولیسێن رزگاری">بنگەهێ پولیسێن رزگاری</option>
-                                    <option value="رێڤەبەریا پولیسێن زاخو">رێڤەبەریا پولیسێن زاخو</option>
-                                    <option value="توندوتیژیا زاخو">توندوتیژیا زاخو</option>
-                                    <option value="نەخوشخانا زاخو">نەخوشخانا زاخو</option>
-                                    <option value="دەستێ سەمیانا">دەستێ سەمیانا</option>
-                                    <option value="مكافحا زاخو">مكافحا زاخو</option>
-                                    <option value="مكافحا بێدارێ">مكافحا بێدارێ</option>
-                                    <option value="ئاسايشا زاخو">ئاسايشا زاخو</option>
-                                    <option value="ئاگرڤەمراندنا زاخو">ئاگرڤەمراندنا زاخو</option>
-                                    <option value="گرتیخانا زاخو">گرتیخانا زاخو</option>
-                                    <option value="هاتوچووا زاخو">هاتوچووا زاخو</option>
-                                </select>
-                            </div>
-                            
                             <div class="form-group point-input">
                                 <label for="point">خالا (النقطة)</label>
                                 <select id="point" name="point" required>
@@ -182,6 +152,30 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sent-to">رەوانەكرن بـــو</label>
+                        <select id="sent-to" name="sent-to">
+                            <option value="" disabled selected>اختر الجهة</option>
+                            <option value="بنگەهێ پولیسێن كارێز">بنگەهێ پولیسێن كارێز</option>
+                            <option value="بنگەهێ پولیسێن زاخو">بنگەهێ پولیسێن زاخو</option>
+                            <option value="بنگەهێ پولیسێن سێمالكا">بنگەهێ پولیسێن سێمالكا</option>
+                            <option value="بنگەهێ پولیسێن دەلال">بنگەهێ پولیسێن دەلال</option>
+                            <option value="بنگەهێ پولیسێن بێدارێ">بنگەهێ پولیسێن بێدارێ</option>
+                            <option value="بنگەهێ پولیسێن نیو زاخو">بنگەهێ پولیسێن نیو زاخو</option>
+                            <option value="بنگەهێ پولیسێن رزگاری">بنگەهێ پولیسێن رزگاری</option>
+                            <option value="رێڤەبەریا پولیسێن زاخو">رێڤەبەریا پولیسێن زاخو</option>
+                            <option value="توندوتیژیا زاخو">توندوتیژیا زاخو</option>
+                            <option value="نەخوشخانا زاخو">نەخوشخانا زاخو</option>
+                            <option value="دەستێ سەمیانا">دەستێ سەمیانا</option>
+                            <option value="مكافحا زاخو">مكافحا زاخو</option>
+                            <option value="مكافحا بێدارێ">مكافحا بێدارێ</option>
+                            <option value="ئاسايشا زاخو">ئاسايشا زاخو</option>
+                            <option value="ئاگرڤەمراندنا زاخو">ئاگرڤەمراندنا زاخو</option>
+                            <option value="گرتیخانا زاخو">گرتیخانا زاخو</option>
+                            <option value="هاتوچووا زاخو">هاتوچووا زاخو</option>
+                        </select>
                     </div>
 
                     <button type="submit" id="save-button" class="primary-button">
