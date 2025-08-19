@@ -72,7 +72,7 @@ function saveSuspectData() {
         imprisonment: document.getElementById('imprisonment').value,
         phone: document.getElementById('phone').value,
         sentTo: document.getElementById('sent-to').value,
-        timestamp: new Date().toLocaleString('ar-SA')
+        timestamp: new Date().toLocaleString('en-US')
     };
 
     // Combine with photo data
@@ -153,7 +153,7 @@ function generateSuspectCard(data) {
         const photoX = canvas.width - 500; // Position on the right side
         const photoY = 180;
         const photoWidth = 400;
-        const photoHeight = 300;
+        const photoHeight = 450; // زيادة طول الصورة العمودية
         
         // Draw photo background
         ctx.fillStyle = '#ffffff';
@@ -201,7 +201,7 @@ function generateSuspectCard(data) {
         const photoX = canvas.width - 500; // Position on the right side
         const photoY = 180;
         const photoWidth = 400;
-        const photoHeight = 300;
+        const photoHeight = 450; // زيادة طول الصورة العمودية
         
         // No photo, draw a placeholder
         ctx.fillStyle = '#ecf0f1';
@@ -307,8 +307,8 @@ function generateSuspectCard(data) {
         
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'right';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width - 50, canvas.height - 40);
+        ctx.textAlign = 'center';
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, canvas.height - 40);
     }
     
     function drawInfoBox(label, value, y) {
@@ -341,13 +341,13 @@ function generateSuspectCard(data) {
     }
 }
 
-// Format date to Kurdish format
+// Format date to Gregorian format
 function formatDate(dateString) {
     if (!dateString) return '';
     
     const date = new Date(dateString);
-    // Using Kurdish locale if available, falling back to Arabic if not
-    return date.toLocaleDateString('ckb-IR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    // Using Gregorian calendar format (year-month-day)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 // Function to draw rounded rectangles
