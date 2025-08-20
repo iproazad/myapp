@@ -839,20 +839,35 @@ function saveImageToDevice() {
         const fileName = sanitizedName + '_' + new Date().getTime() + '.png';
         
         // For mobile devices, we need to ensure the MIME type is correct and force download
-        // Convert the base64 image to a Blob for better mobile compatibility
-        const imageData = currentSuspectData.cardImage;
-        const byteString = atob(imageData.split(',')[1]);
-        const mimeType = 'image/png'; // Force PNG MIME type for better compatibility
+        // Get the canvas element directly for better mobile compatibility
+        const canvas = document.getElementById('cardCanvas');
         
-        // Add filename to the blob for better mobile compatibility
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
+        // Prepare variables for blob creation
+        let imageData, byteString, mimeType, ab, ia, blob;
+        
+        // If we have a canvas element, use it directly
+        if (canvas) {
+            // Try to use the canvas directly for better filename support
+            imageData = canvas.toDataURL('image/png');
+        } else {
+            // Fallback to using the stored image data
+            imageData = currentSuspectData.cardImage;
+        }
+        
+        // Process the image data to create a blob
+        byteString = atob(imageData.split(',')[1]);
+        mimeType = 'image/png'; // Force PNG MIME type for better compatibility
+        
+        // Create array buffer from binary string
+        ab = new ArrayBuffer(byteString.length);
+        ia = new Uint8Array(ab);
         for (let i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
         }
         
         // Create blob with proper type and suggested filename
-        const blob = new Blob([ab], {type: mimeType});
+        blob = new Blob([ab], {type: mimeType});
+        
         // Some browsers support this property to suggest filename
         if (typeof blob.name !== 'undefined') {
             blob.name = fileName;
@@ -862,6 +877,17 @@ function saveImageToDevice() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isAndroid = /Android/.test(navigator.userAgent);
+        
+        // Add a specific filename attribute to the blob for better compatibility
+        // This uses a non-standard but sometimes supported property
+        try {
+            Object.defineProperty(blob, 'name', {
+                value: fileName,
+                writable: false
+            });
+        } catch (e) {
+            console.log('Could not set blob name property:', e);
+        }
         
         if (isIOS) {
             // Special handling for iOS devices
@@ -881,51 +907,87 @@ function saveImageToDevice() {
         } else if (isAndroid && typeof navigator.msSaveOrOpenBlob === 'undefined') {
             // Special handling for Android devices
             try {
-                // Try using the download attribute with a hidden iframe for Android
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
+                // Create a download link with specific attributes for Android
+                const downloadLink = document.createElement('a');
                 
-                // Write a form to the iframe that will submit and download the blob
-                const iframeDoc = iframe.contentWindow.document;
-                const form = iframeDoc.createElement('form');
-                form.method = 'POST';
-                form.action = URL.createObjectURL(blob);
-                form.enctype = 'multipart/form-data';
+                // Create a blob URL with specific MIME type
+                const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/octet-stream' }));
                 
-                const input = iframeDoc.createElement('input');
-                input.type = 'hidden';
-                input.name = 'filename';
-                input.value = fileName;
-                form.appendChild(input);
+                // Set download attributes with multiple approaches
+                downloadLink.href = blobUrl;
+                downloadLink.download = fileName;
+                downloadLink.setAttribute('download', fileName);
                 
-                iframeDoc.body.appendChild(form);
-                form.submit();
+                // Add additional attributes that might help with filename
+                downloadLink.setAttribute('data-downloadurl', ['application/octet-stream', fileName, blobUrl].join(':'));
                 
-                // Clean up after a delay
+                // Make it look like a button click for better browser compatibility
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: false
+                });
+                
+                // Append to body, dispatch click event, and remove
+                document.body.appendChild(downloadLink);
+                downloadLink.dispatchEvent(clickEvent);
+                
+                // Clean up after a longer delay for slower devices
                 setTimeout(() => {
-                    document.body.removeChild(iframe);
-                    URL.revokeObjectURL(form.action);
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(blobUrl);
                     alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
-                }, 1500);
+                }, 2500);
             } catch (e) {
-                console.error('Android iframe download failed:', e);
+                console.error('Android download failed:', e);
                 
-                // Fallback to direct download if iframe method fails
-                window.open(URL.createObjectURL(blob), '_blank');
-                alert('تم حفظ البطاقة. يرجى التحقق من مجلد التنزيلات.');
+                try {
+                    // Try another approach for Android using download manager
+                    const blobUrl = URL.createObjectURL(blob);
+                    
+                    // Create a hidden download link with specific attributes
+                    const downloadLink = document.createElement('a');
+                    downloadLink.style.display = 'none';
+                    downloadLink.href = blobUrl;
+                    downloadLink.download = fileName;
+                    downloadLink.setAttribute('download', fileName);
+                    downloadLink.setAttribute('target', '_blank');
+                    downloadLink.setAttribute('rel', 'noopener');
+                    
+                    // Add to DOM, click and remove
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(downloadLink);
+                        URL.revokeObjectURL(blobUrl);
+                        alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
+                    }, 2000);
+                } catch (innerError) {
+                    console.error('All Android download methods failed:', innerError);
+                    alert('تم حفظ البطاقة. يرجى التحقق من مجلد التنزيلات.');
+                }
             }
         } else if (typeof navigator.msSaveOrOpenBlob !== 'undefined') {
             // For IE and Edge
             navigator.msSaveOrOpenBlob(blob, fileName);
             alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
         } else {
-            // Standard approach for other browsers
+            // Standard approach for other browsers with improved filename handling
             const tempLink = document.createElement('a');
             const blobUrl = URL.createObjectURL(blob);
+            
+            // Set download attributes with multiple approaches for better compatibility
             tempLink.href = blobUrl;
             tempLink.download = fileName;
             tempLink.setAttribute('download', fileName);
+            tempLink.setAttribute('target', '_blank');
+            
+            // Force content disposition to attachment
+            tempLink.setAttribute('type', 'application/octet-stream');
+            
+            // Add data attributes that some browsers might use
+            tempLink.dataset.downloadurl = ['image/png', fileName, blobUrl].join(':');
             
             // Append to body, click, and remove
             document.body.appendChild(tempLink);
@@ -936,7 +998,7 @@ function saveImageToDevice() {
                 document.body.removeChild(tempLink);
                 URL.revokeObjectURL(blobUrl); // Clean up the blob URL
                 alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
-            }, 1000);
+            }, 2000); // Increased timeout for slower devices
         }
     } catch (error) {
         console.error('Error saving image:', error);
