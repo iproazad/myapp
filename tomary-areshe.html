@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توماری ئاریشە - Problem Registration</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        /* Additional styles specific to this page */
+        .multi-person-section {
+            margin-bottom: 20px;
+        }
+        
+        .person-container {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        
+        .person-number {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #3498db;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+        
+        .person-photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .person-photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #3498db;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+        
+        .person-photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .person-photo-preview i {
+            font-size: 60px;
+            color: #bdc3c7;
+        }
+        
+        .person-photo-number {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: #3498db;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+        
+        .person-type-select {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .person-info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .person-info-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .add-person-button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            font-weight: bold;
+        }
+        
+        .add-person-button i {
+            margin-left: 8px;
+        }
+        
+        .add-person-button:hover {
+            background-color: #27ae60;
+        }
+        
+        .remove-person-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        
+        .remove-person-button:hover {
+            background-color: #c0392b;
+        }
+        
+        .case-info-section {
+            margin-top: 30px;
+            border-top: 2px dashed #3498db;
+            padding-top: 20px;
+        }
+        
+        .case-info-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+        
+        @media (max-width: 768px) {
+            .person-info-row {
+                flex-direction: column;
+            }
+            
+            .person-info-row .form-group {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>توماری ئاریشە</h1>
+            <h2>Problem Registration</h2>
+        </header>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-button">
+                <i class="fas fa-user-shield"></i> توماركرنا تومەتباری
+            </a>
+            <a href="tomary-areshe.html" class="nav-button active">
+                <i class="fas fa-users"></i> توماری ئاریشە
+            </a>
+            <a href="login.html" class="nav-button back-button">
+                <i class="fas fa-home"></i> الصفحة الرئيسية
+            </a>
+        </div>
+
+        <main>
+            <form id="multi-person-form">
+                <div class="multi-person-section" id="persons-container">
+                    <!-- Person 1 -->
+                    <div class="person-container" data-person-id="1">
+                        <div class="person-number">1</div>
+                        <div class="person-photo-section">
+                            <div class="person-photo-preview">
+                                <i class="fas fa-user-circle" id="default-photo-icon-1"></i>
+                                <img id="selected-photo-1" style="display: none;" alt="وێنێ كەسی">
+                                <div class="person-photo-number">1</div>
+                            </div>
+                            <button type="button" class="primary-button photo-button" data-person-id="1">
+                                <i class="fas fa-camera"></i> وێنەگرتن یان باركرن
+                            </button>
+                            <input type="file" class="photo-input" id="photo-input-1" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <div class="person-type-select">
+                            <select class="person-type" id="person-type-1" required>
+                                <option value="" disabled selected>اختر نوع الشخص</option>
+                                <option value="مشتەكی">مشتەكی</option>
+                                <option value="تاوانبار">تاوانبار</option>
+                            </select>
+                        </div>
+                        
+                        <div class="person-info-row">
+                            <div class="form-group">
+                                <label for="fullname-1">ناڤێ تومەتباری</label>
+                                <input type="text" id="fullname-1" name="fullname-1" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="birthdate-1">ژدایـــكبون</label>
+                                <input type="number" id="birthdate-1" name="birthdate-1" placeholder="سنة الميلاد" min="1900" max="2024" required>
+                            </div>
+                        </div>
+                        
+                        <div class="person-info-row">
+                            <div class="form-group">
+                                <label for="address-1">ئاكنجی بوون</label>
+                                <input type="text" id="address-1" name="address-1" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone-1">ژمارا موبایلی</label>
+                                <input type="tel" id="phone-1" name="phone-1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" id="add-person-button" class="add-person-button">
+                    <i class="fas fa-user-plus"></i> إضافة شخص آخر
+                </button>
+                
+                <div class="case-info-section">
+                    <h3 class="case-info-title">معلومات القضية</h3>
+                    
+                    <div class="form-group">
+                        <label for="issue-type">جورێ ئاریشێ</label>
+                        <select id="issue-type" name="issue-type" required>
+                            <option value="" disabled selected>اختر نوع المشكلة</option>
+                            <option value="ئاریشا خێزانی">ئاریشا خێزانی</option>
+                            <option value="خازوك">خازوك</option>
+                            <option value="شـــەر">شـــەر</option>
+                            <option value="سەرخوش">سەرخوش</option>
+                            <option value="رویدانا ترومبێلێ">رویدانا ترومبێلێ</option>
+                            <option value="مخەدەر">مخەدەر</option>
+                            <option value="دزی">دزی</option>
+                            <option value="بەرزەبون">بەرزەبون</option>
+                            <option value="ازعــاج">ازعــاج</option>
+                            <option value="داخازكری">داخازكری</option>
+                            <option value="گومانلێكری">گومانلێكری</option>
+                            <option value="هەولا خوكوشتنێ">هەولا خوكوشتنێ</option>
+                            <option value="خوكوشتن">خوكوشتن</option>
+                            <option value="كوشتن">كوشتن</option>
+                            <option value="گیان ژدەستدان">گیان ژدەستدان</option>
+                            <option value="بێ سەمیان">بێ سەمیان</option>
+                            <option value="كێشانا سكوتینێ">كێشانا سكوتینێ</option>
+                            <option value="فیلبازی تشقلە">فیلبازی تشقلە</option>
+                            <option value="ترومبيلا بي خودان">ترومبيلا بي خودان</option>
+                            <option value="ئاگر بەربون">ئاگر بەربون</option>
+                            <option value="تەقەكرن">تەقەكرن</option>
+                            <option value="مەلەڤاني جهی قەدەغە">مەلەڤاني جهی قەدەغە</option>
+                            <option value="تێكدەر">تێكدەر</option>
+                            <option value="خەندقین">خەندقین</option>
+                            <option value="گەفكرن">گەفكرن</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group time-input-container">
+                        <label for="time">دەمژمێر (الوقت)</label>
+                        <input type="text" id="time" name="time" placeholder="مثال: 2:00 الى 3:00" required>
+                        <div class="time-options">
+                            <label class="radio-label">
+                                <input type="radio" name="day-night" value="روژ" checked> روژ (نهار)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="day-night" value="شەڤ"> شەڤ (ليل)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="problem-location">جهێ ئاریشێ (مكان المشكلة)</label>
+                        <input type="text" id="problem-location" name="problem-location" required>
+                    </div>
+                    
+                    <div class="driver-point-group">
+                        <div class="form-group driver-input">
+                            <label for="driver-name">ناڤێ شوفێری (اسم السائق)</label>
+                            <input type="text" id="driver-name" name="driver-name" required>
+                        </div>
+                        
+                        <div class="form-group point-input">
+                            <label for="point">خالا (النقطة)</label>
+                            <select id="point" name="point" required>
+                                <option value="" disabled selected>اختر النقطة</option>
+                                <option value="100">100</option>
+                                <option value="101">101</option>
+                                <option value="102">102</option>
+                                <option value="103">103</option>
+                                <option value="105">105</option>
+                                <option value="106">106</option>
+                                <option value="107">107</option>
+                                <option value="108">108</option>
+                                <option value="109">109</option>
+                                <option value="110">110</option>
+                                <option value="111">111</option>
+                                <option value="112">112</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sent-to">رەوانەكرن بـــو</label>
+                        <select id="sent-to" name="sent-to">
+                            <option value="" disabled selected>اختر الجهة</option>
+                            <option value="بنگەهێ پولیسێن كارێز">بنگەهێ پولیسێن كارێز</option>
+                            <option value="بنگەهێ پولیسێن زاخو">بنگەهێ پولیسێن زاخو</option>
+                            <option value="بنگەهێ پولیسێن سێمالكا">بنگەهێ پولیسێن سێمالكا</option>
+                            <option value="بنگەهێ پولیسێن دەلال">بنگەهێ پولیسێن دەلال</option>
+                            <option value="بنگەهێ پولیسێن بێدارێ">بنگەهێ پولیسێن بێدارێ</option>
+                            <option value="بنگەهێ پولیسێن نیو زاخو">بنگەهێ پولیسێن نیو زاخو</option>
+                            <option value="بنگەهێ پولیسێن رزگاری">بنگەهێ پولیسێن رزگاری</option>
+                            <option value="رێڤەبەریا پولیسێن زاخو">رێڤەبەریا پولیسێن زاخو</option>
+                            <option value="توندوتیژیا زاخو">توندوتیژیا زاخو</option>
+                            <option value="نەخوشخانا زاخو">نەخوشخانا زاخو</option>
+                            <option value="دەستێ سەمیانا">دەستێ سەمیانا</option>
+                            <option value="مكافحا زاخو">مكافحا زاخو</option>
+                            <option value="مكافحا بێدارێ">مكافحا بێدارێ</option>
+                            <option value="ئاسايشا زاخو">ئاسايشا زاخو</option>
+                            <option value="ئاگرڤەمراندنا زاخو">ئاگرڤەمراندنا زاخو</option>
+                            <option value="گرتیخانا زاخو">گرتیخانا زاخو</option>
+                            <option value="هاتوچووا زاخو">هاتوچووا زاخو</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" id="save-button" class="primary-button">
+                    <i class="fas fa-save"></i> خەزنكرنا كارتێ
+                </button>
+            </form>
+        </main>
+        
+        <div id="success-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-check-circle"></i> زانیاری ب سەركەفتی هاتنە خەزنكرن</h3>
+                <div class="modal-buttons">
+                    <button id="share-whatsapp" class="action-button whatsapp-button">
+                        <i class="fab fa-whatsapp"></i> هنارتن ب رێیا واتساب
+                    </button>
+                    <button id="new-entry" class="action-button">
+                        <i class="fas fa-plus-circle"></i> زێدەكرنا زانیاریێن نوی
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="multi-person.js"></script>
+    
+    <!-- Register Service Worker for PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
