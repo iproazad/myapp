@@ -542,6 +542,9 @@ function generateSuspectCard(data) {
         const fontSize = isNewInfo ? 19 : 21; // Further reduced font size by 3%
         const labelWidth = isNewInfo ? 126 : 145; // Further reduced label width by 3%
         
+        // Remove colon from label if it exists
+        label = label.replace(':', '');
+        
         // Calculate if we need multiple lines for the value
         ctx.font = `${fontSize}px Arial`;
         const valueWidth = ctx.measureText(value || '-').width;
@@ -549,8 +552,8 @@ function generateSuspectCard(data) {
         const valueBoxWidth = canvas.width / 3.09 - 39 - labelWidth; // Reduced width by additional 3%
         const needsMultipleLines = valueWidth > valueBoxWidth - 14; // Reduced padding by 3%
         
-        // Adjust box height based on content
-        let boxHeight = isNewInfo ? 33 : 37; // Further reduced default height by 3%
+        // Adjust box height based on content - increase by 3%
+        let boxHeight = isNewInfo ? 34 : 38; // Increased height by 3%
         let lines = [];
         
         // If text is too long, calculate how many lines we need
@@ -626,8 +629,8 @@ function generateSuspectCard(data) {
         ctx.font = `bold ${fontSize}px Arial`;
         ctx.fillStyle = isNewInfo ? '#2c3e50' : '#2c3e50';
         ctx.textAlign = 'center';
-        // Center label vertically in the box
-        ctx.fillText(label, labelBoxX + labelWidth/2, y + (needsMultipleLines ? -boxHeight/4 : 2));
+        // Center label both vertically and horizontally in the box
+        ctx.fillText(label, labelBoxX + labelWidth/2, y + (needsMultipleLines ? -boxHeight/4 : boxHeight/4));
         
         // Draw value with enhanced styling (now on left)
         ctx.font = `${fontSize}px Arial`;
@@ -636,8 +639,11 @@ function generateSuspectCard(data) {
         // Check if text is RTL (Arabic, Kurdish, etc.)
         const isRTL = value && /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(value);
         
-        // Set text alignment based on language direction
-        ctx.textAlign = isRTL ? 'left' : 'left';
+        // Set text alignment to center for better appearance
+        ctx.textAlign = 'center';
+        
+        // Calculate the center of the value box
+        const valueBoxCenter = valueBoxX + (boxWidth - labelWidth - 4) / 2;
         
         if (needsMultipleLines && lines.length > 0) {
             // Draw multiple lines of text with improved spacing
@@ -649,14 +655,12 @@ function generateSuspectCard(data) {
             const startY = y - totalTextHeight / 2 + fontSize / 2;
             
             for (let i = 0; i < lines.length; i++) {
-                // Position text closer to the label with less padding
-                const xPosition = valueBoxX + 4; // Further reduced padding by 3%
-                ctx.fillText(lines[i], xPosition, startY + i * lineHeight);
+                // Position text in the center of the value box
+                ctx.fillText(lines[i], valueBoxCenter, startY + i * lineHeight);
             }
         } else {
-            // Draw single line of text
-            const xPosition = valueBoxX + 4; // Further reduced padding by 3%
-            ctx.fillText(value || '-', xPosition, y + 2);
+            // Draw single line of text centered vertically and horizontally
+            ctx.fillText(value || '-', valueBoxCenter, y + boxHeight/4);
         }
         
         // Reset text alignment for other text
