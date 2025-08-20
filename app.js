@@ -179,11 +179,53 @@ function generateSuspectCard(data) {
     ctx.font = 'bold 48px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('بەشێ پولیسێن هەوارهاتنا زاخو', canvas.width / 2, 90);
+    ctx.fillText('توماركرنا تومەتباری', canvas.width / 2, 90);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
+    
+    // Draw case information header (similar to توماری ئاریشە)
+    drawCaseInfoHeader(ctx, data, canvas.width);
+    
+    // Function to draw case information header (similar to توماری ئاریشە)
+    function drawCaseInfoHeader(ctx, data, width) {
+        // Draw header background with gradient
+        const headerY = 150;
+        const headerHeight = 120;
+        const headerGradient = ctx.createLinearGradient(0, headerY, 0, headerY + headerHeight);
+        headerGradient.addColorStop(0, '#3498db');
+        headerGradient.addColorStop(1, '#2980b9');
+        ctx.fillStyle = headerGradient;
+        ctx.fillRect(30, headerY, width - 60, headerHeight);
+        
+        // Add decorative border
+        ctx.strokeStyle = '#f39c12';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(40, headerY + 10, width - 80, headerHeight - 20);
+        
+        // Add case information
+        ctx.font = 'bold 22px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#ffffff';
+        
+        // First row
+        ctx.fillText(`جورێ ئاریشێ: ${data.issueType}`, width - 80, headerY + 40);
+        ctx.fillText(`دەمژمێر: ${data.time} ${data.dayNight}`, width - 80, headerY + 70);
+        ctx.fillText(`جهێ ئاریشێ: ${data.problemLocation}`, width - 80, headerY + 100);
+        
+        // Second row (left side)
+        ctx.textAlign = 'left';
+        ctx.fillText(`ناڤێ شوفێری: ${data.driverName}`, 80, headerY + 40);
+        ctx.fillText(`خالا: ${data.point}`, 80, headerY + 70);
+        ctx.fillText(`رەوانەكرن بـــو: ${data.sentTo}`, 80, headerY + 100);
+        
+        // Add current date
+        const currentDate = new Date().toLocaleDateString('ar-IQ');
+        ctx.textAlign = 'center';
+        ctx.font = '18px Arial';
+        ctx.fillText(`تاریخ: ${currentDate}`, width / 2, headerY + 100);
+    }
     
     // Add photo if available with enhanced styling
     if (data.photo) {
@@ -192,9 +234,9 @@ function generateSuspectCard(data) {
         
         // Draw rectangular photo background and frame with elegant styling
         const photoX = canvas.width - 470; // Position on the right side
-        const photoY = 180;
+        const photoY = 280; // Moved down to make room for case info header
         const photoWidth = 420;
-        const photoHeight = 600; // زيادة طول الصورة العمودية
+        const photoHeight = 500; // Adjusted height
         
         // Add shadow effect to photo
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
@@ -250,23 +292,21 @@ function generateSuspectCard(data) {
         roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
         ctx.clip();
         
-        // Wait for image to load
-        img.onload = function() {
-            ctx.drawImage(img, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
-            ctx.restore();
-            
-            // Continue with drawing text after image loads
-            drawSuspectInfo();
-            
-            // Save the final image
-            currentSuspectData.cardImage = canvas.toDataURL('image/png');
-        };
+        // Draw image immediately (synchronously)
+        ctx.drawImage(img, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10);
+        ctx.restore();
+        
+        // Continue with drawing text
+        drawSuspectInfo();
+        
+        // Save the final image
+        currentSuspectData.cardImage = canvas.toDataURL('image/png');
     } else {
         // Define photo dimensions for consistency
         const photoX = canvas.width - 470; // Position on the right side
-        const photoY = 180;
+        const photoY = 280; // Moved down to make room for case info header
         const photoWidth = 420;
-        const photoHeight = 600; // زيادة طول الصورة العمودية
+        const photoHeight = 500; // Adjusted height
         
         // No photo, draw a placeholder
         ctx.fillStyle = '#ecf0f1';
@@ -315,9 +355,9 @@ function generateSuspectCard(data) {
     function drawSuspectInfo() {
         // Define info section dimensions with more space
         const infoX = 50;
-        const infoY = 180;
+        const infoY = 280; // Adjusted to start after case header
         const infoWidth = canvas.width - 550; // Leave space for photo on the right
-        const infoHeight = 700; // Maintain height for proper content spacing
+        const infoHeight = 500; // Reduced height to make it shorter vertically
         
         // Add shadow effect to info section
         ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
@@ -466,42 +506,15 @@ function generateSuspectCard(data) {
         ctx.lineTo(infoX + infoWidth - 50, maxFieldsY);
         ctx.stroke();
         
-        // Add additional information section with improved styling
+        // Skip additional information section header since it's now in the case info header
         const additionalInfoY = maxFieldsY + 30;
         
-        // Add section subtitle with elegant styling
-        ctx.font = 'bold 30px Arial';
-        ctx.fillStyle = '#2c3e50';
-        ctx.textAlign = 'center';
-        ctx.fillText('معلومات إضافية', infoX + infoWidth / 2, additionalInfoY);
+        // Skip additional information section entirely
         
-        // Add decorative elements under subtitle
-        ctx.fillStyle = '#f1c40f';
-        ctx.fillRect(infoX + infoWidth/2 - 100, additionalInfoY + 10, 200, 2);
-        
-        // Draw additional information in two columns with elegant styling
-        const addInfoStartY = additionalInfoY + 50;
-        const addInfoLineHeight = 50;
-        
-        // Draw additional fields in two columns
-        if (data.time) {
-            drawInfoBox('دەمژمێر:', data.time + (data.dayNight ? ' - ' + data.dayNight : ''), addInfoStartY, col1X, '#2980b9');
-        }
-        
-        if (data.problemLocation) {
-            drawInfoBox('جهێ ئاریشێ:', data.problemLocation, addInfoStartY, col2X, '#2980b9');
-        }
-        
-        if (data.driverName) {
-            drawInfoBox('ناڤێ شوفێری:', data.driverName, addInfoStartY + addInfoLineHeight, col1X, '#2980b9');
-        }
-        
-        if (data.point) {
-            drawInfoBox('خالا:', data.point, addInfoStartY + addInfoLineHeight, col2X, '#2980b9');
-        }
+        // Skip drawing additional fields as they are already shown in the case info header
         
         // Calculate footer position based on content
-        const footerY = addInfoStartY + addInfoLineHeight * 2 + 30;
+        const footerY = additionalInfoY + 30;
         
         // Add elegant footer with enhanced gradient
         const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
@@ -509,12 +522,12 @@ function generateSuspectCard(data) {
         footerGradient.addColorStop(0.5, '#3498db'); // Medium blue
         footerGradient.addColorStop(1, '#2980b9'); // Darker blue again
         ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, footerY, canvas.width - 40, 70, {tl: 0, tr: 0, bl: 20, br: 20}, true, false);
+        roundRect(ctx, 20, footerY, canvas.width - 40, 90, {tl: 0, tr: 0, bl: 20, br: 20}, true, false);
         
         // Add elegant pattern to footer
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         for (let i = 0; i < canvas.width; i += 30) {
-            ctx.fillRect(i, footerY, 15, 70);
+            ctx.fillRect(i, footerY, 15, 90);
         }
         
         // Add gold accent line above footer
@@ -529,7 +542,7 @@ function generateSuspectCard(data) {
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 40);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 55);
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
