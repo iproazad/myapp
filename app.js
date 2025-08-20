@@ -832,31 +832,47 @@ function saveImageToDevice() {
     try {
         // Create a temporary link to download the image
         const tempLink = document.createElement('a');
-        tempLink.href = currentSuspectData.cardImage;
         
         // Use suspect name in the filename if available
         const suspectName = currentSuspectData.fullname || 'suspect';
         
-        // Automatically use the suspect name as filename
-        const fileName = suspectName + '_' + new Date().getTime() + '.png';
+        // Automatically use the suspect name as filename with timestamp to ensure uniqueness
+        // Remove any special characters that might cause issues with filenames
+        const sanitizedName = suspectName.replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, '_');
+        const fileName = sanitizedName + '_' + new Date().getTime() + '.png';
         
-        // Set download attributes with PNG extension
+        // For mobile devices, we need to ensure the MIME type is correct and force download
+        // Convert the base64 image to a Blob for better mobile compatibility
+        const imageData = currentSuspectData.cardImage;
+        const byteString = atob(imageData.split(',')[1]);
+        const mimeType = imageData.split(',')[0].split(':')[1].split(';')[0];
+        
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        
+        const blob = new Blob([ab], {type: mimeType});
+        const blobUrl = URL.createObjectURL(blob);
+        
+        // Set attributes for better mobile compatibility
+        tempLink.href = blobUrl;
         tempLink.download = fileName;
-        
-        // Explicitly set attributes for better compatibility
         tempLink.setAttribute('download', fileName);
-        tempLink.setAttribute('href', currentSuspectData.cardImage.replace(/^data:image\/[^;]+/, 'data:application/octet-stream'));
         tempLink.setAttribute('target', '_blank');
         
         // Append to body, click, and remove
         document.body.appendChild(tempLink);
         tempLink.click();
         
-        // Add a small delay before removing the link
+        // Add a longer delay before removing the link and revoking the blob URL
+        // This helps ensure the download completes on slower mobile devices
         setTimeout(() => {
             document.body.removeChild(tempLink);
+            URL.revokeObjectURL(blobUrl); // Clean up the blob URL
             alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
-        }, 100);
+        }, 500);
     } catch (error) {
         console.error('Error saving image:', error);
         alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
