@@ -830,9 +830,6 @@ function shareViaWhatsapp() {
 // Function to save image to device
 function saveImageToDevice() {
     try {
-        // Create a temporary link to download the image
-        const tempLink = document.createElement('a');
-        
         // Use suspect name in the filename if available
         const suspectName = currentSuspectData.fullname || 'suspect';
         
@@ -845,34 +842,102 @@ function saveImageToDevice() {
         // Convert the base64 image to a Blob for better mobile compatibility
         const imageData = currentSuspectData.cardImage;
         const byteString = atob(imageData.split(',')[1]);
-        const mimeType = imageData.split(',')[0].split(':')[1].split(';')[0];
+        const mimeType = 'image/png'; // Force PNG MIME type for better compatibility
         
+        // Add filename to the blob for better mobile compatibility
         const ab = new ArrayBuffer(byteString.length);
         const ia = new Uint8Array(ab);
         for (let i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
         }
         
+        // Create blob with proper type and suggested filename
         const blob = new Blob([ab], {type: mimeType});
-        const blobUrl = URL.createObjectURL(blob);
+        // Some browsers support this property to suggest filename
+        if (typeof blob.name !== 'undefined') {
+            blob.name = fileName;
+        }
         
-        // Set attributes for better mobile compatibility
-        tempLink.href = blobUrl;
-        tempLink.download = fileName;
-        tempLink.setAttribute('download', fileName);
-        tempLink.setAttribute('target', '_blank');
+        // Mobile detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
         
-        // Append to body, click, and remove
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        
-        // Add a longer delay before removing the link and revoking the blob URL
-        // This helps ensure the download completes on slower mobile devices
-        setTimeout(() => {
-            document.body.removeChild(tempLink);
-            URL.revokeObjectURL(blobUrl); // Clean up the blob URL
+        if (isIOS) {
+            // Special handling for iOS devices
+            // iOS doesn't support downloads properly, so we'll open in a new tab
+            const blobUrl = URL.createObjectURL(blob);
+            const newTab = window.open(blobUrl, '_blank');
+            
+            if (!newTab) {
+                // If popup blocked, try to show instructions
+                alert('لحفظ الصورة على جهاز iOS، اضغط مطولاً على الصورة ثم اختر "حفظ الصورة"');
+                window.location.href = blobUrl; // Try to navigate to the blob URL in the current window
+            }
+            
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+            }, 1500);
+        } else if (isAndroid && typeof navigator.msSaveOrOpenBlob === 'undefined') {
+            // Special handling for Android devices
+            try {
+                // Try using the download attribute with a hidden iframe for Android
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // Write a form to the iframe that will submit and download the blob
+                const iframeDoc = iframe.contentWindow.document;
+                const form = iframeDoc.createElement('form');
+                form.method = 'POST';
+                form.action = URL.createObjectURL(blob);
+                form.enctype = 'multipart/form-data';
+                
+                const input = iframeDoc.createElement('input');
+                input.type = 'hidden';
+                input.name = 'filename';
+                input.value = fileName;
+                form.appendChild(input);
+                
+                iframeDoc.body.appendChild(form);
+                form.submit();
+                
+                // Clean up after a delay
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                    URL.revokeObjectURL(form.action);
+                    alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
+                }, 1500);
+            } catch (e) {
+                console.error('Android iframe download failed:', e);
+                
+                // Fallback to direct download if iframe method fails
+                window.open(URL.createObjectURL(blob), '_blank');
+                alert('تم حفظ البطاقة. يرجى التحقق من مجلد التنزيلات.');
+            }
+        } else if (typeof navigator.msSaveOrOpenBlob !== 'undefined') {
+            // For IE and Edge
+            navigator.msSaveOrOpenBlob(blob, fileName);
             alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
-        }, 500);
+        } else {
+            // Standard approach for other browsers
+            const tempLink = document.createElement('a');
+            const blobUrl = URL.createObjectURL(blob);
+            tempLink.href = blobUrl;
+            tempLink.download = fileName;
+            tempLink.setAttribute('download', fileName);
+            
+            // Append to body, click, and remove
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            
+            // Add a longer delay before removing the link and revoking the blob URL
+            setTimeout(() => {
+                document.body.removeChild(tempLink);
+                URL.revokeObjectURL(blobUrl); // Clean up the blob URL
+                alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
+            }, 1000);
+        }
     } catch (error) {
         console.error('Error saving image:', error);
         alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
