@@ -539,29 +539,29 @@ function generateSuspectCard(data) {
     function drawInfoBox(label, value, y, boxX = 80, labelColor = '#3498db', isHighlighted = false) {
         // Define info box dimensions with elegant proportions
         const isNewInfo = labelColor === '#777777' || labelColor === '#2980b9';
-        const fontSize = isNewInfo ? 20 : 22; // Smaller font for better fit
-        const labelWidth = isNewInfo ? 130 : 150; // Further reduced label width for better balance
+        const fontSize = isNewInfo ? 19 : 21; // Further reduced font size by 3%
+        const labelWidth = isNewInfo ? 126 : 145; // Further reduced label width by 3%
         
         // Calculate if we need multiple lines for the value
         ctx.font = `${fontSize}px Arial`;
         const valueWidth = ctx.measureText(value || '-').width;
         // Increase value box width by reducing the gap between label and value
-        const valueBoxWidth = canvas.width / 3 - 40 - labelWidth; // Reduced width to 1/3 of canvas
-        const needsMultipleLines = valueWidth > valueBoxWidth - 15; // Reduced padding from 20 to 15
+        const valueBoxWidth = canvas.width / 3.09 - 39 - labelWidth; // Reduced width by additional 3%
+        const needsMultipleLines = valueWidth > valueBoxWidth - 14; // Reduced padding by 3%
         
         // Adjust box height based on content
-        let boxHeight = isNewInfo ? 34 : 38; // Further reduced default height
+        let boxHeight = isNewInfo ? 33 : 37; // Further reduced default height by 3%
         let lines = [];
         
         // If text is too long, calculate how many lines we need
          if (needsMultipleLines && value) {
-             lines = wrapText(ctx, value, valueBoxWidth - 15, fontSize);
+             lines = wrapText(ctx, value, valueBoxWidth - 14, fontSize);
              // Increase box height to accommodate multiple lines with better spacing
-             const lineSpacing = fontSize * 0.25; // Further reduced line spacing
-             boxHeight = Math.max(boxHeight, lines.length * (fontSize + lineSpacing) + 10); // Reduced padding from 15 to 10
+             const lineSpacing = fontSize * 0.24; // Further reduced line spacing by 3%
+             boxHeight = Math.max(boxHeight, lines.length * (fontSize + lineSpacing) + 9); // Reduced padding by 3%
          }
         
-        const boxWidth = canvas.width / 3 - 40; // Reduced width to 1/3 of canvas
+        const boxWidth = canvas.width / 3.09 - 39; // Reduced width by additional 3%
         
         // Add subtle shadow effect for depth
         if (!isNewInfo || isHighlighted) {
@@ -573,7 +573,7 @@ function generateSuspectCard(data) {
         
         // Reverse the positions - Value box on left, Label on right with reduced gap
         const valueBoxX = boxX;
-        const labelBoxX = boxX + boxWidth - labelWidth + 5; // Further reduced gap to 5px
+        const labelBoxX = boxX + boxWidth - labelWidth + 4; // Further reduced gap by 3%
         
         // Create gradient backgrounds for more elegant appearance
         // Value box gradient background (now on left)
@@ -586,7 +586,7 @@ function generateSuspectCard(data) {
             valueGradient.addColorStop(1, '#f8f9fa');
         }
         ctx.fillStyle = valueGradient;
-        roundRect(ctx, valueBoxX, y - boxHeight/2, boxWidth - labelWidth - 5, boxHeight, {tl: 10, bl: 10, tr: 0, br: 0}, true, false); // Further reduced width to 5px
+        roundRect(ctx, valueBoxX, y - boxHeight/2, boxWidth - labelWidth - 4, boxHeight, {tl: 10, bl: 10, tr: 0, br: 0}, true, false); // Further reduced width by 3%
         
         // Label background gradient (now on right)
         const labelGradient = ctx.createLinearGradient(labelBoxX, y - boxHeight/2, labelBoxX, y + boxHeight/2);
@@ -641,7 +641,7 @@ function generateSuspectCard(data) {
         
         if (needsMultipleLines && lines.length > 0) {
             // Draw multiple lines of text with improved spacing
-            const lineSpacing = fontSize * 0.25; // Further reduced line spacing to match earlier change
+            const lineSpacing = fontSize * 0.24; // Further reduced line spacing by 3%
             const lineHeight = fontSize + lineSpacing;
             
             // Calculate starting Y position to center text vertically in the box
@@ -650,12 +650,12 @@ function generateSuspectCard(data) {
             
             for (let i = 0; i < lines.length; i++) {
                 // Position text closer to the label with less padding
-                const xPosition = valueBoxX + 5; // Further reduced padding from 10 to 5
+                const xPosition = valueBoxX + 4; // Further reduced padding by 3%
                 ctx.fillText(lines[i], xPosition, startY + i * lineHeight);
             }
         } else {
             // Draw single line of text
-            const xPosition = valueBoxX + 5; // Further reduced padding from 10 to 5
+            const xPosition = valueBoxX + 4; // Further reduced padding by 3%
             ctx.fillText(value || '-', xPosition, y + 2);
         }
         
@@ -833,20 +833,11 @@ function saveImageToDevice() {
         // Use suspect name in the filename if available
         const suspectName = currentSuspectData.fullname || 'suspect';
         
-        // Ask user for custom filename
-        let defaultFileName = 'بطاقة_' + suspectName;
-        let customFileName = prompt('أدخل اسم الملف:', defaultFileName);
+        // Automatically use the suspect name as filename
+        const fileName = suspectName + '_' + new Date().getTime() + '.png';
         
-        // If user cancels prompt, use default name
-        if (customFileName === null) {
-            customFileName = defaultFileName;
-        }
-        
-        // Add timestamp to ensure uniqueness
-        const fileName = customFileName + '_' + new Date().getTime();
-        
-        // Set download attributes
-        tempLink.download = fileName; // No file extension to save as regular file
+        // Set download attributes with PNG extension
+        tempLink.download = fileName;
         
         // Explicitly set attributes for better compatibility
         tempLink.setAttribute('download', fileName);
@@ -860,7 +851,7 @@ function saveImageToDevice() {
         // Add a small delay before removing the link
         setTimeout(() => {
             document.body.removeChild(tempLink);
-            alert('تم حفظ البطاقة في مجلد التنزيلات. لتغيير امتداد الملف: \n1. اذهب إلى مجلد التنزيلات\n2. انقر بزر الماوس الأيمن على الملف\n3. اختر "إعادة تسمية"\n4. أضف الامتداد المطلوب (مثل .pdf أو .doc)');
+            alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
         }, 100);
     } catch (error) {
         console.error('Error saving image:', error);
