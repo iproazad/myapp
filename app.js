@@ -179,7 +179,7 @@ function generateSuspectCard(data) {
     ctx.font = 'bold 48px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('كارتا زانیاریێن تومەتباری', canvas.width / 2, 90);
+    ctx.fillText('بەشێ پولیسێن هەوارهاتنا زاخو', canvas.width / 2, 90);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
@@ -370,7 +370,7 @@ function generateSuspectCard(data) {
         ctx.font = 'bold 36px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('زانیاریێن كەسی', infoX + infoWidth / 2, infoY + 45);
+        ctx.fillText('پێزانین تومەتبار', infoX + infoWidth / 2, infoY + 45);
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
