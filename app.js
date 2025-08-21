@@ -104,7 +104,6 @@ function saveSuspectData() {
 function generateSuspectCard(data) {
     // Create a virtual canvas to generate the card image
     const canvas = document.createElement('canvas');
-    canvas.id = 'cardCanvas'; // Add ID to canvas for later reference
     const ctx = canvas.getContext('2d');
     
     // Set canvas dimensions - elegant widescreen format
@@ -863,65 +862,24 @@ function saveImageToDevice() {
         if (canvas) {
             // Try to use the canvas directly for better filename support
             imageData = canvas.toDataURL('image/png');
-            console.log('Using canvas element to save image');
         } else {
             // Fallback to using the stored image data
             imageData = currentSuspectData.cardImage;
-            console.log('Using stored image data to save image');
         }
         
-        // Add the canvas to the document body temporarily if it doesn't exist
-        // This ensures we can access it for saving in both pages
-        if (!document.getElementById('cardCanvas') && currentSuspectData.cardImage) {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.id = 'cardCanvas';
-            tempCanvas.style.display = 'none';
-            document.body.appendChild(tempCanvas);
-            
-            // Create an image to draw on the canvas
-            const img = new Image();
-            img.onload = function() {
-                tempCanvas.width = img.width;
-                tempCanvas.height = img.height;
-                const ctx = tempCanvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                
-                // Now continue with the download process
-                completeImageSave(tempCanvas.toDataURL('image/png'), fileName);
-                
-                // Remove the temporary canvas after a delay
-                setTimeout(() => {
-                    document.body.removeChild(tempCanvas);
-                }, 3000);
-            };
-            img.src = currentSuspectData.cardImage;
-            return; // Exit early as we'll continue in the onload callback
-        }
-        
-        // Continue with normal process if we have image data
-        completeImageSave(imageData, fileName);
-    } catch (error) {
-        console.error('Error saving image:', error);
-        alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
-    }
-}
-
-// Helper function to complete the image saving process
-function completeImageSave(imageData, fileName) {
-    try {
         // Process the image data to create a blob
-        const byteString = atob(imageData.split(',')[1]);
-        const mimeType = 'image/png'; // Force PNG MIME type for better compatibility
+        byteString = atob(imageData.split(',')[1]);
+        mimeType = 'image/png'; // Force PNG MIME type for better compatibility
         
         // Create array buffer from binary string
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
+        ab = new ArrayBuffer(byteString.length);
+        ia = new Uint8Array(ab);
         for (let i = 0; i < byteString.length; i++) {
             ia[i] = byteString.charCodeAt(i);
         }
         
         // Create blob with proper type and suggested filename
-        const blob = new Blob([ab], {type: mimeType});
+        blob = new Blob([ab], {type: mimeType});
         
         // Some browsers support this property to suggest filename
         if (typeof blob.name !== 'undefined') {
@@ -952,7 +910,7 @@ function completeImageSave(imageData, fileName) {
             
             if (!newTab) {
                 // If popup blocked, try to show instructions
-                alert('بو پاراستنا وێنەی لسەر ئامیرێن iOS، پەنجەیێ خو لسەر وێنەی بهێلە و پاشی "پاراستنا وێنەی" هەلبژێرە');
+                alert('لحفظ الصورة على جهاز iOS، اضغط مطولاً على الصورة ثم اختر "حفظ الصورة"');
                 window.location.href = blobUrl; // Try to navigate to the blob URL in the current window
             }
             
@@ -991,7 +949,7 @@ function completeImageSave(imageData, fileName) {
                 setTimeout(() => {
                     document.body.removeChild(downloadLink);
                     URL.revokeObjectURL(blobUrl);
-                    alert('كارت ب ناڤێ تومەتباری هاتە پاراستن د فولدەرا داونلودێ دا ب فورماتێ PNG');
+                    alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
                 }, 2500);
             } catch (e) {
                 console.error('Android download failed:', e);
@@ -1016,17 +974,17 @@ function completeImageSave(imageData, fileName) {
                     setTimeout(() => {
                         document.body.removeChild(downloadLink);
                         URL.revokeObjectURL(blobUrl);
-                        alert('كارت ب ناڤێ تومەتباری هاتە پاراستن د فولدەرا داونلودێ دا ب فورماتێ PNG');
+                        alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
                     }, 2000);
                 } catch (innerError) {
                     console.error('All Android download methods failed:', innerError);
-                    alert('كارت هاتە پاراستن. تكایە فولدەرا داونلودێ ببینە.');
+                    alert('تم حفظ البطاقة. يرجى التحقق من مجلد التنزيلات.');
                 }
             }
         } else if (typeof navigator.msSaveOrOpenBlob !== 'undefined') {
             // For IE and Edge
             navigator.msSaveOrOpenBlob(blob, fileName);
-            alert('كارت ب ناڤێ تومەتباری هاتە پاراستن د فولدەرا داونلودێ دا ب فورماتێ PNG');
+            alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
         } else {
             // Standard approach for other browsers with improved filename handling
             const tempLink = document.createElement('a');
@@ -1040,7 +998,6 @@ function completeImageSave(imageData, fileName) {
             
             // Force content disposition to attachment
             tempLink.setAttribute('type', 'application/octet-stream');
-
             
             // Add data attributes that some browsers might use
             tempLink.dataset.downloadurl = ['image/png', fileName, blobUrl].join(':');
@@ -1053,14 +1010,13 @@ function completeImageSave(imageData, fileName) {
             setTimeout(() => {
                 document.body.removeChild(tempLink);
                 URL.revokeObjectURL(blobUrl); // Clean up the blob URL
-                alert('كارت ب ناڤێ تومەتباری هاتە پاراستن د فولدەرا داونلودێ دا ب فورماتێ PNG');
+                alert('تم حفظ البطاقة باسم المتهم في مجلد التنزيلات بصيغة PNG');
             }, 2000); // Increased timeout for slower devices
         }
     } catch (error) {
         console.error('Error saving image:', error);
         alert('هەلەك چێبوو دەمێ خەزنكرنا وێنەی. تكایە دووبارە هەول بدە.');
     }
-}
 }
 
 // Reset form for new entry
