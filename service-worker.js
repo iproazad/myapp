@@ -1,6 +1,6 @@
 // Service Worker for Misconduct Logger App
 
-const CACHE_NAME = 'misconduct-logger-v1';
+const CACHE_NAME = 'misconduct-logger-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,6 +11,8 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './debug.js',
+  './test-navigation.html',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2'
@@ -21,10 +23,15 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
+        console.log('Caching app assets...');
         return cache.addAll(ASSETS_TO_CACHE);
       })
       .then(() => {
+        console.log('Service worker installed and assets cached');
         return self.skipWaiting();
+      })
+      .catch(error => {
+        console.error('Error during service worker installation:', error);
       })
   );
 });

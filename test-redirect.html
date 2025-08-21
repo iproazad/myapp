@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار التوجيه</title>
+</head>
+<body>
+    <h1>صفحة اختبار التوجيه</h1>
+    <p>إذا كان التوجيه يعمل بشكل صحيح، فلن ترى هذه الصفحة وسيتم توجيهك إلى صفحة تسجيل الدخول.</p>
+    
+    <script>
+        // تأكد من أن التوجيه يعمل بشكل صحيح
+        window.onload = function() {
+            console.log('تم تحميل صفحة الاختبار');
+            // توجيه إلى صفحة تسجيل الدخول بعد ثانية واحدة
+            setTimeout(function() {
+                window.location.href = 'login.html';
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
