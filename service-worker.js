@@ -4,8 +4,10 @@ const CACHE_NAME = 'misconduct-logger-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './login.html',
   './style.css',
   './app.js',
+  './redirect.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',

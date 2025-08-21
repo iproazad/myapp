@@ -179,7 +179,7 @@ function generateSuspectCard(data) {
     ctx.font = 'bold 48px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('توماركرنا تومەتباری', canvas.width / 2, 90);
+    ctx.fillText('بەشێ پولیسێن هەوارهاتنێ', canvas.width / 2, 90);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
@@ -514,7 +514,7 @@ function generateSuspectCard(data) {
         // Skip drawing additional fields as they are already shown in the case info header
         
         // Calculate footer position based on content
-        const footerY = additionalInfoY + 30;
+        const footerY = additionalInfoY + 70;
         
         // Add elegant footer with enhanced gradient
         const footerGradient = ctx.createLinearGradient(0, footerY, canvas.width, footerY);
@@ -522,12 +522,12 @@ function generateSuspectCard(data) {
         footerGradient.addColorStop(0.5, '#3498db'); // Medium blue
         footerGradient.addColorStop(1, '#2980b9'); // Darker blue again
         ctx.fillStyle = footerGradient;
-        roundRect(ctx, 20, footerY, canvas.width - 40, 90, {tl: 0, tr: 0, bl: 20, br: 20}, true, false);
+        roundRect(ctx, 20, footerY, canvas.width - 40, 70, {tl: 0, tr: 0, bl: 20, br: 20}, true, false);
         
         // Add elegant pattern to footer
         ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
         for (let i = 0; i < canvas.width; i += 30) {
-            ctx.fillRect(i, footerY, 15, 90);
+            ctx.fillRect(i, footerY, 15, 70);
         }
         
         // Add gold accent line above footer
@@ -542,7 +542,7 @@ function generateSuspectCard(data) {
         ctx.font = 'italic 24px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
-        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 55);
+        ctx.fillText('دەمێ توماركرنێ: ' + data.timestamp, canvas.width / 2, footerY + 40);
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
