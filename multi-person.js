@@ -218,75 +218,159 @@ function saveMultiPersonData(event) {
 
 function generateMultiPersonCard(personsData, caseData) {
     const canvas = document.createElement('canvas');
+    canvas.id = 'multiPersonCanvas';
     const ctx = canvas.getContext('2d');
     
     // Set canvas dimensions based on number of persons
-    const personHeight = 300; // Height per person
-    const headerHeight = 200; // Height for case information
+    const personHeight = 320; // Increased height per person
+    const headerHeight = 220; // Increased height for case information
     const canvasWidth = 1000;
-    const canvasHeight = headerHeight + (personsData.length * personHeight);
+    const canvasHeight = headerHeight + (personsData.length * personHeight) + 50; // Added footer space
     
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     
-    // Fill background
-    ctx.fillStyle = '#f5f5f5';
+    // Fill background with gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+    bgGradient.addColorStop(0, '#f5f5f5');
+    bgGradient.addColorStop(1, '#e0e0e0');
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+    // Add subtle pattern to background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+    for (let i = 0; i < canvasWidth; i += 30) {
+        for (let j = 0; j < canvasHeight; j += 30) {
+            ctx.fillRect(i, j, 15, 15);
+        }
+    }
+    
+    // Add card border
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(10, 10, canvasWidth - 20, canvasHeight - 20);
     
     // Draw header with case information
     drawCaseHeader(ctx, caseData, canvasWidth, headerHeight);
     
-    // Draw each person's information
+    // Draw each person's information with improved spacing
     personsData.forEach((person, index) => {
         const yOffset = headerHeight + (index * personHeight);
         drawPersonInfo(ctx, person, yOffset, canvasWidth, personHeight);
+        
+        // Add separator between persons (except after the last one)
+        if (index < personsData.length - 1) {
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 5]);
+            ctx.beginPath();
+            ctx.moveTo(50, yOffset + personHeight - 10);
+            ctx.lineTo(canvasWidth - 50, yOffset + personHeight - 10);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
     });
+    
+    // Add footer
+    const footerY = headerHeight + (personsData.length * personHeight) + 10;
+    ctx.fillStyle = '#2980b9';
+    ctx.fillRect(0, footerY, canvasWidth, 40);
+    
+    // Add footer text
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    const timestamp = new Date().toLocaleString('ar-IQ');
+    ctx.fillText(`تم إنشاء هذه البطاقة في: ${timestamp}`, canvasWidth / 2, footerY + 25);
     
     // Convert canvas to image and save
     const cardImage = canvas.toDataURL('image/png');
     saveImageToDevice(cardImage);
+    
+    // Return the canvas for potential further use
+    return canvas;
 }
 
 function drawCaseHeader(ctx, caseData, width, height) {
-    // Draw header background with gradient
+    // Draw header background with enhanced gradient
     const headerGradient = ctx.createLinearGradient(0, 0, 0, height);
-    headerGradient.addColorStop(0, '#3498db');
+    headerGradient.addColorStop(0, '#2980b9');
+    headerGradient.addColorStop(0.5, '#3498db');
     headerGradient.addColorStop(1, '#2980b9');
     ctx.fillStyle = headerGradient;
     ctx.fillRect(0, 0, width, height);
     
-    // Add decorative border
+    // Add subtle pattern to header
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    for (let i = 0; i < width; i += 20) {
+        for (let j = 0; j < height; j += 20) {
+            ctx.fillRect(i, j, 10, 10);
+        }
+    }
+    
+    // Add elegant decorative border
     ctx.strokeStyle = '#f39c12';
     ctx.lineWidth = 4;
     ctx.strokeRect(10, 10, width - 20, height - 20);
     
-    // Add title
-    ctx.font = 'bold 36px Arial';
+    // Add inner border for more elegance
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(15, 15, width - 30, height - 30);
+    
+    // Add title with shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.font = 'bold 38px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText('توماری ئاریشە', width / 2, 50);
+    ctx.shadowColor = 'transparent';
     
-    // Add case information
+    // Add gold accent line under title
+    ctx.strokeStyle = '#f39c12';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(width / 2 - 100, 60);
+    ctx.lineTo(width / 2 + 100, 60);
+    ctx.stroke();
+    
+    // Add case information with improved styling
     ctx.font = 'bold 22px Arial';
     ctx.textAlign = 'right';
     ctx.fillStyle = '#ffffff';
     
-    // First row
-    ctx.fillText(`جورێ ئاریشێ: ${caseData.issueType}`, width - 50, 90);
-    ctx.fillText(`دەمژمێر: ${caseData.time} ${caseData.dayNight}`, width - 50, 120);
-    ctx.fillText(`جهێ ئاریشێ: ${caseData.location}`, width - 50, 150);
+    // First row (right side) with improved spacing and alignment
+    ctx.fillText(`جورێ ئاریشێ: ${caseData.issueType || '-'}`, width - 40, 95);
+    ctx.fillText(`دەمژمێر: ${caseData.time || '-'} ${caseData.dayNight || ''}`, width - 40, 125);
+    ctx.fillText(`جهێ ئاریشێ: ${caseData.location || '-'}`, width - 40, 155);
     
-    // Second row (left side)
+    // Second row (left side) with improved spacing and alignment
     ctx.textAlign = 'left';
-    ctx.fillText(`ناڤێ شوفێری: ${caseData.driverName}`, 50, 90);
-    ctx.fillText(`خالا: ${caseData.point}`, 50, 120);
-    ctx.fillText(`رەوانەكرن بـــو: ${caseData.sentTo}`, 50, 150);
+    ctx.fillText(`ناڤێ شوفێری: ${caseData.driverName || '-'}`, 40, 95);
+    ctx.fillText(`خالا: ${caseData.point || '-'}`, 40, 125);
+    ctx.fillText(`رەوانەكرن بـــو: ${caseData.sentTo || '-'}`, 40, 155);
     
-    // Add current date
+    // Add current date with improved styling
     const currentDate = new Date().toLocaleDateString('ar-IQ');
     ctx.textAlign = 'center';
-    ctx.font = '18px Arial';
-    ctx.fillText(`تاریخ: ${currentDate}`, width / 2, 180);
+    ctx.font = 'bold 18px Arial';
+    
+    // Add date background
+    const dateWidth = 200;
+    const dateHeight = 30;
+    const dateX = (width / 2) - (dateWidth / 2);
+    const dateY = 170;
+    
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.beginPath();
+    ctx.roundRect(dateX, dateY, dateWidth, dateHeight, 15);
+    ctx.fill();
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`تاریخ: ${currentDate}`, width / 2, dateY + 20);
 }
 
 function drawPersonInfo(ctx, person, yOffset, width, height) {
