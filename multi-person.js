@@ -405,6 +405,42 @@ function saveImageToDevice(dataUrl) {
     link.download = `توماری-ئاریشە-${timestamp}.png`;
     link.href = dataUrl;
     link.click();
+    
+    // Also display the image in the success modal
+    const modal = document.getElementById('success-modal');
+    
+    // Check if there's already an image and remove it
+    const existingImg = modal.querySelector('.card-preview-image');
+    if (existingImg) {
+        existingImg.remove();
+    }
+    
+    // Create image container with fixed aspect ratio
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'card-preview-container';
+    imgContainer.style.width = '100%';
+    imgContainer.style.maxWidth = '500px';
+    imgContainer.style.margin = '0 auto';
+    imgContainer.style.position = 'relative';
+    imgContainer.style.overflow = 'hidden';
+    imgContainer.style.maxHeight = '60vh';
+    
+    // Create and add the new image
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.className = 'card-preview-image';
+    img.style.width = '100%';
+    img.style.height = 'auto';
+    img.style.display = 'block';
+    img.style.marginTop = '20px';
+    img.style.borderRadius = '10px';
+    img.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    img.style.objectFit = 'contain';
+    
+    imgContainer.appendChild(img);
+    
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.appendChild(imgContainer);
 }
 
 function shareViaWhatsapp() {
