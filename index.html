@@ -135,8 +135,8 @@
          }
          
          .suspect-photo-container {
-             width: 150px;
-             height: 240px;
+             width: 187px;
+             height: 350px;
              border: none;
              border-radius: 12px;
              overflow: hidden;
@@ -399,7 +399,7 @@
         .modal-content {
             background-color: white;
             border-radius: 10px;
-            max-width: 900px;
+            max-width: 500px;
             margin: 20px auto;
             position: relative;
             padding: 20px;
@@ -559,7 +559,7 @@
         .modal-content {
             background-color: white;
             border-radius: 10px;
-            max-width: 900px;
+            max-width: 500px;
             margin: 20px auto;
             position: relative;
             padding: 20px;
@@ -1339,91 +1339,76 @@
             
             // إنشاء محتوى البطاقة
             cardPreview.innerHTML = `
-                <div class="full-card suspect-card" style="max-width: 720px; border: 2px solid #3498db; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #3498db; color: white; padding: 15px;">
-                        <h2 style="margin: 0;">تومارکرنا توماتباری</h2>
-                        <div style="font-size: 0.9rem; display: flex; align-items: center;">
-                            <div style="margin-left: 15px;">
-                                <div><i class="fas fa-calendar-alt" style="margin-left: 5px;"></i>${formattedDate}</div>
-                                <div><i class="fas fa-clock" style="margin-left: 5px;"></i>${formattedTime}</div>
-                            </div>
-                        </div>
+                <div class="full-card suspect-card" style="display: flex; flex-direction: column; max-width: 600px; margin: 0 auto;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <h2 style="margin: 0; font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); text-align: center; padding: 8px 0;">بەشێ پولیسێن هەوارهاتنێ</h2>
                     </div>
                     
-                    <div class="time-info-box" style="margin: 10px 0; background-color: #3498db; border-radius: 8px; padding: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 12px; color: white; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px; text-align: center; font-size: 18px;">معلومات إضافية</div>
-                        <div class="time-info-content" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 10px;">
-                            <div style="display: flex; align-items: center; border-bottom: 1px dotted rgba(255, 255, 255, 0.3); padding-bottom: 5px;">
-                                <div class="time-label" style="font-weight: bold; color: white; margin-left: 8px; min-width: 90px;">الوقت:</div>
-                                <div class="time-value" style="color: white;">${record.timeFrom || '-'} - ${record.timeTo || '-'}</div>
-                            </div>
-                            <div style="display: flex; align-items: center; border-bottom: 1px dotted rgba(255, 255, 255, 0.3); padding-bottom: 5px;">
-                                <div class="time-label" style="font-weight: bold; color: white; margin-left: 8px; min-width: 90px;">الفترة:</div>
-                                <div class="time-value" style="color: white;">${record.period === 'day' ? 'روژ' : 'شەڤ'}</div>
-                            </div>
-                            <div style="display: flex; align-items: center; border-bottom: 1px dotted rgba(255, 255, 255, 0.3); padding-bottom: 5px;">
-                                <div class="time-label" style="font-weight: bold; color: white; margin-left: 8px; min-width: 90px;">جهێ ئاریشێ:</div>
-                                <div class="time-value" style="color: white;">${record.problemLocation || '-'}</div>
-                            </div>
-                            <div style="display: flex; align-items: center; border-bottom: 1px dotted rgba(255, 255, 255, 0.3); padding-bottom: 5px;">
-                                <div class="time-label" style="font-weight: bold; color: white; margin-left: 8px; min-width: 90px;">ناڤێ شوفێری:</div>
-                                <div class="time-value" style="color: white;">${record.driverName || '-'}</div>
-                            </div>
-                            <div style="display: flex; align-items: center; border-bottom: 1px dotted rgba(255, 255, 255, 0.3); padding-bottom: 5px;">
-                                <div class="time-label" style="font-weight: bold; color: white; margin-left: 8px; min-width: 90px;">خالا:</div>
-                                <div class="time-value" style="color: white;">${record.point || '-'}</div>
-                            </div>
-                            <div style="display: flex; align-items: center; border-bottom: 1px dotted rgba(255, 255, 255, 0.3); padding-bottom: 5px;">
-                                <div class="time-label" style="font-weight: bold; color: white; margin-left: 8px; min-width: 90px;">رەوانەكرن بـــو:</div>
-                                <div class="time-value" style="color: white;">${record.sentTo || '-'}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-body" style="display: flex; flex-direction: row; padding: 15px; background-color: white;">
-                        <div class="suspect-info-container" style="display: flex; flex-direction: row; width: 100%; background-color: white; border-radius: 8px; padding: 10px;">
-                            <div class="suspect-photo-container" style="display: flex; flex-direction: column; margin-left: 15px;">
-                                <div style="position: relative; width: 300px; height: 300px; border-radius: 10px; overflow: hidden; display: flex; justify-content: center; align-items: center; background-color: #f0f0f0;">
-                                    <img src="${record.photo}" alt="${record.name}" style="width: 100%; height: 100%; object-fit: scale-down; object-position: center;">
+                    <div class="card-body" style="padding: 12px;">
+                        <div class="suspect-info-container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                            <div style="display: flex; width: 100%; gap: 10px; align-items: flex-start;">
+                                <div class="suspect-photo-container" style="width: 172px; height: 320px; border-radius: 8px; border: 2px solid #e74c3c; overflow: hidden; box-shadow: 0 3px 6px rgba(0,0,0,0.1); flex-shrink: 0;">
+                                    <img src="${record.photo}" alt="${record.name}" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
-                            </div>
-                            <div class="suspect-details" style="flex: 1;">
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">ناڤێ تومەتباری:</div>
-                                        <div class="field-value" style="font-weight: bold;">${record.name}</div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 4px; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ناڤێ تومەتباری:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.name}</div>
                                     </div>
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">ژدایـــكبون:</div>
-                                        <div class="field-value">${record.birthdate || '-'}</div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 4px; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ژدایـــكبون:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.birthdate || '-'}</div>
                                     </div>
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">ئاكنجی بوون:</div>
-                                        <div class="field-value">${record.address || '-'}</div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 4px; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ژمارا موبایلي:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.phone || '-'}</div>
                                     </div>
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">بارێ خێزانی:</div>
-                                        <div class="field-value">${record.maritalStatus || '-'}</div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 5px; padding: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ئاكنجی بوون:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.address || '-'}</div>
                                     </div>
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">زیندانكرن:</div>
-                                        <div class="field-value">${record.prison || '-'}</div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 5px; padding: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">بارێ خێزانی:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.maritalStatus || '-'}</div>
                                     </div>
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">ژمارا موبایلي:</div>
-                                        <div class="field-value">${record.phone || '-'}</div>
-                                    </div>
-                                    <div class="card-field" style="margin-bottom: 5px;">
-                                        <div class="field-label">جورێ ئاریشێ:</div>
-                                        <div class="field-value" style="color: #e74c3c; font-weight: bold;">${record.problemType || '-'}</div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 5px; padding: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">زیندانكرن:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.prison || '-'}</div>
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div class="time-info-box" style="background: linear-gradient(135deg, #3498db, #2980b9); margin: 3px 0; border-radius: 5px; padding: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%;">
+                                <h3 style="text-align: center; margin-top: 0; margin-bottom: 2px; color: white; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px;">پێزانینێن رویدانێ</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px;">
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">الوقت والفترة:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.timeFrom || '-'} - ${record.timeTo || '-'} (${record.period === 'day' ? 'روژ' : 'شەڤ'})</div>
+                                    </div>
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">جهێ ئاریشێ:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.problemLocation || '-'}</div>
+                                    </div>
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">ناڤێ شوفێری:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.driverName || '-'}</div>
+                                    </div>
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">خالا:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.point || '-'}</div>
+                                    </div>
+                                </div>
+                                <div style="background-color: rgba(144, 238, 144, 0.3); border-radius: 3px; padding: 8px; margin: 6px auto; width: 80%; text-align: center;">
+                                    <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">رەوانەكرن بـــو:</div>
+                                    <div style="color: white; font-size: 0.85rem;">${record.sentTo || '-'}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 4px; background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 5px; color: white; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; font-size: 0.85rem;">
+                                <i class="fas fa-exclamation-triangle" style="margin-left: 5px;"></i>
+                                مێژویا توماركرنا رویدانێ: ${formattedDate}
+                            </div>
                         </div>
-                        
-
-                        
-
                     </div>
                 </div>
             `;
