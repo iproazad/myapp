@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', initApp);
 let personCount = 1;
 const MAX_PERSONS = 5;
 let personPhotos = {};
+let caseImages = {}; // Store case images
+let savedRecords = [];
+const STORAGE_KEY = 'tomaryAresheRecords';
 
 function initApp() {
     // Initialize event listeners
@@ -11,9 +14,100 @@ function initApp() {
     document.getElementById('multi-person-form').addEventListener('submit', saveMultiPersonData);
     document.getElementById('share-whatsapp').addEventListener('click', shareViaWhatsapp);
     document.getElementById('new-entry').addEventListener('click', resetForm);
+    document.getElementById('show-records-button').addEventListener('click', showRecordsModal);
+    document.getElementById('close-records-modal').addEventListener('click', hideRecordsModal);
     
     // Initialize photo buttons for the first person
     initializePhotoButton(1);
+    
+    // Initialize case image buttons
+    initializeCaseImageButtons();
+    
+    // Load saved records from localStorage
+    loadSavedRecords();
+}
+
+function initializeCaseImageButtons() {
+    // Initialize each case image button
+    for (let i = 1; i <= 3; i++) {
+        const imageButton = document.getElementById(`case-image-button-${i}`);
+        const imageInput = document.getElementById(`case-image-input-${i}`);
+        
+        if (imageButton && imageInput) {
+            imageButton.addEventListener('click', () => {
+                imageInput.click();
+            });
+            
+            imageInput.addEventListener('change', (event) => {
+                if (event.target.files && event.target.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        // Store the image data
+                        caseImages[i] = e.target.result;
+                        
+                        // Display the image preview
+                        displayCaseImagePreview(i, e.target.result);
+                    };
+                    
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            });
+        }
+    }
+}
+
+function displayCaseImagePreview(imageId, imageData) {
+    const previewContainer = document.getElementById('case-images-preview');
+    
+    // Check if this image already has a preview
+    const existingPreview = document.getElementById(`case-image-preview-${imageId}`);
+    if (existingPreview) {
+        // Update existing preview
+        existingPreview.querySelector('img').src = imageData;
+        return;
+    }
+    
+    // Create new preview container
+    const imageContainer = document.createElement('div');
+    imageContainer.className = 'case-image-container';
+    imageContainer.id = `case-image-preview-${imageId}`;
+    
+    // Create image element
+    const img = document.createElement('img');
+    img.src = imageData;
+    img.alt = `صورة ${imageId}`;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    
+    // Create remove button
+    const removeButton = document.createElement('button');
+    removeButton.className = 'case-image-remove';
+    removeButton.innerHTML = '<i class="fas fa-times"></i>';
+    removeButton.addEventListener('click', () => removeCaseImage(imageId));
+    
+    // Append elements
+    imageContainer.appendChild(img);
+    imageContainer.appendChild(removeButton);
+    previewContainer.appendChild(imageContainer);
+}
+
+function removeCaseImage(imageId) {
+    // Remove from storage
+    delete caseImages[imageId];
+    
+    // Remove preview
+    const preview = document.getElementById(`case-image-preview-${imageId}`);
+    if (preview) {
+        preview.remove();
+    }
+    
+    // Reset file input
+    const input = document.getElementById(`case-image-input-${imageId}`);
+    if (input) {
+        input.value = '';
+    }
 }
 
 function initializePhotoButton(personId) {
@@ -201,16 +295,28 @@ function saveMultiPersonData(event) {
     // Collect case information
     const caseData = {
         issueType: document.getElementById('issue-type').value,
-        time: document.getElementById('time').value,
-        dayNight: document.querySelector('input[name="day-night"]:checked').value,
+        timeFrom: document.getElementById('time-from').value,
+        timeTo: document.getElementById('time-to').value,
+        period: document.getElementById('period').value,
         location: document.getElementById('problem-location').value,
         driverName: document.getElementById('driver-name').value,
         point: document.getElementById('point').value,
-        sentTo: document.getElementById('sent-to').value
+        sentTo: document.getElementById('sent-to').value,
+        caseImages: Object.keys(caseImages).length > 0 ? {...caseImages} : null
     };
     
+    // Add case images to each person's data for display in the card
+    if (caseData.caseImages) {
+        personsData.forEach(person => {
+            person.caseImages = caseData.caseImages;
+        });
+    }
+    
     // Generate and save the multi-person card
-    generateMultiPersonCard(personsData, caseData);
+    const cardImage = generateMultiPersonCard(personsData, caseData);
+    
+    // Save record to localStorage
+    saveRecord(personsData, caseData, cardImage);
     
     // Show success modal
     document.getElementById('success-modal').style.display = 'flex';
@@ -221,11 +327,16 @@ function generateMultiPersonCard(personsData, caseData) {
     canvas.id = 'multiPersonCanvas';
     const ctx = canvas.getContext('2d');
     
+    // Check if we need extra height for additional images frame
+    const hasThirdImage = caseData.caseImages && caseData.caseImages['3'];
+    
     // Set canvas dimensions based on number of persons
-    const personHeight = 320; // Increased height per person
-    const headerHeight = 220; // Increased height for case information
+    const personHeight = 320; // Base height per person
+    const additionalFrameHeight = 0; // Set to 0 since we removed the frame under person info
+    const headerHeight = 220; // Height for case information
+    const specialFrameHeight = (caseData.caseImages && caseData.caseImages['1'] && caseData.caseImages['2'] && caseData.caseImages['3']) ? 260 : 0; // Height for special frame at bottom (including margins)
     const canvasWidth = 1000;
-    const canvasHeight = headerHeight + (personsData.length * personHeight) + 50; // Added footer space
+    const canvasHeight = headerHeight + (personsData.length * personHeight) + specialFrameHeight + 50; // Added footer space
     
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -255,7 +366,9 @@ function generateMultiPersonCard(personsData, caseData) {
     
     // Draw each person's information with improved spacing
     personsData.forEach((person, index) => {
-        const yOffset = headerHeight + (index * personHeight);
+        // Calculate the total height for this person's section
+        const totalPersonHeight = personHeight; // No additional frame height needed anymore
+        const yOffset = headerHeight + (index * totalPersonHeight);
         drawPersonInfo(ctx, person, yOffset, canvasWidth, personHeight);
         
         // Add separator between persons (except after the last one)
@@ -271,8 +384,125 @@ function generateMultiPersonCard(personsData, caseData) {
         }
     });
     
+    // Add a special frame for all three case images at the bottom of the card
+    let specialFrameY = headerHeight + (personsData.length * personHeight) + 10;
+    
+    // Check if we have all three case images
+    if (caseData.caseImages && caseData.caseImages['1'] && caseData.caseImages['2'] && caseData.caseImages['3']) {
+        // Draw a special frame for all three images
+        const frameWidth = canvasWidth - 60; // Slightly smaller than canvas width
+        const frameHeight = 220; // Height for the frame
+        const frameX = 30; // Centered horizontally
+        
+        // Draw frame background with gradient
+        const gradient = ctx.createLinearGradient(frameX, specialFrameY, frameX, specialFrameY + frameHeight);
+        gradient.addColorStop(0, '#f8f9fa');
+        gradient.addColorStop(1, '#e9ecef');
+        ctx.fillStyle = gradient;
+        
+        // Draw rounded rectangle for frame
+        ctx.beginPath();
+        ctx.roundRect(frameX, specialFrameY, frameWidth, frameHeight, 15);
+        ctx.fill();
+        
+        // Draw frame border with shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 5;
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        
+        // Draw decorative header bar
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.roundRect(frameX, specialFrameY - 5, frameWidth, 10, 5);
+        ctx.fill();
+        
+        // Draw title for the special frame
+        ctx.fillStyle = '#2c3e50';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('الصور الإضافية', canvasWidth / 2, specialFrameY - 15);
+        
+        // Calculate image dimensions and positions
+        const imageWidth = (frameWidth - 60) / 3; // 3 images with some spacing
+        const imageHeight = frameHeight - 40;
+        const imageY = specialFrameY + 20;
+        
+        // Draw each image
+        for (let i = 1; i <= 3; i++) {
+            if (caseData.caseImages[i]) {
+                const img = new Image();
+                img.src = caseData.caseImages[i];
+                
+                const imageX = frameX + 20 + (i - 1) * (imageWidth + 20);
+                
+                // Draw image background and border
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.roundRect(imageX - 5, imageY - 5, imageWidth + 10, imageHeight + 10, 10);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#dee2e6';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Draw image with proper sizing and maintain aspect ratio
+                ctx.save();
+                ctx.beginPath();
+                ctx.roundRect(imageX, imageY, imageWidth, imageHeight, 8);
+                ctx.clip();
+                
+                // Calculate dimensions to maintain aspect ratio
+                const imgWidth = img.width || imageWidth;
+                const imgHeight = img.height || imageHeight;
+                let drawWidth = imageWidth;
+                let drawHeight = imageHeight;
+                let offsetX = 0;
+                let offsetY = 0;
+                
+                if (imgWidth / imgHeight > imageWidth / imageHeight) {
+                    // Image is wider than container
+                    drawHeight = imageHeight;
+                    drawWidth = (imgWidth / imgHeight) * imageHeight;
+                    offsetX = (imageWidth - drawWidth) / 2;
+                } else {
+                    // Image is taller than container
+                    drawWidth = imageWidth;
+                    drawHeight = (imgHeight / imgWidth) * imageWidth;
+                    offsetY = (imageHeight - drawHeight) / 2;
+                }
+                
+                ctx.drawImage(img, imageX + offsetX, imageY + offsetY, drawWidth, drawHeight);
+                ctx.restore();
+                
+                // Draw image number
+                ctx.fillStyle = '#3498db';
+                ctx.beginPath();
+                ctx.arc(imageX + imageWidth - 10, imageY + 10, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(i, imageX + imageWidth - 10, imageY + 15);
+            }
+        }
+        
+        // Update the footer position
+        specialFrameY += frameHeight + 20;
+    }
+    
     // Add footer
-    const footerY = headerHeight + (personsData.length * personHeight) + 10;
+    const footerY = specialFrameY;
     ctx.fillStyle = '#2980b9';
     ctx.fillRect(0, footerY, canvasWidth, 40);
     
@@ -287,8 +517,8 @@ function generateMultiPersonCard(personsData, caseData) {
     const cardImage = canvas.toDataURL('image/png');
     saveImageToDevice(cardImage);
     
-    // Return the canvas for potential further use
-    return canvas;
+    // Return the card image for saving in records
+    return cardImage;
 }
 
 function drawCaseHeader(ctx, caseData, width, height) {
@@ -344,7 +574,20 @@ function drawCaseHeader(ctx, caseData, width, height) {
     
     // First row (right side) with improved spacing and alignment
     ctx.fillText(`جورێ ئاریشێ: ${caseData.issueType || '-'}`, width - 40, 95);
-    ctx.fillText(`دەمژمێر: ${caseData.time || '-'} ${caseData.dayNight || ''}`, width - 40, 125);
+    
+    // Handle both old and new time format
+    let timeDisplay = '';
+    if (caseData.timeFrom && caseData.timeTo) {
+        // New format with timeFrom and timeTo
+        timeDisplay = `${formatTime12Hour(caseData.timeFrom) || '-'} - ${formatTime12Hour(caseData.timeTo) || '-'} (${caseData.period || '-'})`;
+    } else if (caseData.time) {
+        // Old format with time and dayNight
+        timeDisplay = `${formatTime12Hour(caseData.time) || '-'} (${caseData.dayNight || '-'})`;
+    } else {
+        timeDisplay = '-';
+    }
+    
+    ctx.fillText(`دەمژمێر: ${timeDisplay}`, width - 40, 125);
     ctx.fillText(`جهێ ئاریشێ: ${caseData.location || '-'}`, width - 40, 155);
     
     // Second row (left side) with improved spacing and alignment
@@ -473,6 +716,8 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     const infoX = 300;
     const infoY = yOffset + 60;
     
+    // No additional images frame under person info - removed as requested
+    
     ctx.fillStyle = '#2c3e50';
     ctx.font = 'bold 22px Arial';
     ctx.textAlign = 'right';
@@ -570,6 +815,13 @@ function resetForm() {
     // Reset global variables
     personCount = 1;
     personPhotos = {};
+    caseImages = {};
+    
+    // Reset case images preview
+    const caseImagesPreview = document.getElementById('case-images-preview');
+    if (caseImagesPreview) {
+        caseImagesPreview.innerHTML = '';
+    }
     
     // Enable add button
     const addButton = document.getElementById('add-person-button');
@@ -578,6 +830,229 @@ function resetForm() {
     
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Records Management Functions
+function saveRecord(personsData, caseData, cardImage) {
+    // Create a record object
+    const record = {
+        id: Date.now().toString(), // Unique ID based on timestamp
+        date: new Date().toISOString(),
+        personsData: personsData,
+        caseData: caseData,
+        cardImage: cardImage // Store the original card image
+    };
+    
+    // Add to records array
+    savedRecords.unshift(record); // Add to beginning of array (newest first)
+    
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRecords));
+}
+
+function loadSavedRecords() {
+    // Load records from localStorage
+    const storedRecords = localStorage.getItem(STORAGE_KEY);
+    if (storedRecords) {
+        savedRecords = JSON.parse(storedRecords);
+        // We don't regenerate card images here to avoid DOM issues
+        // Images will be regenerated when viewed instead
+    }
+}
+
+function showRecordsModal() {
+    // Show the records modal
+    const modal = document.getElementById('records-modal');
+    modal.style.display = 'flex';
+    
+    // Render the records list
+    renderRecordsList();
+}
+
+function hideRecordsModal() {
+    // Hide the records modal
+    document.getElementById('records-modal').style.display = 'none';
+}
+
+function renderRecordsList() {
+    const recordsList = document.getElementById('records-list');
+    const noRecordsMessage = document.getElementById('no-records-message');
+    
+    // Clear the current list
+    recordsList.innerHTML = '';
+    
+    // Show/hide no records message
+    if (savedRecords.length === 0) {
+        noRecordsMessage.style.display = 'flex';
+        return;
+    } else {
+        noRecordsMessage.style.display = 'none';
+    }
+    
+    // Add each record to the list
+    savedRecords.forEach(record => {
+        const recordCard = document.createElement('div');
+        recordCard.className = 'record-card';
+        recordCard.dataset.recordId = record.id;
+        
+        // Format date
+        const recordDate = new Date(record.date);
+        const formattedDate = recordDate.toLocaleDateString('ar-IQ') + ' ' + 
+                             recordDate.toLocaleTimeString('ar-IQ', {hour: '2-digit', minute:'2-digit'});
+        
+        // Create card content with fallbacks for old record formats
+        let timeDisplay = '';
+        
+        // Handle both old and new time format
+        if (record.caseData.timeFrom && record.caseData.timeTo) {
+            // New format with timeFrom and timeTo
+            timeDisplay = `${formatTime12Hour(record.caseData.timeFrom) || '-'} - ${formatTime12Hour(record.caseData.timeTo) || '-'} (${record.caseData.period || '-'})`;
+        } else if (record.caseData.time) {
+            // Old format with time and dayNight
+            timeDisplay = `${formatTime12Hour(record.caseData.time) || '-'} (${record.caseData.dayNight || '-'})`;
+        } else {
+            timeDisplay = '-';
+        }
+        
+        recordCard.innerHTML = `
+            <h4>${record.caseData.issueType || 'بدون عنوان'}</h4>
+            <p><strong>الأشخاص:</strong> ${record.personsData.length}</p>
+            <p><strong>المكان:</strong> ${record.caseData.location || '-'}</p>
+            <p><strong>الوقت:</strong> ${timeDisplay}</p>
+            <div class="record-date">${formattedDate}</div>
+            <div class="record-actions">
+                <button class="action-button view-button" title="عرض">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="action-button delete-button" title="حذف">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        // Add event listeners
+        const viewButton = recordCard.querySelector('.view-button');
+        const deleteButton = recordCard.querySelector('.delete-button');
+        
+        viewButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            viewRecord(record.id);
+        });
+        
+        deleteButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteRecord(record.id);
+        });
+        
+        // Add click event to the whole card
+        recordCard.addEventListener('click', () => {
+            viewRecord(record.id);
+        });
+        
+        recordsList.appendChild(recordCard);
+    });
+}
+
+function viewRecord(recordId) {
+    // Find the record
+    const record = savedRecords.find(r => r.id === recordId);
+    if (!record) return;
+    
+    // Create a modal to display the record
+    const viewModal = document.createElement('div');
+    viewModal.className = 'modal';
+    viewModal.id = 'view-record-modal';
+    viewModal.style.display = 'flex';
+    
+    // Use the stored card image
+    // We don't regenerate to avoid DOM-related errors
+    viewModal.innerHTML = `
+        <div class="modal-content view-record-modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> عرض السجل</h3>
+                <button id="close-view-record-modal" class="close-button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="view-record-container">
+                <img src="${record.cardImage}" alt="بطاقة السجل" class="record-image" style="max-width: 600px; max-height: 70vh; object-fit: contain;">
+                <!-- تم إزالة قسم الصور الإضافية من الجانب الأيسر -->
+            </div>
+            <div class="modal-footer">
+                <button id="download-record-image" class="action-button">
+                    <i class="fas fa-download"></i> تنزيل الصورة
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(viewModal);
+    
+    // Add event listeners
+    document.getElementById('close-view-record-modal').addEventListener('click', () => {
+        viewModal.remove();
+    });
+    
+    document.getElementById('download-record-image').addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = `توماری-ئاریشە-${new Date(record.date).toISOString().replace(/[:.]/g, '-')}.png`;
+        link.href = record.cardImage;
+        link.click();
+    });
+    
+    // تم إزالة معالجة الصور الإضافية لأننا لم نعد نعرضها
+}
+
+// تم إزالة وظيفة renderAdditionalCaseImages لأننا لم نعد بحاجة إليها
+function renderAdditionalCaseImages(record) {
+    // تم تعطيل هذه الوظيفة وإرجاع سلسلة فارغة دائمًا
+    return '';
+}
+
+// تم إزالة وظيفة openImageInFullscreen لأننا لم نعد بحاجة إليها بعد إزالة عرض الصور الإضافية
+    
+    // Add event listener to close button
+// نهاية إزالة وظيفة openImageInFullscreen
+
+function deleteRecord(recordId) {
+    // Confirm deletion
+    if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+        // Remove the record from the array
+        savedRecords = savedRecords.filter(record => record.id !== recordId);
+        
+        // Save to localStorage
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRecords));
+        
+        // Re-render the list
+        renderRecordsList();
+    }
+}
+
+// Function to convert 24-hour time format to 12-hour format
+function formatTime12Hour(time24) {
+    if (!time24 || time24 === '-') return '-';
+    
+    try {
+        // Parse the time string (format: HH:MM)
+        const [hours24, minutes] = time24.split(':');
+        if (!hours24 || !minutes) return '-';
+        
+        // Convert hours to 12-hour format
+        let hours12 = parseInt(hours24, 10) % 12;
+        if (hours12 === 0) hours12 = 12; // 0 should be displayed as 12 in 12-hour format
+        
+        // Determine AM/PM
+        const period = parseInt(hours24, 10) < 12 ? 'ص' : 'م';
+        
+        // Ensure minutes are always displayed with two digits
+        const formattedMinutes = minutes.padStart(2, '0');
+        
+        // Return formatted time
+        return `${hours12}:${formattedMinutes} ${period}`;
+    } catch (error) {
+        console.error('Error formatting time:', error);
+        return '-';
+    }
 }
 
 // Polyfill for roundRect if not supported
