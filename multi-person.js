@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', initApp);
 let personCount = 1;
 const MAX_PERSONS = 5;
 let personPhotos = {};
-let caseImages = {}; // Store case images
 let savedRecords = [];
 const STORAGE_KEY = 'tomaryAresheRecords';
 
@@ -20,94 +19,8 @@ function initApp() {
     // Initialize photo buttons for the first person
     initializePhotoButton(1);
     
-    // Initialize case image buttons
-    initializeCaseImageButtons();
-    
     // Load saved records from localStorage
     loadSavedRecords();
-}
-
-function initializeCaseImageButtons() {
-    // Initialize each case image button
-    for (let i = 1; i <= 3; i++) {
-        const imageButton = document.getElementById(`case-image-button-${i}`);
-        const imageInput = document.getElementById(`case-image-input-${i}`);
-        
-        if (imageButton && imageInput) {
-            imageButton.addEventListener('click', () => {
-                imageInput.click();
-            });
-            
-            imageInput.addEventListener('change', (event) => {
-                if (event.target.files && event.target.files[0]) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = (e) => {
-                        // Store the image data
-                        caseImages[i] = e.target.result;
-                        
-                        // Display the image preview
-                        displayCaseImagePreview(i, e.target.result);
-                    };
-                    
-                    reader.readAsDataURL(event.target.files[0]);
-                }
-            });
-        }
-    }
-}
-
-function displayCaseImagePreview(imageId, imageData) {
-    const previewContainer = document.getElementById('case-images-preview');
-    
-    // Check if this image already has a preview
-    const existingPreview = document.getElementById(`case-image-preview-${imageId}`);
-    if (existingPreview) {
-        // Update existing preview
-        existingPreview.querySelector('img').src = imageData;
-        return;
-    }
-    
-    // Create new preview container
-    const imageContainer = document.createElement('div');
-    imageContainer.className = 'case-image-container';
-    imageContainer.id = `case-image-preview-${imageId}`;
-    
-    // Create image element
-    const img = document.createElement('img');
-    img.src = imageData;
-    img.alt = `صورة ${imageId}`;
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    
-    // Create remove button
-    const removeButton = document.createElement('button');
-    removeButton.className = 'case-image-remove';
-    removeButton.innerHTML = '<i class="fas fa-times"></i>';
-    removeButton.addEventListener('click', () => removeCaseImage(imageId));
-    
-    // Append elements
-    imageContainer.appendChild(img);
-    imageContainer.appendChild(removeButton);
-    previewContainer.appendChild(imageContainer);
-}
-
-function removeCaseImage(imageId) {
-    // Remove from storage
-    delete caseImages[imageId];
-    
-    // Remove preview
-    const preview = document.getElementById(`case-image-preview-${imageId}`);
-    if (preview) {
-        preview.remove();
-    }
-    
-    // Reset file input
-    const input = document.getElementById(`case-image-input-${imageId}`);
-    if (input) {
-        input.value = '';
-    }
 }
 
 function initializePhotoButton(personId) {
@@ -301,16 +214,8 @@ function saveMultiPersonData(event) {
         location: document.getElementById('problem-location').value,
         driverName: document.getElementById('driver-name').value,
         point: document.getElementById('point').value,
-        sentTo: document.getElementById('sent-to').value,
-        caseImages: Object.keys(caseImages).length > 0 ? {...caseImages} : null
+        sentTo: document.getElementById('sent-to').value
     };
-    
-    // Add case images to each person's data for display in the card
-    if (caseData.caseImages) {
-        personsData.forEach(person => {
-            person.caseImages = caseData.caseImages;
-        });
-    }
     
     // Generate and save the multi-person card
     const cardImage = generateMultiPersonCard(personsData, caseData);
@@ -327,16 +232,11 @@ function generateMultiPersonCard(personsData, caseData) {
     canvas.id = 'multiPersonCanvas';
     const ctx = canvas.getContext('2d');
     
-    // Check if we need extra height for additional images frame
-    const hasThirdImage = caseData.caseImages && caseData.caseImages['3'];
-    
     // Set canvas dimensions based on number of persons
-    const personHeight = 320; // Base height per person
-    const additionalFrameHeight = 0; // Set to 0 since we removed the frame under person info
-    const headerHeight = 220; // Height for case information
-    const specialFrameHeight = (caseData.caseImages && caseData.caseImages['1'] && caseData.caseImages['2'] && caseData.caseImages['3']) ? 260 : 0; // Height for special frame at bottom (including margins)
+    const personHeight = 320; // Increased height per person
+    const headerHeight = 220; // Increased height for case information
     const canvasWidth = 1000;
-    const canvasHeight = headerHeight + (personsData.length * personHeight) + specialFrameHeight + 50; // Added footer space
+    const canvasHeight = headerHeight + (personsData.length * personHeight) + 50; // Added footer space
     
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -366,9 +266,7 @@ function generateMultiPersonCard(personsData, caseData) {
     
     // Draw each person's information with improved spacing
     personsData.forEach((person, index) => {
-        // Calculate the total height for this person's section
-        const totalPersonHeight = personHeight; // No additional frame height needed anymore
-        const yOffset = headerHeight + (index * totalPersonHeight);
+        const yOffset = headerHeight + (index * personHeight);
         drawPersonInfo(ctx, person, yOffset, canvasWidth, personHeight);
         
         // Add separator between persons (except after the last one)
@@ -384,125 +282,8 @@ function generateMultiPersonCard(personsData, caseData) {
         }
     });
     
-    // Add a special frame for all three case images at the bottom of the card
-    let specialFrameY = headerHeight + (personsData.length * personHeight) + 10;
-    
-    // Check if we have all three case images
-    if (caseData.caseImages && caseData.caseImages['1'] && caseData.caseImages['2'] && caseData.caseImages['3']) {
-        // Draw a special frame for all three images
-        const frameWidth = canvasWidth - 60; // Slightly smaller than canvas width
-        const frameHeight = 220; // Height for the frame
-        const frameX = 30; // Centered horizontally
-        
-        // Draw frame background with gradient
-        const gradient = ctx.createLinearGradient(frameX, specialFrameY, frameX, specialFrameY + frameHeight);
-        gradient.addColorStop(0, '#f8f9fa');
-        gradient.addColorStop(1, '#e9ecef');
-        ctx.fillStyle = gradient;
-        
-        // Draw rounded rectangle for frame
-        ctx.beginPath();
-        ctx.roundRect(frameX, specialFrameY, frameWidth, frameHeight, 15);
-        ctx.fill();
-        
-        // Draw frame border with shadow
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 5;
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        
-        // Reset shadow
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        
-        // Draw decorative header bar
-        ctx.fillStyle = '#3498db';
-        ctx.beginPath();
-        ctx.roundRect(frameX, specialFrameY - 5, frameWidth, 10, 5);
-        ctx.fill();
-        
-        // Draw title for the special frame
-        ctx.fillStyle = '#2c3e50';
-        ctx.font = 'bold 24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('الصور الإضافية', canvasWidth / 2, specialFrameY - 15);
-        
-        // Calculate image dimensions and positions
-        const imageWidth = (frameWidth - 60) / 3; // 3 images with some spacing
-        const imageHeight = frameHeight - 40;
-        const imageY = specialFrameY + 20;
-        
-        // Draw each image
-        for (let i = 1; i <= 3; i++) {
-            if (caseData.caseImages[i]) {
-                const img = new Image();
-                img.src = caseData.caseImages[i];
-                
-                const imageX = frameX + 20 + (i - 1) * (imageWidth + 20);
-                
-                // Draw image background and border
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.roundRect(imageX - 5, imageY - 5, imageWidth + 10, imageHeight + 10, 10);
-                ctx.fill();
-                
-                ctx.strokeStyle = '#dee2e6';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-                
-                // Draw image with proper sizing and maintain aspect ratio
-                ctx.save();
-                ctx.beginPath();
-                ctx.roundRect(imageX, imageY, imageWidth, imageHeight, 8);
-                ctx.clip();
-                
-                // Calculate dimensions to maintain aspect ratio
-                const imgWidth = img.width || imageWidth;
-                const imgHeight = img.height || imageHeight;
-                let drawWidth = imageWidth;
-                let drawHeight = imageHeight;
-                let offsetX = 0;
-                let offsetY = 0;
-                
-                if (imgWidth / imgHeight > imageWidth / imageHeight) {
-                    // Image is wider than container
-                    drawHeight = imageHeight;
-                    drawWidth = (imgWidth / imgHeight) * imageHeight;
-                    offsetX = (imageWidth - drawWidth) / 2;
-                } else {
-                    // Image is taller than container
-                    drawWidth = imageWidth;
-                    drawHeight = (imgHeight / imgWidth) * imageWidth;
-                    offsetY = (imageHeight - drawHeight) / 2;
-                }
-                
-                ctx.drawImage(img, imageX + offsetX, imageY + offsetY, drawWidth, drawHeight);
-                ctx.restore();
-                
-                // Draw image number
-                ctx.fillStyle = '#3498db';
-                ctx.beginPath();
-                ctx.arc(imageX + imageWidth - 10, imageY + 10, 15, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(i, imageX + imageWidth - 10, imageY + 15);
-            }
-        }
-        
-        // Update the footer position
-        specialFrameY += frameHeight + 20;
-    }
-    
     // Add footer
-    const footerY = specialFrameY;
+    const footerY = headerHeight + (personsData.length * personHeight) + 10;
     ctx.fillStyle = '#2980b9';
     ctx.fillRect(0, footerY, canvasWidth, 40);
     
@@ -716,8 +497,6 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     const infoX = 300;
     const infoY = yOffset + 60;
     
-    // No additional images frame under person info - removed as requested
-    
     ctx.fillStyle = '#2c3e50';
     ctx.font = 'bold 22px Arial';
     ctx.textAlign = 'right';
@@ -815,13 +594,6 @@ function resetForm() {
     // Reset global variables
     personCount = 1;
     personPhotos = {};
-    caseImages = {};
-    
-    // Reset case images preview
-    const caseImagesPreview = document.getElementById('case-images-preview');
-    if (caseImagesPreview) {
-        caseImagesPreview.innerHTML = '';
-    }
     
     // Enable add button
     const addButton = document.getElementById('add-person-button');
@@ -975,8 +747,7 @@ function viewRecord(recordId) {
                 </button>
             </div>
             <div class="view-record-container">
-                <img src="${record.cardImage}" alt="بطاقة السجل" class="record-image" style="max-width: 600px; max-height: 70vh; object-fit: contain;">
-                <!-- تم إزالة قسم الصور الإضافية من الجانب الأيسر -->
+                <img src="${record.cardImage}" alt="بطاقة السجل" class="record-image">
             </div>
             <div class="modal-footer">
                 <button id="download-record-image" class="action-button">
@@ -999,20 +770,7 @@ function viewRecord(recordId) {
         link.href = record.cardImage;
         link.click();
     });
-    
-    // تم إزالة معالجة الصور الإضافية لأننا لم نعد نعرضها
 }
-
-// تم إزالة وظيفة renderAdditionalCaseImages لأننا لم نعد بحاجة إليها
-function renderAdditionalCaseImages(record) {
-    // تم تعطيل هذه الوظيفة وإرجاع سلسلة فارغة دائمًا
-    return '';
-}
-
-// تم إزالة وظيفة openImageInFullscreen لأننا لم نعد بحاجة إليها بعد إزالة عرض الصور الإضافية
-    
-    // Add event listener to close button
-// نهاية إزالة وظيفة openImageInFullscreen
 
 function deleteRecord(recordId) {
     // Confirm deletion
