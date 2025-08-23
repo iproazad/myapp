@@ -104,128 +104,171 @@ function saveSuspectData() {
 function generateSuspectCard(data) {
     // Create a canvas element
     const canvas = document.createElement('canvas');
-    canvas.width = 1000; // عرض مناسب للبطاقة
-    canvas.height = 1400; // ارتفاع مناسب للبطاقة
+    canvas.width = 1600; // عرض مناسب للبطاقة الأفقية
+    canvas.height = 900; // ارتفاع مناسب للبطاقة الأفقية
     canvas.id = 'cardCanvas'; // إضافة معرف للكانفاس
     const ctx = canvas.getContext('2d');
     
     // تطبيق خلفية بتدرج لوني أنيق
-    const mainBgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    mainBgGradient.addColorStop(0, '#ffffff');
-    mainBgGradient.addColorStop(1, '#f0f0f0');
+    const mainBgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    mainBgGradient.addColorStop(0, '#1a237e'); // لون أزرق داكن
+    mainBgGradient.addColorStop(0.7, '#283593');
+    mainBgGradient.addColorStop(1, '#303f9f');
     ctx.fillStyle = mainBgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // إضافة نمط خفيف للخلفية
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    for (let i = 0; i < canvas.width; i += 60) {
-        for (let j = 0; j < canvas.height; j += 60) {
-            ctx.fillRect(i, j, 30, 30);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    for (let i = 0; i < canvas.width; i += 40) {
+        for (let j = 0; j < canvas.height; j += 40) {
+            ctx.beginPath();
+            ctx.arc(i, j, 2, 0, Math.PI * 2);
+            ctx.fill();
         }
     }
     
     // إضافة خلفية البطاقة الرئيسية بتدرج لوني أنيق
-    const cardBgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    const cardBgGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
     cardBgGradient.addColorStop(0, '#ffffff');
-    cardBgGradient.addColorStop(1, '#f8f9fa');
+    cardBgGradient.addColorStop(0.5, '#f8f9fa');
+    cardBgGradient.addColorStop(1, '#ffffff');
     ctx.fillStyle = cardBgGradient;
-    roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 20, true, false);
+    roundRect(ctx, 40, 40, canvas.width - 80, canvas.height - 80, 25, true, false);
     
     // إضافة تأثير الظل للبطاقة الرئيسية
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-    ctx.shadowBlur = 15;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 25;
     ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 5;
-    roundRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 20, true, false);
+    ctx.shadowOffsetY = 10;
+    roundRect(ctx, 40, 40, canvas.width - 80, canvas.height - 80, 25, true, false);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     
-    // إضافة حدود أنيقة بلمسة ذهبية
-    ctx.strokeStyle = '#3498db'; // أزرق أساسي
-    ctx.lineWidth = 3;
-    roundRect(ctx, 25, 25, canvas.width - 50, canvas.height - 50, 18, false, true);
+    // إضافة حدود أنيقة
+    ctx.strokeStyle = '#3f51b5'; // أزرق أنيق
+    ctx.lineWidth = 4;
+    roundRect(ctx, 45, 45, canvas.width - 90, canvas.height - 90, 22, false, true);
     
     // إضافة حدود داخلية ثانية بلمسة ذهبية
-    ctx.strokeStyle = '#f1c40f'; // لون ذهبي
-    ctx.lineWidth = 1;
-    roundRect(ctx, 30, 30, canvas.width - 60, canvas.height - 60, 16, false, true);
+    ctx.strokeStyle = '#ffc107'; // لون ذهبي
+    ctx.lineWidth = 2;
+    roundRect(ctx, 50, 50, canvas.width - 100, canvas.height - 100, 20, false, true);
     
     // إضافة رأس عصري بتدرج لوني
     const headerGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-    headerGradient.addColorStop(0, '#2980b9'); // أزرق داكن
-    headerGradient.addColorStop(0.5, '#3498db'); // أزرق متوسط
-    headerGradient.addColorStop(1, '#2980b9'); // أزرق داكن مرة أخرى
+    headerGradient.addColorStop(0, '#d32f2f'); // أحمر داكن
+    headerGradient.addColorStop(0.5, '#f44336'); // أحمر
+    headerGradient.addColorStop(1, '#d32f2f'); // أحمر داكن مرة أخرى
     ctx.fillStyle = headerGradient;
-    roundRect(ctx, 30, 30, canvas.width - 60, 110, {tl: 16, tr: 16, bl: 0, br: 0}, true, false);
+    roundRect(ctx, 50, 50, canvas.width - 100, 120, {tl: 20, tr: 20, bl: 0, br: 0}, true, false);
     
     // إضافة نمط أنيق للرأس
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    for (let i = 0; i < canvas.width; i += 30) {
-        ctx.fillRect(i, 30, 15, 110);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    for (let i = 50; i < canvas.width - 50; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(i, 50);
+        ctx.lineTo(i + 10, 50);
+        ctx.lineTo(i, 170);
+        ctx.lineTo(i - 10, 170);
+        ctx.closePath();
+        ctx.fill();
     }
     
     // إضافة خط ذهبي تحت الرأس
-    ctx.fillStyle = '#f1c40f'; // لون ذهبي
-    ctx.fillRect(50, 145, canvas.width - 100, 2);
+    const goldGradient = ctx.createLinearGradient(50, 0, canvas.width - 100, 0);
+    goldGradient.addColorStop(0, '#ffd54f');
+    goldGradient.addColorStop(0.5, '#ffeb3b');
+    goldGradient.addColorStop(1, '#ffd54f');
+    ctx.fillStyle = goldGradient;
+    roundRect(ctx, 70, 175, canvas.width - 140, 4, 2, true, false);
     
     // إضافة العنوان مع تأثير ظل محسن
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-    ctx.shadowBlur = 6;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 8;
     ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.font = 'bold 40px Arial';
+    ctx.shadowOffsetY = 3;
+    ctx.font = 'bold 48px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('بەشێ پولیسێن هەوارهاتنێ', canvas.width / 2, 90);
+    ctx.fillText('بطاقة المشتبه به', canvas.width / 2, 120);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     
     // Draw case information header
-    const headerY = 150;
-    const headerHeight = 120;
+    const headerY = 190;
+    const headerHeight = 150;
     
     // Draw header background with gradient
-    const infoHeaderGradient = ctx.createLinearGradient(0, headerY, 0, headerY + headerHeight);
-    infoHeaderGradient.addColorStop(0, '#3498db');
-    infoHeaderGradient.addColorStop(1, '#2980b9');
+    const infoHeaderGradient = ctx.createLinearGradient(canvas.width, headerY, 0, headerY + headerHeight);
+    infoHeaderGradient.addColorStop(0, '#1565c0');
+    infoHeaderGradient.addColorStop(1, '#0d47a1');
     ctx.fillStyle = infoHeaderGradient;
-    ctx.fillRect(50, headerY, canvas.width - 100, headerHeight);
+    roundRect(ctx, 70, headerY, canvas.width - 140, headerHeight, 15, true, false);
+    
+    // إضافة نمط خلفية مميز
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+    for (let i = 70; i < canvas.width - 70; i += 40) {
+        for (let j = headerY; j < headerY + headerHeight; j += 40) {
+            ctx.beginPath();
+            ctx.arc(i, j, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
     
     // Add decorative border
-    ctx.strokeStyle = '#f39c12';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(60, headerY + 10, canvas.width - 120, headerHeight - 20);
+    ctx.strokeStyle = '#ffc107';
+    ctx.lineWidth = 3;
+    roundRect(ctx, 80, headerY + 10, canvas.width - 160, headerHeight - 20, 10, false, true);
     
-    // Add case information
-    ctx.font = 'bold 20px Arial';
-    ctx.textAlign = 'right';
+    // إضافة عنوان لقسم معلومات القضية
+    ctx.font = 'bold 22px Arial';
+    ctx.textAlign = 'center';
     ctx.fillStyle = '#ffffff';
+    ctx.fillText('معلومات القضية', canvas.width / 2, headerY + 35);
+    
+    // إضافة خط فاصل تحت العنوان
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(120, headerY + 45, canvas.width - 240, 2);
+    
+    // إنشاء وظيفة لرسم حقول المعلومات بشكل أنيق
+    function drawCaseInfoField(label, value, x, y, align) {
+        // رسم خلفية للحقل
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        const fieldWidth = 300;
+        const fieldHeight = 30;
+        const fieldX = align === 'right' ? x - fieldWidth : x;
+        roundRect(ctx, fieldX, y - 25, fieldWidth, fieldHeight, 5, true, false);
+        
+        // كتابة النص
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = align;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(`${label}: ${value || ''}`, x, y);
+    }
     
     // First row
-    ctx.fillText(`جورێ ئاریشێ: ${data.issueType || ''}`, canvas.width - 100, headerY + 40);
-    ctx.fillText(`دەمژمێر: ${data.time || ''} ${data.dayNight || ''}`, canvas.width - 100, headerY + 70);
-    ctx.fillText(`جهێ ئاریشێ: ${data.problemLocation || ''}`, canvas.width - 100, headerY + 100);
+    drawCaseInfoField('جورێ ئاریشێ', data.issueType, canvas.width - 120, headerY + 80, 'right');
+    drawCaseInfoField('دەمژمێر', `${data.time || ''} ${data.dayNight || ''}`, canvas.width - 120, headerY + 120, 'right');
     
     // Second row (left side)
-    ctx.textAlign = 'left';
-    ctx.fillText(`ناڤێ شوفێری: ${data.driverName || ''}`, 100, headerY + 40);
-    ctx.fillText(`خالا: ${data.point || ''}`, 100, headerY + 70);
-    ctx.fillText(`رەوانەكرن بـــو: ${data.sentTo || ''}`, 100, headerY + 100);
+    drawCaseInfoField('ناڤێ شوفێری', data.driverName, 120, headerY + 80, 'left');
+    drawCaseInfoField('خالا', data.point, 120, headerY + 120, 'left');
     
     // Add current date
     const currentDate = new Date().toLocaleDateString('ar-IQ');
     ctx.textAlign = 'center';
-    ctx.font = '18px Arial';
-    ctx.fillText(`تاریخ: ${currentDate}`, canvas.width / 2, headerY + 100);
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`تاریخ: ${currentDate}`, canvas.width / 2, headerY + 120);
     
-    // Add photo if available with enhanced styling
-    const photoX = canvas.width / 2 - 150; // وضع الصورة في المنتصف
-    const photoY = 300; // زيادة المسافة من الأعلى
-    const photoWidth = 300; // عرض مناسب للصورة
+    // Add photo if available with enhanced styling - تعديل موضع الصورة للتصميم الأفقي
+    const photoX = canvas.width - 380; // وضع الصورة في الجانب الأيمن
+    const photoY = 360; // زيادة المسافة من الأعلى
+    const photoWidth = 280; // عرض مناسب للصورة 
     const photoHeight = 350; // ارتفاع مناسب للصورة
     
     if (data.photo) {
@@ -233,17 +276,17 @@ function generateSuspectCard(data) {
         img.src = data.photo;
         
         // Add shadow effect to photo
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 12;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetX = 5;
+        ctx.shadowOffsetY = 5;
         
         // Draw photo background with gradient
-        const photoGradient = ctx.createLinearGradient(photoX, photoY, photoX, photoY + photoHeight);
+        const photoGradient = ctx.createLinearGradient(photoX, photoY, photoX + photoWidth, photoY + photoHeight);
         photoGradient.addColorStop(0, '#ffffff');
-        photoGradient.addColorStop(1, '#f8f9fa');
+        photoGradient.addColorStop(1, '#f5f5f5');
         ctx.fillStyle = photoGradient;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 15, true, false);
         
         // Reset shadow for clean borders
         ctx.shadowColor = 'transparent';
@@ -252,73 +295,89 @@ function generateSuspectCard(data) {
         ctx.shadowOffsetY = 0;
         
         // Add photo frame with elegant double border
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 5;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+        ctx.strokeStyle = '#3f51b5';
+        ctx.lineWidth = 6;
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 15, false, true);
         
         // Add inner gold accent border
-        ctx.strokeStyle = '#f1c40f';
-        ctx.lineWidth = 2;
-        roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, true);
+        ctx.strokeStyle = '#ffc107';
+        ctx.lineWidth = 3;
+        roundRect(ctx, photoX + 6, photoY + 6, photoWidth - 12, photoHeight - 12, 10, false, true);
         
         // Add decorative elements around photo (corners) with enhanced styling
         const cornerPositions = [
-            {x: photoX - 5, y: photoY - 5}, // Top left
-            {x: photoX + photoWidth + 5, y: photoY - 5}, // Top right
-            {x: photoX + photoWidth + 5, y: photoY + photoHeight + 5}, // Bottom right
-            {x: photoX - 5, y: photoY + photoHeight + 5} // Bottom left
+            {x: photoX - 8, y: photoY - 8}, // Top left
+            {x: photoX + photoWidth + 8, y: photoY - 8}, // Top right
+            {x: photoX + photoWidth + 8, y: photoY + photoHeight + 8}, // Bottom right
+            {x: photoX - 8, y: photoY + photoHeight + 8} // Bottom left
         ];
         
         cornerPositions.forEach(pos => {
             // Add gradient to corner decorations
-            const cornerGradient = ctx.createRadialGradient(pos.x, pos.y, 2, pos.x, pos.y, 8);
-            cornerGradient.addColorStop(0, '#f1c40f'); // Gold center
-            cornerGradient.addColorStop(1, '#f39c12'); // Orange edge
+            const cornerGradient = ctx.createRadialGradient(pos.x, pos.y, 3, pos.x, pos.y, 12);
+            cornerGradient.addColorStop(0, '#ffd54f'); // Gold center
+            cornerGradient.addColorStop(1, '#ff9800'); // Orange edge
             ctx.fillStyle = cornerGradient;
             ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2, true);
+            ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2, true);
             ctx.fill();
+            
+            // إضافة حدود للزخارف
+            ctx.strokeStyle = '#f57c00';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 12, 0, Math.PI * 2, true);
+            ctx.stroke();
         });
         
         // Draw rectangular photo
         ctx.save();
         ctx.beginPath();
-        roundRect(ctx, photoX + 5, photoY + 5, photoWidth - 10, photoHeight - 10, 8, false, false);
+        roundRect(ctx, photoX + 6, photoY + 6, photoWidth - 12, photoHeight - 12, 10, false, false);
         ctx.clip();
         
         // تحسين طريقة عرض الصورة مع الحفاظ على النسب
         const imgAspect = img.width / img.height;
-        const frameAspect = (photoWidth - 10) / (photoHeight - 10);
+        const frameAspect = (photoWidth - 12) / (photoHeight - 12);
         
         let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
         
         if (imgAspect > frameAspect) {
             // الصورة أعرض من الإطار
-            drawHeight = photoHeight - 10;
+            drawHeight = photoHeight - 12;
             drawWidth = drawHeight * imgAspect;
-            offsetX = (photoWidth - 10 - drawWidth) / 2;
+            offsetX = (photoWidth - 12 - drawWidth) / 2;
         } else {
             // الصورة أطول من الإطار
-            drawWidth = photoWidth - 10;
+            drawWidth = photoWidth - 12;
             drawHeight = drawWidth / imgAspect;
-            offsetY = (photoHeight - 10 - drawHeight) / 2;
+            offsetY = (photoHeight - 12 - drawHeight) / 2;
         }
         
-        ctx.drawImage(img, photoX + 5 + offsetX, photoY + 5 + offsetY, drawWidth, drawHeight);
+        ctx.drawImage(img, photoX + 6 + offsetX, photoY + 6 + offsetY, drawWidth, drawHeight);
+        ctx.restore();
+        
+        // إضافة تأثير تظليل خفيف على الصورة
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.save();
+        ctx.beginPath();
+        roundRect(ctx, photoX + 6, photoY + 6, photoWidth - 12, photoHeight - 12, 10, false, false);
+        ctx.clip();
+        ctx.fillRect(photoX + 6, photoY + 6, photoWidth - 12, photoHeight - 12);
         ctx.restore();
     } else {
         // Draw placeholder if no image is available
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 12;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetX = 5;
+        ctx.shadowOffsetY = 5;
         
         // Draw photo background with gradient
-        const photoGradient = ctx.createLinearGradient(photoX, photoY, photoX, photoY + photoHeight);
+        const photoGradient = ctx.createLinearGradient(photoX, photoY, photoX + photoWidth, photoY + photoHeight);
         photoGradient.addColorStop(0, '#f5f5f5');
         photoGradient.addColorStop(1, '#e0e0e0');
         ctx.fillStyle = photoGradient;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, true, false);
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 15, true, false);
         
         // Reset shadow
         ctx.shadowColor = 'transparent';
@@ -327,88 +386,111 @@ function generateSuspectCard(data) {
         ctx.shadowOffsetY = 0;
         
         // Add photo frame
-        ctx.strokeStyle = '#bdc3c7';
-        ctx.lineWidth = 5;
-        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 10, false, true);
+        ctx.strokeStyle = '#9e9e9e';
+        ctx.lineWidth = 6;
+        roundRect(ctx, photoX, photoY, photoWidth, photoHeight, 15, false, true);
         
         // Add user icon
-        ctx.fillStyle = '#bdc3c7';
+        ctx.fillStyle = '#9e9e9e';
         ctx.beginPath();
         // Head
-        ctx.arc(photoX + photoWidth/2, photoY + photoHeight/2 - 30, 50, 0, Math.PI * 2, true);
+        ctx.arc(photoX + photoWidth/2, photoY + photoHeight/2 - 40, 60, 0, Math.PI * 2, true);
         ctx.fill();
         // Body
         ctx.beginPath();
-        ctx.moveTo(photoX + photoWidth/2, photoY + photoHeight/2 + 30);
-        ctx.arc(photoX + photoWidth/2, photoY + photoHeight/2 + 30, 70, Math.PI * 0.7, Math.PI * 0.3, true);
+        ctx.moveTo(photoX + photoWidth/2, photoY + photoHeight/2 + 40);
+        ctx.arc(photoX + photoWidth/2, photoY + photoHeight/2 + 40, 80, Math.PI * 0.7, Math.PI * 0.3, true);
         ctx.fill();
+        
+        // إضافة نص بديل
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = '#616161';
+        ctx.textAlign = 'center';
+        ctx.fillText('لا توجد صورة', photoX + photoWidth/2, photoY + photoHeight - 30);
     }
     
-    // Draw suspect information section
-    const infoY = photoY + photoHeight + 30;
+    // Draw suspect information section - تعديل موضع قسم المعلومات للتصميم الأفقي
+    const infoY = headerY + headerHeight + 30;
+    const infoWidth = canvas.width - 450; // عرض قسم المعلومات مع ترك مساحة للصورة
     
     // Draw section background with gradient
-    const infoGradient = ctx.createLinearGradient(0, infoY, 0, infoY + 400);
+    const infoGradient = ctx.createLinearGradient(0, infoY, 0, infoY + 600);
     infoGradient.addColorStop(0, '#f8f9fa');
     infoGradient.addColorStop(1, '#e9ecef');
     ctx.fillStyle = infoGradient;
-    roundRect(ctx, 50, infoY, canvas.width - 100, 400, 10, true, false);
+    roundRect(ctx, 50, infoY, infoWidth, 600, 10, true, false);
     
     // Add elegant border
     ctx.strokeStyle = '#3498db';
     ctx.lineWidth = 3;
-    roundRect(ctx, 50, infoY, canvas.width - 100, 400, 10, false, true);
+    roundRect(ctx, 50, infoY, infoWidth, 600, 10, false, true);
     
     // Add section title with enhanced styling
     ctx.fillStyle = '#2c3e50';
-    ctx.font = 'bold 28px Arial';
+    ctx.font = 'bold 22px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('پێزانین تومەتبار', canvas.width / 2, infoY + 40);
+    ctx.fillText('پێزانین تومەتبار', infoWidth / 2 + 50, infoY + 40);
     
     // Add gold accent line under title
     const lineY = infoY + 60;
     ctx.fillStyle = '#f1c40f';
-    ctx.fillRect(100, lineY, canvas.width - 200, 2);
+    ctx.fillRect(100, lineY, infoWidth - 100, 2);
     
-    // Draw suspect information in two columns
+    // Draw suspect information in two columns - تعديل توزيع الأعمدة للتصميم الأفقي
     const leftColX = 100;
-    const rightColX = canvas.width - 100;
+    const rightColX = infoWidth - 50;
     let rowY = infoY + 100;
-    const lineHeight = 40;
+    const lineHeight = 45; // المسافة بين الصفوف
+    const fieldWidth = infoWidth / 2 - 80; // عرض حقل المعلومات
+    const fieldHeight = 35; // ارتفاع حقل المعلومات
     
-    // Set text style for information
-    ctx.font = 'bold 20px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#2c3e50';
+    // وظيفة لرسم حقل معلومات مع خلفية رمادية شفافة
+    function drawInfoField(label, value, x, y, align) {
+        // رسم الخلفية الرمادية الشفافة
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+        const fieldX = align === 'right' ? x - fieldWidth : x;
+        roundRect(ctx, fieldX, y - fieldHeight + 5, fieldWidth, fieldHeight, 5, true, false);
+        
+        // إضافة حدود خفيفة
+        ctx.strokeStyle = 'rgba(150, 150, 150, 0.5)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, fieldX, y - fieldHeight + 5, fieldWidth, fieldHeight, 5, false, true);
+        
+        // كتابة النص
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = align;
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillText(`${label}: ${value || ''}`, x, y);
+    }
     
     // Right column (personal info)
-    ctx.fillText(`ناڤ و پاشناڤ: ${data.fullName || ''}`, rightColX, rowY);
+    ctx.textAlign = 'right';
+    drawInfoField('ناڤ و پاشناڤ', data.fullName, rightColX, rowY, 'right');
     rowY += lineHeight;
-    ctx.fillText(`ناڤێ بابێ: ${data.fatherName || ''}`, rightColX, rowY);
+    drawInfoField('ناڤێ بابێ', data.fatherName, rightColX, rowY, 'right');
     rowY += lineHeight;
-    ctx.fillText(`ناڤێ دایكێ: ${data.motherName || ''}`, rightColX, rowY);
+    drawInfoField('ناڤێ دایكێ', data.motherName, rightColX, rowY, 'right');
     rowY += lineHeight;
-    ctx.fillText(`ساخبوون: ${data.birthYear || ''}`, rightColX, rowY);
+    drawInfoField('ساخبوون', data.birthYear, rightColX, rowY, 'right');
     rowY += lineHeight;
-    ctx.fillText(`جهێ ساخبوونێ: ${data.birthPlace || ''}`, rightColX, rowY);
+    drawInfoField('جهێ ساخبوونێ', data.birthPlace, rightColX, rowY, 'right');
     
     // Reset for left column
     rowY = infoY + 100;
-    ctx.textAlign = 'left';
     
     // Left column (case info)
-    ctx.fillText(`جهێ نیشتەجێبوونێ: ${data.residencePlace || ''}`, leftColX, rowY);
+    drawInfoField('جهێ نیشتەجێبوونێ', data.residencePlace, leftColX, rowY, 'left');
     rowY += lineHeight;
-    ctx.fillText(`ژمارا مۆبایلێ: ${data.phoneNumber || ''}`, leftColX, rowY);
+    drawInfoField('ژمارا مۆبایلێ', data.phoneNumber, leftColX, rowY, 'left');
     rowY += lineHeight;
-    ctx.fillText(`جۆرێ تاوانێ: ${data.crimeType || ''}`, leftColX, rowY);
+    drawInfoField('جۆرێ تاوانێ', data.crimeType, leftColX, rowY, 'left');
     rowY += lineHeight;
-    ctx.fillText(`ژمارا دۆسیێ: ${data.fileNumber || ''}`, leftColX, rowY);
+    drawInfoField('ژمارا دۆسیێ', data.fileNumber, leftColX, rowY, 'left');
     rowY += lineHeight;
-    ctx.fillText(`تێبینی: ${data.notes || ''}`, leftColX, rowY);
+    drawInfoField('تێبینی', data.notes, leftColX, rowY, 'left');
     
-    // Add separator
-    const separatorY = infoY + 400 + 20;
+    // Add separator - تعديل موضع الفاصل للتصميم الأفقي
+    const separatorY = infoY + 600 + 20;
     ctx.fillStyle = '#3498db';
     ctx.fillRect(50, separatorY, canvas.width - 100, 2);
     
@@ -434,7 +516,7 @@ function generateSuspectCard(data) {
     
     // Add timestamp with enhanced styling
     const timestamp = new Date().toLocaleString('ar-IQ');
-    ctx.font = 'bold 18px Arial';
+    ctx.font = 'bold 14px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText(`تم إنشاء هذه البطاقة في: ${timestamp}`, canvas.width / 2, footerY + 50);
