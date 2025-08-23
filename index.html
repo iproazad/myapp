@@ -1327,6 +1327,50 @@
             });
         }
         
+        // دالة لتحويل الوقت من صيغة 24 ساعة إلى صيغة 12 ساعة
+        function formatTo12Hour(time24) {
+            if (!time24) return '-';
+            
+            // تقسيم الوقت إلى ساعات ودقائق
+            const [hours24, minutes] = time24.split(':');
+            
+            // تحويل الساعات إلى صيغة 12 ساعة
+            let hours12 = parseInt(hours24, 10) % 12;
+            if (hours12 === 0) hours12 = 12; // تحويل 00 إلى 12
+            
+            // تحديد الفترة (صباحًا/مساءً)
+            const period = parseInt(hours24, 10) < 12 ? 'ص' : 'م';
+            
+            // إرجاع الوقت بصيغة 12 ساعة
+            return `${hours12}:${minutes} ${period}`;
+        }
+        
+        // دالة لتحويل الوقت من formattedTime إلى صيغة 12 ساعة
+        function formatTimeFrom24Hour(formattedTime) {
+            if (!formattedTime) return '-';
+            
+            try {
+                // استخراج الساعات والدقائق من النص
+                const timeParts = formattedTime.split(':');
+                if (timeParts.length < 2) return formattedTime;
+                
+                // تنسيق الوقت بصيغة HH:MM
+                const hours = timeParts[0];
+                let minutes = timeParts[1];
+                
+                // التعامل مع الثواني إذا كانت موجودة
+                if (minutes.includes(':') || minutes.includes(' ')) {
+                    minutes = minutes.split(/[: ]/)[0];
+                }
+                
+                // استخدام دالة formatTo12Hour للتحويل
+                return formatTo12Hour(`${hours}:${minutes}`);
+            } catch (error) {
+                console.error('خطأ في تنسيق الوقت:', error);
+                return formattedTime; // إرجاع الوقت الأصلي في حالة حدوث خطأ
+            }
+        }
+        
         // عرض النافذة المنبثقة للبطاقة
         function showCardModal(record) {
             const cardModal = document.getElementById('card-modal');
@@ -1335,7 +1379,14 @@
             // تنسيق التاريخ والوقت
             const recordDate = new Date(record.date);
             const formattedDate = recordDate.toLocaleDateString('ar-IQ');
-            const formattedTime = recordDate.toLocaleTimeString('ar-IQ');
+            
+            // تنسيق الوقت بصيغة 12 ساعة مباشرة
+            const hours = recordDate.getHours();
+            const minutes = recordDate.getMinutes();
+            let hours12 = hours % 12;
+            if (hours12 === 0) hours12 = 12;
+            const period = hours < 12 ? 'ص' : 'م';
+            const formattedTime12 = `${hours12}:${minutes < 10 ? '0' + minutes : minutes} ${period}`;
             
             // إنشاء محتوى البطاقة
             cardPreview.innerHTML = `
@@ -1383,7 +1434,7 @@
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px;">
                                     <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
                                         <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">الوقت والفترة:</div>
-                                        <div style="color: white; font-size: 0.85rem;">${record.timeFrom || '-'} - ${record.timeTo || '-'} (${record.period === 'day' ? 'روژ' : 'شەڤ'})</div>
+                                        <div style="color: white; font-size: 0.85rem;">${formatTo12Hour(record.timeFrom) || '-'} - ${formatTo12Hour(record.timeTo) || '-'} (${record.period === 'day' ? 'روژ' : 'شەڤ'})</div>
                                     </div>
                                     <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
                                         <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">جهێ ئاریشێ:</div>
@@ -1412,7 +1463,7 @@
                             
                             <div style="text-align: center; padding: 4px; background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 5px; color: white; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; font-size: 0.85rem;">
                                 <i class="fas fa-exclamation-triangle" style="margin-left: 5px;"></i>
-                                مێژویا توماركرنا رویدانێ: ${formattedDate}
+                                مێژویا توماركرنا رویدانێ: ${formattedDate} - ${formattedTime12}
                             </div>
                         </div>
                     </div>
