@@ -998,40 +998,42 @@
                             </div>
                             <div class="form-group">
                                 <label for="problem-type">جورێ ئاریشێ</label>
-                                <select id="problem-type" name="problem-type">
-                                    <option value="ئاریشا خێزانی">ئاریشا خێزانی</option>
-                                    <option value="خازوك">خازوك</option>
-                                    <option value="شـــەر">شـــەر</option>
-                                    <option value="سەرخوش">سەرخوش</option>
-                                    <option value="رویدانا ترومبێلێ">رویدانا ترومبێلێ</option>
-                                    <option value="مخەدەر">مخەدەر</option>
-                                    <option value="دزی">دزی</option>
-                                    <option value="بەرزەبون">بەرزەبون</option>
-                                    <option value="ازعــاج">ازعــاج</option>
-                                    <option value="داخازكری">داخازكری</option>
-                                    <option value="گومانلێكری">گومانلێكری</option>
-                                    <option value="هەولا خوكوشتنێ">هەولا خوكوشتنێ</option>
-                                    <option value="خوكوشتن">خوكوشتن</option>
-                                    <option value="كوشتن">كوشتن</option>
-                                    <option value="گیان ژدەستدان">گیان ژدەستدان</option>
-                                    <option value="بێ سەمیان">بێ سەمیان</option>
-                                    <option value="كێشانا سكوتینێ">كێشانا سكوتینێ</option>
-                                    <option value="فیلبازی تشقلە">فیلبازی تشقلە</option>
-                                    <option value="ترومبيلا بي خودان">ترومبيلا بي خودان</option>
-                                    <option value="ئاگر بەربون">ئاگر بەربون</option>
-                                    <option value="تەقەكرن">تەقەكرن</option>
-                                    <option value="مەلەڤاني جهی قەدەغە">مەلەڤاني جهی قەدەغە</option>
-                                    <option value="تێكدەر">تێكدەر</option>
-                                    <option value="خەندقین">خەندقین</option>
-                                    <option value="گەفكرن">گەفكرن</option>
-                                </select>
+                                <input list="problem-type-list" id="problem-type" name="problem-type">
+                                <datalist id="problem-type-list">
+                                    <option value="ئاریشا خێزانی">
+                                    <option value="خازوك">
+                                    <option value="شـــەر">
+                                    <option value="سەرخوش">
+                                    <option value="رویدانا ترومبێلێ">
+                                    <option value="مخەدەر">
+                                    <option value="دزی">
+                                    <option value="بەرزەبون">
+                                    <option value="ازعــاج">
+                                    <option value="داخازكری">
+                                    <option value="گومانلێكری">
+                                    <option value="هەولا خوكوشتنێ">
+                                    <option value="خوكوشتن">
+                                    <option value="كوشتن">
+                                    <option value="گیان ژدەستدان">
+                                    <option value="بێ سەمیان">
+                                    <option value="كێشانا سكوتینێ">
+                                    <option value="فیلبازی تشقلە">
+                                    <option value="ترومبيلا بي خودان">
+                                    <option value="ئاگر بەربون">
+                                    <option value="تەقەكرن">
+                                    <option value="مەلەڤاني جهی قەدەغە">
+                                    <option value="تێكدەر">
+                                    <option value="خەندقین">
+                                    <option value="گەفكرن">
+                                </datalist>
                             </div>
                             <div class="form-group">
                                 <label for="marital-status">بارێ خێزانی</label>
-                                <select id="marital-status" name="marital-status">
-                                    <option value="خێزاندەرە">خێزاندەرە</option>
-                                    <option value="نە خێزاندارە">نە خێزاندارە</option>
-                                </select>
+                                <input list="marital-status-list" id="marital-status" name="marital-status">
+                                <datalist id="marital-status-list">
+                                    <option value="خێزاندەرە">
+                                    <option value="نە خێزاندارە">
+                                </datalist>
                             </div>
                             <div class="form-group">
                                 <label for="job">كارێ وی</label>
@@ -1039,10 +1041,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="prison">زیندانكرن</label>
-                                <select id="prison" name="prison">
-                                    <option value="بەلی">بەلی</option>
-                                    <option value="نەخێر">نەخێر</option>
-                                </select>
+                                <input list="prison-list" id="prison" name="prison">
+                                <datalist id="prison-list">
+                                    <option value="بەلی">
+                                    <option value="نەخێر">
+                                </datalist>
                             </div>
                             <div class="form-group">
                                 <label for="phone">ژمارا موبایلي</label>
@@ -1068,10 +1071,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="period">الفترة</label>
-                                <select id="period" name="period">
-                                    <option value="day">روژ</option>
-                                    <option value="night">شەڤ</option>
-                                </select>
+                                <input list="period-list" id="period" name="period">
+                                <datalist id="period-list">
+                                    <option value="روژ">
+                                    <option value="شەڤ">
+                                </datalist>
                             </div>
                         </div>
                         
@@ -1087,26 +1091,27 @@
                             </div>
                             <div class="form-group">
                                 <label for="driver-name">ناڤێ شوفێری</label>
-                                <select id="driver-name" name="driver-name">
-                                    <option value="سليمان علي حميد">سليمان علي حميد</option>
-                                    <option value="نیچیرڤان عباس بشار">نیچیرڤان عباس بشار</option>
-                                    <option value="نعمان رمضان محمد">نعمان رمضان محمد</option>
-                                    <option value="رضوان محمود محمد">رضوان محمود محمد</option>
-                                    <option value="داود قادر ندیر ناصر">داود قادر ندیر ناصر</option>
-                                    <option value="سربست محمدعلی">سربست محمدعلی</option>
-                                    <option value="حسن رؤوف حسن">حسن رؤوف حسن</option>
-                                    <option value="ريزان سمو محمد">ريزان سمو محمد</option>
-                                    <option value="صابر شفیق شمزین">صابر شفیق شمزین</option>
-                                    <option value="رضوان رمضان علی">رضوان رمضان علی</option>
-                                    <option value="سعید سربست رسول">سعید سربست رسول</option>
-                                    <option value="نیجیرڤان احمد علی">نیجیرڤان احمد علی</option>
-                                    <option value="دشتی عادل عثمان">دشتی عادل عثمان</option>
-                                    <option value="ریبر سلمان عثمان">ریبر سلمان عثمان</option>
-                                    <option value="ازاد عدنان عبدالله">ازاد عدنان عبدالله</option>
-                                    <option value="بیوار اسماعیل محمد">بیوار اسماعیل محمد</option>
-                                    <option value="مهڤان تحسين پيراموس">مهڤان تحسين پيراموس</option>
-                                    <option value="فارس بكر رشید">فارس بكر رشید</option>
-                                </select>
+                                <input list="driver-name-list" id="driver-name" name="driver-name">
+                                <datalist id="driver-name-list">
+                                    <option value="سليمان علي حميد">
+                                    <option value="نیچیرڤان عباس بشار">
+                                    <option value="نعمان رمضان محمد">
+                                    <option value="رضوان محمود محمد">
+                                    <option value="داود قادر ندیر ناصر">
+                                    <option value="سربست محمدعلی">
+                                    <option value="حسن رؤوف حسن">
+                                    <option value="ريزان سمو محمد">
+                                    <option value="صابر شفیق شمزین">
+                                    <option value="رضوان رمضان علی">
+                                    <option value="سعید سربست رسول">
+                                    <option value="نیجیرڤان احمد علی">
+                                    <option value="دشتی عادل عثمان">
+                                    <option value="ریبر سلمان عثمان">
+                                    <option value="ازاد عدنان عبدالله">
+                                    <option value="بیوار اسماعیل محمد">
+                                    <option value="مهڤان تحسين پيراموس">
+                                    <option value="فارس بكر رشید">
+                                </datalist>
                             </div>
                             <div class="form-group">
                                 <label for="point">خالا</label>
