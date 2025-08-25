@@ -884,8 +884,6 @@
                 // تهيئة المتغيرات
                 const photoInput = document.getElementById('photo-input');
                 const photoPreview = document.getElementById('photo-preview');
-                const cameraBtn = document.getElementById('camera-btn');
-                const galleryBtn = document.getElementById('gallery-btn');
                 const recordForm = document.getElementById('record-form');
                 const recordsContainer = document.getElementById('records-container');
                 const cardModal = document.getElementById('card-modal');
@@ -932,19 +930,23 @@
                         }
                     });
                     
-                    // زر الكاميرا
-                    if (cameraBtn) {
-                        cameraBtn.addEventListener('click', function() {
-                            photoInput.setAttribute('capture', 'environment');
-                            photoInput.click();
-                        });
-                    }
-                    
-                    // زر المعرض
-                    if (galleryBtn) {
-                        galleryBtn.addEventListener('click', function() {
-                            photoInput.removeAttribute('capture');
-                            photoInput.click();
+                    // زر الصورة الموحد
+                    const photoButton = document.getElementById('photo-button');
+                    if (photoButton) {
+                        photoButton.addEventListener('click', function() {
+                            // إظهار خيارات اختيار الصورة
+                            const options = ['الكاميرا', 'المعرض', 'إلغاء'];
+                            const choice = confirm('اختر مصدر الصورة:\n1. الكاميرا\n2. المعرض');
+                            
+                            if (choice) {
+                                // اختيار الكاميرا
+                                photoInput.setAttribute('capture', 'environment');
+                                photoInput.click();
+                            } else {
+                                // اختيار المعرض
+                                photoInput.removeAttribute('capture');
+                                photoInput.click();
+                            }
                         });
                     }
                 }
@@ -966,13 +968,9 @@
                                 <i class="fas fa-user"></i>
                             </div>
                             <div class="photo-buttons">
-                                <button type="button" id="camera-btn" class="photo-btn">
+                                <button type="button" id="photo-button" class="photo-btn">
                                     <i class="fas fa-camera"></i>
-                                    الكاميرا
-                                </button>
-                                <button type="button" id="gallery-btn" class="photo-btn">
-                                    <i class="fas fa-images"></i>
-                                    المعرض
+                                    وێنەگرتن یان باركرن
                                 </button>
                             </div>
                             <input type="file" id="photo-input" accept="image/*" style="display: none;">
@@ -1209,19 +1207,22 @@
         // معالجة الصورة
         const photoInput = document.getElementById('photo-input');
         const photoPreview = document.getElementById('photo-preview');
-        const cameraBtn = document.getElementById('camera-btn');
-        const galleryBtn = document.getElementById('gallery-btn');
+        const photoButton = document.getElementById('photo-button');
         
-        // زر الكاميرا
-        cameraBtn.addEventListener('click', () => {
-            photoInput.setAttribute('capture', 'environment');
-            photoInput.click();
-        });
-        
-        // زر المعرض
-        galleryBtn.addEventListener('click', () => {
-            photoInput.removeAttribute('capture');
-            photoInput.click();
+        // زر الصورة الموحد
+        photoButton.addEventListener('click', () => {
+            // إظهار خيارات اختيار الصورة
+            const choice = confirm('اختر مصدر الصورة:\n1. الكاميرا\n2. المعرض');
+            
+            if (choice) {
+                // اختيار الكاميرا
+                photoInput.setAttribute('capture', 'environment');
+                photoInput.click();
+            } else {
+                // اختيار المعرض
+                photoInput.removeAttribute('capture');
+                photoInput.click();
+            }
         });
         
         // معاينة الصورة المختارة
