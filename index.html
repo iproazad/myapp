@@ -1198,11 +1198,7 @@
         const photoPreview = document.getElementById('photo-preview');
         const photoButton = document.getElementById('photo-button');
         
-        // زر الصورة الموحد
-        photoButton.addEventListener('click', () => {
-            // النقر مباشرة على زر اختيار الصورة بدون رسالة تأكيد
-            photoInput.click();
-        });
+        // تم نقل معالج الحدث لزر الصورة إلى مكان آخر في الكود
         
         // معاينة الصورة المختارة
         photoInput.addEventListener('change', (e) => {
