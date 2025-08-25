@@ -934,19 +934,8 @@
                     const photoButton = document.getElementById('photo-button');
                     if (photoButton) {
                         photoButton.addEventListener('click', function() {
-                            // إظهار خيارات اختيار الصورة
-                            const options = ['الكاميرا', 'المعرض', 'إلغاء'];
-                            const choice = confirm('اختر مصدر الصورة:\n1. الكاميرا\n2. المعرض');
-                            
-                            if (choice) {
-                                // اختيار الكاميرا
-                                photoInput.setAttribute('capture', 'environment');
-                                photoInput.click();
-                            } else {
-                                // اختيار المعرض
-                                photoInput.removeAttribute('capture');
-                                photoInput.click();
-                            }
+                            // النقر مباشرة على زر اختيار الصورة بدون رسالة تأكيد
+                            photoInput.click();
                         });
                     }
                 }
@@ -1211,18 +1200,8 @@
         
         // زر الصورة الموحد
         photoButton.addEventListener('click', () => {
-            // إظهار خيارات اختيار الصورة
-            const choice = confirm('اختر مصدر الصورة:\n1. الكاميرا\n2. المعرض');
-            
-            if (choice) {
-                // اختيار الكاميرا
-                photoInput.setAttribute('capture', 'environment');
-                photoInput.click();
-            } else {
-                // اختيار المعرض
-                photoInput.removeAttribute('capture');
-                photoInput.click();
-            }
+            // النقر مباشرة على زر اختيار الصورة بدون رسالة تأكيد
+            photoInput.click();
         });
         
         // معاينة الصورة المختارة
