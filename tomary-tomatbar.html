@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>توماری ئاریشە - Problem Registration</title>
+    <title> تومەتبار - Problem Registration</title>
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -449,44 +449,9 @@
             min-width: 200px;
         }
         
-        .add-person-button {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto;
-            font-weight: bold;
-        }
+        /* تم إزالة CSS لزر إضافة شخص آخر */
         
-        .add-person-button i {
-            margin-left: 8px;
-        }
-        
-        .add-person-button:hover {
-            background-color: #27ae60;
-        }
-        
-        .remove-person-button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-        
-        .remove-person-button:hover {
-            background-color: #c0392b;
-        }
+        /* تم إزالة CSS لزر إزالة شخص */
         
         .case-info-section {
             margin-top: 30px;
@@ -514,16 +479,13 @@
 </head>
 <body>
     <div class="app-container">
-        <header style="background-color: #3498db; padding: 10px; border-radius: 5px;">
-            <h1 style="color: black;">توماری ئاریشە</h1>
-            <h2 style="color: black;">Problem Registration</h2>
+        <header style="background-color: #e74c3c; padding: 10px; border-radius: 5px;">
+            <h1 style="color: black;">تومەتبار </h1>
+            <h2 style="color: black;">Accused </h2>
         </header>
 
         <!-- Navigation Buttons -->
         <div class="nav-buttons">
-            <a href="tomary-areshe.html" class="nav-button active">
-                <i class="fas fa-users"></i> توماری ئاریشە
-            </a>
             <a href="index.html" class="nav-button back-button">
                 <i class="fas fa-home"></i> الصفحة الرئيسية
             </a>
@@ -585,12 +547,42 @@
                                 <input type="tel" id="phone-1" name="phone-1">
                             </div>
                         </div>
+                        
+                        <div class="person-info-row">
+                            <div class="form-group">
+                                <label for="marital-status-1">بارێ خێزانی</label>
+                                <input list="marital-status-options" id="marital-status-1" name="marital-status-1">
+                                <datalist id="marital-status-options">
+                                    <option value="خێزاندەرە">
+                                    <option value="نە خێزاندارە">
+                                </datalist>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="occupation-1">كارێ وی</label>
+                                <input type="text" id="occupation-1" name="occupation-1">
+                            </div>
+                        </div>
+                        
+                        <div class="person-info-row">
+                            <div class="form-group">
+                                <label for="imprisonment-1">زیندانكرن</label>
+                                <input list="imprisonment-options" id="imprisonment-1" name="imprisonment-1">
+                                <datalist id="imprisonment-options">
+                                    <option value="بەلێ">
+                                    <option value="نەخێر">
+                                </datalist>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="id-number-1">ژمارا ناسنامێ</label>
+                                <input type="number" id="id-number-1" name="id-number-1">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <button type="button" id="add-person-button" class="add-person-button">
-                    <i class="fas fa-user-plus"></i> إضافة شخص آخر
-                </button>
+                <!-- تم إزالة زر إضافة شخص آخر -->
                 
                 <div class="case-info-section">
                     <h3 class="case-info-title">معلومات القضية</h3>
@@ -699,7 +691,7 @@
                                 <option value="110">
                                 <option value="111">
                                 <option value="112">
-                                <option value="113"></option>
+                                <option value="113">
                             </datalist>
                         </div>
                     </div>
@@ -814,7 +806,7 @@
         </div>
     </div>
 
-    <script src="multi-person.js"></script>
+    <script src="multi-tomatbar.js"></script>
     
     <!-- Register Service Worker for PWA -->
     <script>

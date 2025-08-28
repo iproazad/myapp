@@ -1,20 +1,34 @@
 document.addEventListener('DOMContentLoaded', initApp);
 
 // Global variables
-let personCount = 1;
-const MAX_PERSONS = 5;
+const personCount = 1; // ثابت لأننا نسمح بشخص واحد فقط
+// تم إزالة MAX_PERSONS لأننا نسمح بشخص واحد فقط
 let personPhotos = {};
 let savedRecords = [];
-const STORAGE_KEY = 'tomaryAresheRecords';
+const STORAGE_KEY = 'tomaryTomatbarRecords';
 let currentViewingRecordId = null; // معرف السجل الحالي الذي يتم عرضه
 
 function initApp() {
-    // Initialize event listeners
-    document.getElementById('add-person-button').addEventListener('click', addNewPerson);
-    document.getElementById('multi-person-form').addEventListener('submit', saveMultiPersonData);
-    document.getElementById('share-whatsapp').addEventListener('click', shareViaWhatsapp);
-    document.getElementById('new-entry').addEventListener('click', resetForm);
-    document.getElementById('close-records-modal').addEventListener('click', hideRecordsModal);
+    // تأكد من وجود العناصر قبل إضافة مستمعي الأحداث
+    const multiPersonForm = document.getElementById('multi-person-form');
+    if (multiPersonForm) {
+        multiPersonForm.addEventListener('submit', saveMultiPersonData);
+    }
+    
+    const shareWhatsappBtn = document.getElementById('share-whatsapp');
+    if (shareWhatsappBtn) {
+        shareWhatsappBtn.addEventListener('click', shareViaWhatsapp);
+    }
+    
+    const newEntryBtn = document.getElementById('new-entry');
+    if (newEntryBtn) {
+        newEntryBtn.addEventListener('click', resetForm);
+    }
+    
+    const closeRecordsModalBtn = document.getElementById('close-records-modal');
+    if (closeRecordsModalBtn) {
+        closeRecordsModalBtn.addEventListener('click', hideRecordsModal);
+    }
     
     // تهيئة أزرار التبويبات
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -108,106 +122,7 @@ function initializePhotoButton(personId) {
     });
 }
 
-function addNewPerson() {
-    if (personCount >= MAX_PERSONS) {
-        alert('لا يمكن إضافة أكثر من 5 أشخاص!');
-        return;
-    }
-    
-    personCount++;
-    
-    const personsContainer = document.getElementById('persons-container');
-    const newPersonDiv = document.createElement('div');
-    newPersonDiv.className = 'person-container';
-    newPersonDiv.dataset.personId = personCount;
-    
-    newPersonDiv.innerHTML = `
-        <div class="person-number">${personCount}</div>
-        <button type="button" class="remove-person-button" data-person-id="${personCount}">
-            <i class="fas fa-trash"></i> حذف
-        </button>
-        <div class="person-photo-section">
-            <div class="person-photo-preview">
-                <i class="fas fa-user-circle" id="default-photo-icon-${personCount}"></i>
-                <img id="selected-photo-${personCount}" style="display: none;" alt="وێنێ كەسی">
-                <div class="person-photo-number">${personCount}</div>
-            </div>
-            <button type="button" class="primary-button photo-button" data-person-id="${personCount}">
-                <i class="fas fa-camera"></i> وێنەگرتن یان باركرن
-            </button>
-            <input type="file" class="photo-input" id="photo-input-${personCount}" accept="image/*" style="display: none;">
-        </div>
-        
-        <div class="person-type-select">
-            <select class="person-type" id="person-type-${personCount}" required>
-                <option value="" disabled selected>اختر نوع الشخص</option>
-                <option value="مشتەكی">مشتەكی</option>
-                <option value="تاوانبار">تاوانبار</option>
-            </select>
-        </div>
-        
-        <div class="person-info-row">
-            <div class="form-group">
-                <label for="fullname-${personCount}">ناڤێ تومەتباری</label>
-                <input type="text" id="fullname-${personCount}" name="fullname-${personCount}" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="birthdate-${personCount}">ژدایـــكبون</label>
-                <input type="number" id="birthdate-${personCount}" name="birthdate-${personCount}" placeholder="سنة الميلاد" min="1900" max="2024" required>
-            </div>
-        </div>
-        
-        <div class="person-info-row">
-            <div class="form-group">
-                <label for="address-${personCount}">ئاكنجی بوون</label>
-                <input type="text" id="address-${personCount}" name="address-${personCount}" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone-${personCount}">ژمارا موبایلی</label>
-                <input type="tel" id="phone-${personCount}" name="phone-${personCount}">
-            </div>
-        </div>
-    `;
-    
-    personsContainer.appendChild(newPersonDiv);
-    
-    // Initialize photo button for the new person
-    initializePhotoButton(personCount);
-    
-    // Add event listener for remove button
-    const removeButton = newPersonDiv.querySelector('.remove-person-button');
-    removeButton.addEventListener('click', function() {
-        removePerson(this.getAttribute('data-person-id'));
-    });
-    
-    // Scroll to the new person container
-    newPersonDiv.scrollIntoView({ behavior: 'smooth' });
-}
 
-function removePerson(personId) {
-    const personContainer = document.querySelector(`.person-container[data-person-id="${personId}"]`);
-    if (personContainer) {
-        personContainer.remove();
-        
-        // Remove the photo data
-        if (personPhotos[personId]) {
-            delete personPhotos[personId];
-        }
-        
-        // No need to decrement personCount as we want to keep the IDs unique
-        // Just update the UI to reflect the correct count of visible person containers
-        updatePersonNumbers();
-        
-        // Enable the add button if it was disabled
-        const addButton = document.getElementById('add-person-button');
-        if (addButton.disabled) {
-            addButton.disabled = false;
-            addButton.style.opacity = '1';
-        }
-    }
-}
 
 function updatePersonNumbers() {
     const personContainers = document.querySelectorAll('.person-container');
@@ -222,16 +137,7 @@ function updatePersonNumbers() {
         const photoNumber = container.querySelector('.person-photo-number');
         photoNumber.textContent = visibleCount;
     });
-    
-    // Update the add button state
-    const addButton = document.getElementById('add-person-button');
-    if (visibleCount >= MAX_PERSONS) {
-        addButton.disabled = true;
-        addButton.style.opacity = '0.5';
-    } else {
-        addButton.disabled = false;
-        addButton.style.opacity = '1';
-    }
+    // تم إزالة الجزء المتعلق بزر إضافة شخص آخر
 }
 
 function saveMultiPersonData(event) {
@@ -243,35 +149,42 @@ function saveMultiPersonData(event) {
     
     personContainers.forEach(container => {
         const personId = container.dataset.personId;
-        const personType = document.getElementById(`person-type-${personId}`).value;
-        const fullName = document.getElementById(`fullname-${personId}`).value;
-        const birthdate = document.getElementById(`birthdate-${personId}`).value;
-        const address = document.getElementById(`address-${personId}`).value;
-        const phone = document.getElementById(`phone-${personId}`).value;
+        // تم إزالة personType لأنه غير موجود في HTML
+        const fullName = document.getElementById(`fullname-${personId}`)?.value || '';
+        const birthdate = document.getElementById(`birthdate-${personId}`)?.value || '';
+        const address = document.getElementById(`address-${personId}`)?.value || '';
+        const phone = document.getElementById(`phone-${personId}`)?.value || '';
+        const maritalStatus = document.getElementById(`marital-status-${personId}`)?.value || '';
+        const imprisoned = document.getElementById(`imprisonment-${personId}`)?.value || '';
+        const idNumber = document.getElementById(`id-number-${personId}`)?.value || '';
+        const occupation = document.getElementById(`occupation-${personId}`)?.value || '';
         const photo = personPhotos[personId] || null;
         
         personsData.push({
             id: personId,
-            type: personType,
             name: fullName,
             birthdate: birthdate,
             address: address,
             phone: phone,
+            maritalStatus: maritalStatus,
+            imprisoned: imprisoned,
+            idNumber: idNumber,
+            occupation: occupation,
             photo: photo
         });
     });
     
     // Collect case information
     const caseData = {
-        issueType: document.getElementById('issue-type').value,
-        timeFrom: document.getElementById('time-from').value,
-        timeTo: document.getElementById('time-to').value,
-        period: document.getElementById('period').value,
-        location: document.getElementById('problem-location').value,
-        driverName: document.getElementById('driver-name').value,
-        point: document.getElementById('point').value,
-        sentTo: document.getElementById('sent-to').value,
-        notes: document.getElementById('notes').value
+        issueType: document.getElementById('issue-type')?.value || '',
+        timeFrom: document.getElementById('time-from')?.value || '',
+        timeTo: document.getElementById('time-to')?.value || '',
+        period: document.getElementById('period')?.value || '',
+        location: document.getElementById('problem-location')?.value || '',
+        driverName: document.getElementById('driver-name')?.value || '',
+        point: document.getElementById('point')?.value || '',
+        sentTo: document.getElementById('sent-to')?.value || '',
+        notes: document.getElementById('notes')?.value || ''
     };
     
     // Generate and save the multi-person card
@@ -291,7 +204,7 @@ function generateMultiPersonCard(personsData, caseData) {
     const ctx = canvas.getContext('2d');
     
     // Set canvas dimensions based on number of persons with higher resolution
-    const personHeight = 640; // Doubled height per person for higher resolution
+    const personHeight = 1050; // زيادة ارتفاع الشخص لاستيعاب الصورة الأكثر عمودية
     const headerHeight = 440; // Doubled height for case information
     const notesHeight = caseData.notes ? 200 : 0; // Doubled height for notes section if notes exist
     const canvasWidth = 2000; // Doubled width for higher resolution
@@ -316,7 +229,7 @@ function generateMultiPersonCard(personsData, caseData) {
     }
     
     // Add card border
-    ctx.strokeStyle = '#3498db';
+    ctx.strokeStyle = '#e74c3c';
     ctx.lineWidth = 6;
     ctx.strokeRect(10, 10, canvasWidth - 20, canvasHeight - 20);
     
@@ -349,7 +262,7 @@ function generateMultiPersonCard(personsData, caseData) {
     
     // Add footer
     const footerY = headerHeight + (personsData.length * personHeight) + notesHeight + 10;
-    ctx.fillStyle = '#2980b9';
+    ctx.fillStyle = '#c0392b';
     ctx.fillRect(0, footerY, canvasWidth, 80);
     
     // Add footer text
@@ -370,9 +283,9 @@ function generateMultiPersonCard(personsData, caseData) {
 function drawCaseHeader(ctx, caseData, width, height) {
     // Draw header background with enhanced gradient
     const headerGradient = ctx.createLinearGradient(0, 0, 0, height);
-    headerGradient.addColorStop(0, '#2980b9');
-    headerGradient.addColorStop(0.5, '#3498db');
-    headerGradient.addColorStop(1, '#2980b9');
+    headerGradient.addColorStop(0, '#c0392b');
+    headerGradient.addColorStop(0.5, '#e74c3c');
+    headerGradient.addColorStop(1, '#c0392b');
     ctx.fillStyle = headerGradient;
     ctx.fillRect(0, 0, width, height);
     
@@ -402,7 +315,7 @@ function drawCaseHeader(ctx, caseData, width, height) {
     ctx.font = 'bold 76px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText('توماری ئاریشە', width / 2, 100);
+    ctx.fillText('تومەتبار', width / 2, 100);
     ctx.shadowColor = 'transparent';
     
     // Add gold accent line under title
@@ -513,13 +426,13 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     ctx.fillRect(0, yOffset, width, height);
     
     // Add border
-    ctx.strokeStyle = '#3498db';
+    ctx.strokeStyle = '#e74c3c';
     ctx.lineWidth = 4;
     ctx.strokeRect(20, yOffset + 20, width - 40, height - 40);
     
     // Draw person number badge
     const badgeSize = 80;
-    ctx.fillStyle = '#3498db';
+    ctx.fillStyle = '#e74c3c';
     ctx.beginPath();
     ctx.arc(width - 60, yOffset + 60, badgeSize / 2, 0, Math.PI * 2);
     ctx.fill();
@@ -529,19 +442,20 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     ctx.textAlign = 'center';
     ctx.fillText(person.id, width - 60, yOffset + 76);
     
-    // Draw photo or placeholder
-    const photoSize = 440;
+    // Draw photo or placeholder - تم تكبير الصورة بنسبة 40% وجعلها أكثر عمودية
+    const photoWidth = 440 * 1.4; // تكبير العرض بنسبة 40%
+    const photoHeight = 440 * 1.8; // تكبير الارتفاع بنسبة 80% لجعلها أكثر عمودية
     const photoX = 160;
     const photoY = yOffset + 80;
     
     // Draw photo background
     ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(photoX, photoY, photoSize, photoSize);
+    ctx.fillRect(photoX, photoY, photoWidth, photoHeight);
     
     // Draw photo border
-    ctx.strokeStyle = '#3498db';
+    ctx.strokeStyle = '#e74c3c';
     ctx.lineWidth = 8;
-    ctx.strokeRect(photoX, photoY, photoSize, photoSize);
+    ctx.strokeRect(photoX, photoY, photoWidth, photoHeight);
     
     // Draw actual photo or placeholder icon
     if (person.photo) {
@@ -552,68 +466,150 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
         // Draw image immediately (synchronously)
         ctx.save();
         ctx.beginPath();
-        ctx.rect(photoX + 4, photoY + 4, photoSize - 8, photoSize - 8);
+        ctx.rect(photoX + 4, photoY + 4, photoWidth - 8, photoHeight - 8);
         ctx.clip();
-        ctx.drawImage(img, photoX, photoY, photoSize, photoSize);
+        ctx.drawImage(img, photoX, photoY, photoWidth, photoHeight);
         ctx.restore();
         
         // Draw photo number badge
-        ctx.fillStyle = '#3498db';
+        ctx.fillStyle = '#e74c3c';
         ctx.beginPath();
-        ctx.rect(photoX + photoSize - 60, photoY + photoSize - 60, 60, 60);
+        ctx.rect(photoX + photoWidth - 60, photoY + photoHeight - 60, 60, 60);
         ctx.fill();
         
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 32px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(person.id, photoX + photoSize - 30, photoY + photoSize - 20);
+        ctx.fillText(person.id, photoX + photoWidth - 30, photoY + photoHeight - 20);
     } else {
         // Draw placeholder icon
         ctx.fillStyle = '#bdc3c7';
         ctx.font = '200px FontAwesome';
         ctx.textAlign = 'center';
-        ctx.fillText('\uf007', photoX + (photoSize / 2), photoY + (photoSize / 2) + 70);
+        ctx.fillText('\uf007', photoX + (photoWidth / 2), photoY + (photoHeight / 2) + 70);
         
         // Draw photo number badge
-        ctx.fillStyle = '#3498db';
+        ctx.fillStyle = '#e74c3c';
         ctx.beginPath();
-        ctx.rect(photoX + photoSize - 60, photoY + photoSize - 60, 60, 60);
+        ctx.rect(photoX + photoWidth - 60, photoY + photoHeight - 60, 60, 60);
         ctx.fill();
         
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 32px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(person.id, photoX + photoSize - 30, photoY + photoSize - 20);
+        ctx.fillText(person.id, photoX + photoWidth - 30, photoY + photoHeight - 20);
     }
     
-    // Draw person type badge
-    const typeBadgeWidth = 240;
-    const typeBadgeHeight = 60;
-    const typeBadgeX = photoX + (photoSize / 2) - (typeBadgeWidth / 2);
-    const typeBadgeY = photoY + photoSize + 20;
+    // تم إزالة شارة نوع الشخص لأن person.type غير موجود في personsData
     
-    ctx.fillStyle = person.type === 'مشتەكی' ? '#27ae60' : '#e74c3c';
-    ctx.beginPath();
-    ctx.roundRect(typeBadgeX, typeBadgeY, typeBadgeWidth, typeBadgeHeight, 30);
-    ctx.fill();
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 32px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(person.type, typeBadgeX + (typeBadgeWidth / 2), typeBadgeY + 40);
-    
-    // Draw person information
-    const infoX = 600;
+    // Draw person information - تم تعديل موقع النص ليناسب الصورة المكبرة
+    const infoX = photoX + photoWidth + 60; // تعديل موقع النص ليناسب الصورة المكبرة
     const infoY = yOffset + 120;
     
+    // إضافة خلفية أنيقة للمعلومات
+    const infoWidth = width - infoX - 80;
+    const infoHeight = 700;
+    const infoBackgroundGradient = ctx.createLinearGradient(infoX, infoY, infoX + infoWidth, infoY);
+    infoBackgroundGradient.addColorStop(0, 'rgba(236, 240, 241, 0.8)');
+    infoBackgroundGradient.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
+    ctx.fillStyle = infoBackgroundGradient;
+    
+    // رسم خلفية المعلومات مع حواف مستديرة
+    ctx.beginPath();
+    ctx.moveTo(infoX, infoY);
+    ctx.lineTo(infoX + infoWidth - 20, infoY);
+    ctx.quadraticCurveTo(infoX + infoWidth, infoY, infoX + infoWidth, infoY + 20);
+    ctx.lineTo(infoX + infoWidth, infoY + infoHeight - 20);
+    ctx.quadraticCurveTo(infoX + infoWidth, infoY + infoHeight, infoX + infoWidth - 20, infoY + infoHeight);
+    ctx.lineTo(infoX + 20, infoY + infoHeight);
+    ctx.quadraticCurveTo(infoX, infoY + infoHeight, infoX, infoY + infoHeight - 20);
+    ctx.lineTo(infoX, infoY + 20);
+    ctx.quadraticCurveTo(infoX, infoY, infoX + 20, infoY);
+    ctx.closePath();
+    ctx.fill();
+    
+    // إضافة إطار أنيق للمعلومات
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // إضافة تأثير ظل خفيف للنص
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    
+    // تحسين نمط النص
     ctx.fillStyle = '#2c3e50';
     ctx.font = 'bold 44px Arial';
     ctx.textAlign = 'right';
     
-    ctx.fillText(`ناڤێ تومەتباری: ${person.name}`, width - 100, infoY + 80);
-    ctx.fillText(`ژدایـــكبون: ${person.birthdate}`, width - 100, infoY + 160);
-    ctx.fillText(`ئاكنجی بوون: ${person.address}`, width - 100, infoY + 240);
-    ctx.fillText(`ژمارا موبایلی: ${person.phone || 'غير متوفر'}`, width - 100, infoY + 320);
+    // تحسين تباعد النص وإضافة أيقونات
+    const lineHeight = 80;
+    const textX = width - 100;
+    
+    // رسم خط فاصل زخرفي أعلى المعلومات
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(infoX + 50, infoY + 40);
+    ctx.lineTo(width - 100, infoY + 40);
+    ctx.stroke();
+    
+    // رسم المعلومات مع تأثيرات أفضل
+    // وظيفة لرسم العنوان داخل إطار أحمر والمعلومات داخل إطار شفاف
+    function drawInfoLine(label, value, lineNumber) {
+        // رسم إطار أحمر للعنوان
+        const labelWidth = ctx.measureText(label).width;
+        const labelX = textX - labelWidth - 20;
+        const labelY = infoY + lineHeight * lineNumber - 40;
+        
+        // خلفية العنوان
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(labelX - 10, labelY, labelWidth + 20, 50);
+        
+        // نص العنوان
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'right';
+        ctx.fillText(label, textX - 20, infoY + lineHeight * lineNumber);
+        
+        // رسم إطار شفاف للمعلومات
+        const valueWidth = ctx.measureText(value).width;
+        const valueX = textX - labelWidth - 40;
+        
+        // خلفية المعلومات
+        ctx.fillStyle = 'rgba(236, 240, 241, 0.5)';
+        ctx.fillRect(valueX - valueWidth - 10, labelY, valueWidth + 20, 50);
+        
+        // نص المعلومات
+        ctx.fillStyle = '#2c3e50';
+        ctx.textAlign = 'right';
+        ctx.fillText(value, valueX, infoY + lineHeight * lineNumber);
+    }
+    
+    // رسم المعلومات بالتنسيق الجديد
+    drawInfoLine("ناڤێ تومەتباری", person.name, 1);
+    drawInfoLine("ژدایـــكبون", person.birthdate, 2);
+    drawInfoLine("ئاكنجی بوون", person.address, 3);
+    drawInfoLine("ژمارا موبایلی", person.phone || 'غير متوفر', 4);
+    drawInfoLine("بارێ خێزانی", person.maritalStatus || 'غير متوفر', 5);
+    drawInfoLine("زیندانكرن", person.imprisoned || 'غير متوفر', 6);
+    drawInfoLine("ژمارا ناسنامێ", person.idNumber || 'غير متوفر', 7);
+    drawInfoLine("كارێ وی", person.occupation || 'غير متوفر', 8);
+    
+    // رسم خط فاصل زخرفي أسفل المعلومات
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(infoX + 50, infoY + lineHeight * 8.5);
+    ctx.lineTo(width - 100, infoY + lineHeight * 8.5);
+    ctx.stroke();
+    
+    // إعادة تعيين تأثير الظل
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
 }
 
 function saveImageToDevice(dataUrl) {
@@ -798,8 +794,19 @@ function saveRecord(personsData, caseData, cardImage, date) {
 function loadSavedRecords() {
     // Load records from localStorage
     const storedRecords = localStorage.getItem(STORAGE_KEY);
-    if (storedRecords) {
+    
+    // إذا لم تكن هناك سجلات محفوظة بالمفتاح الجديد، نحاول البحث عن سجلات بالمفتاح القديم
+    if (!storedRecords) {
+        const oldStoredRecords = localStorage.getItem('tomaryAresheRecords');
+        if (oldStoredRecords) {
+            // نقل السجلات من المفتاح القديم إلى المفتاح الجديد
+            savedRecords = JSON.parse(oldStoredRecords);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRecords));
+            console.log('تم نقل السجلات من المفتاح القديم إلى المفتاح الجديد');
+        }
+    } else {
         savedRecords = JSON.parse(storedRecords);
+    }
         
         // ترتيب السجلات حسب التاريخ (الأحدث أولاً)
         savedRecords.sort((a, b) => {
@@ -811,7 +818,7 @@ function loadSavedRecords() {
         // We don't regenerate card images here to avoid DOM issues
         // Images will be regenerated when viewed instead
     }
-}
+
 
 // عرض السجلات في تبويب قائمة السجلات
 function displayRecords() {

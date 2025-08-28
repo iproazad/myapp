@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توماركرنا تومەتباری</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for card sharing/download -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3498db">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <script>
+        // تحميل مكتبة html2canvas إذا لم تكن موجودة
+        if (typeof html2canvas === 'undefined') {
+            console.log('تحميل مكتبة html2canvas من رأس الصفحة...');
+            const script = document.createElement('script');
+            script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+            script.async = false; // تحميل بشكل متزامن
+            script.onload = function() {
+                console.log('تم تحميل مكتبة html2canvas بنجاح من رأس الصفحة');
+            };
+            script.onerror = function(error) {
+                console.error('فشل تحميل مكتبة html2canvas من رأس الصفحة:', error);
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+    <style>
+        /* تنسيقات خاصة بصفحة توماركرنا تومەتباری */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .tab-btn {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+        
+        /* تنسيقات بطاقة المعلومات الجديدة - نفس نمط توماری ئاریشە */
+        .person-container {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        
+        .person-info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .person-photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .person-photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #3498db;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+        
+        /* تنسيقات صندوق معلومات الوقت */
+        .time-info-box {
+            background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-bottom: 3px solid #0a4275;
+        }
+        
+        .time-info-content {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .time-label, .date-label {
+            font-weight: bold;
+            font-size: 15px;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+        }
+        
+        .time-value, .date-value {
+            font-size: 15px;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        
+        .extra-info {
+            grid-column: 3 / span 2;
+            text-align: left;
+            font-weight: bold;
+            font-size: 15px;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* تنسيقات معلومات المتهم */
+         .suspect-info-container {
+             display: flex;
+             gap: 25px;
+             margin-top: 20px;
+             flex-direction: row;
+             width: 100%;
+         }
+         
+         .suspect-photo-container {
+             width: 187px;
+             height: 350px;
+             border: none;
+             border-radius: 12px;
+             overflow: hidden;
+             flex-shrink: 0;
+             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+             position: relative;
+         }
+         
+         .suspect-photo-container::after {
+             content: '';
+             position: absolute;
+             bottom: 0;
+             left: 0;
+             right: 0;
+             height: 40px;
+             background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+         }
+         
+         .suspect-photo-container img {
+             width: 100%;
+             height: 100%;
+             object-fit: contain;
+             transition: transform 0.3s ease;
+         }
+         
+         .suspect-photo-container:hover img {
+             transform: scale(1.03);
+         }
+        
+        .suspect-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 5px;
+        }
+        
+        .card-body {
+            width: 100%;
+        }
+        
+        .full-card {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .person-photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .person-photo-preview i {
+            font-size: 60px;
+            color: #bdc3c7;
+        }
+        
+        .person-info-details {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .card-field {
+            margin-bottom: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card-field:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .field-label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+        
+        .field-value {
+            background-color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            margin-top: 3px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .tab-btn.active {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-left: 8px;
+            color: #e74c3c;
+        }
+        
+        .photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .photo-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .photo-preview i {
+            font-size: 3rem;
+            color: #bdc3c7;
+        }
+        
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .photo-btn {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .photo-btn i {
+            margin-left: 5px;
+        }
+        
+        .submit-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* تنسيقات قائمة السجلات */
+        .records-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .record-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .record-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .card-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            overflow: hidden;
+        }
+        
+        .card-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-info {
+            text-align: center;
+        }
+        
+        .card-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .card-type {
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .card-date {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+        
+        /* تنسيقات النافذة المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+            position: relative;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .card-preview {
+            padding: 15px;
+        }
+        
+        .suspect-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+        
+        .card-date {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 15px;
+        }
+        
+        .card-photo-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            border: 3px solid #e74c3c;
+        }
+        
+        .card-photo-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-details {
+            margin-bottom: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 15px;
+        }
+        
+        .detail-title {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-title i {
+            margin-left: 5px;
+        }
+        
+        .detail-content {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .detail-item {
+            margin-bottom: 5px;
+            display: flex;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            margin-left: 5px;
+            min-width: 100px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .card-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .share-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .download-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .card-btn i {
+            margin-left: 5px;
+        }
+        
+        /* تنسيقات البحث */
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .no-records {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+            position: relative;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        #card-preview {
+            padding: 15px;
+        }
+        
+        .suspect-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 90%;
+            width: 1000px;
+            margin: 0 auto;
+            border: 2px solid #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+        }
+        
+        .card-header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .card-date-time {
+            font-size: 0.8rem;
+        }
+        
+        .card-body {
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .card-section {
+            margin-bottom: 10px;
+            border: 1px solid #3498db;
+            border-radius: 6px;
+            padding: 6px;
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .card-section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #3498db;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 3px;
+        }
+        
+        .card-section-title i {
+            margin-left: 4px;
+            color: #3498db;
+            font-size: 0.8rem;
+        }
+        
+        .card-field {
+            display: flex;
+            margin-bottom: 6px;
+            padding: 3px 0;
+        }
+        
+        .card-label {
+            font-weight: bold;
+            min-width: 90px;
+            font-size: 0.8rem;
+            color: #2c3e50;
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        
+        .card-value {
+            flex: 1;
+            font-size: 0.8rem;
+            padding: 2px 4px;
+        }
+        
+        .card-photo-large {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            overflow: hidden;
+            border: 1px solid #e74c3c;
+        }
+        
+        .card-photo-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .card-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .card-btn i {
+            margin-left: 5px;
+        }
+        
+        #share-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        #download-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        /* تنسيق حقل البحث */
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        /* رسالة عدم وجود سجلات */
+        .no-records {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        /* تنسيق للحقول المخفية */
+        .hidden {
+            display: none;
+        }
+        
+        /* تنسيقات النافذة المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        #card-preview {
+            padding: 20px;
+        }
+        
+        .full-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-section {
+            margin-bottom: 20px;
+        }
+        
+        .card-section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-section-title i {
+            margin-left: 5px;
+            color: #e74c3c;
+        }
+        
+        .card-field {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .card-photo-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            border: 3px solid #e74c3c;
+        }
+        
+        .card-photo-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .card-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .card-btn i {
+            margin-left: 5px;
+        }
+        
+        .share-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .download-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .no-records {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+    </style>
+    <!-- تحميل مكتبة html2canvas -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>توماركرنا تومەتباری</h1>
+            <div class="header-actions">
+                <button id="install-btn" class="install-btn" style="display: none;">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-button active">
+                <i class="fas fa-user-shield"></i> توماركرنا تومەتباری
+            </a>
+            <a href="tomary-areshe.html" class="nav-button">
+                <i class="fas fa-users"></i> توماری ئاریشە
+            </a>
+            <a href="login.html" class="nav-button back-button">
+                <i class="fas fa-home"></i> الصفحة الرئيسية
+            </a>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // تهيئة المتغيرات
+                const photoInput = document.getElementById('photo-input');
+                const photoPreview = document.getElementById('photo-preview');
+                const recordForm = document.getElementById('record-form');
+                const recordsContainer = document.getElementById('records-container');
+                const cardModal = document.getElementById('card-modal');
+                const cardPreview = document.getElementById('card-preview');
+                const closeModal = document.querySelector('.close-modal');
+                const tabButtons = document.querySelectorAll('.tab-btn');
+                const tabContents = document.querySelectorAll('.tab-content');
+                
+                let selectedImage = null;
+                
+                // تبديل التبويبات
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.getAttribute('data-tab');
+                        
+                        // تحديث الأزرار النشطة
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        // تحديث المحتوى النشط
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        document.getElementById(targetId).classList.add('active');
+                        
+                        // تحديث قائمة السجلات عند الانتقال إلى تبويب السجلات
+                        if (targetId === 'records-list') {
+                            loadRecords();
+                        }
+                    });
+                });
+                
+            });
+            
+            // معالجة الصور (تم تحديثه ليطابق توماری ئاریشە)
+            // تعريف المتغير في النطاق العالمي
+            var personPhotos = {}; // لتخزين بيانات الصور
+            
+            // تهيئة زر الصورة - تم نقله خارج الدالة المجهولة ليكون متاحًا عالميًا
+            document.addEventListener('DOMContentLoaded', function() {
+                const photoButton = document.querySelector('.photo-button[data-person-id="1"]');
+                const photoInput = document.getElementById('photo-input-1');
+                
+                if (photoButton && photoInput) {
+                    photoButton.addEventListener('click', () => {
+                        photoInput.click();
+                    });
+                    
+                    photoInput.addEventListener('change', (event) => {
+                        if (event.target.files && event.target.files[0]) {
+                            const reader = new FileReader();
+                            
+                            reader.onload = (e) => {
+                                const selectedPhoto = document.getElementById('selected-photo-1');
+                                const defaultIcon = document.getElementById('default-photo-icon-1');
+                                
+                                selectedPhoto.src = e.target.result;
+                                selectedPhoto.style.display = 'block';
+                                defaultIcon.style.display = 'none';
+                                
+                                // تخزين بيانات الصورة
+                                personPhotos[1] = e.target.result;
+                                selectedImage = e.target.result; // للتوافق مع الكود القديم
+                            };
+                            
+                            reader.readAsDataURL(event.target.files[0]);
+                        }
+                    });
+                }
+            });
+        </script>
+        
+        <main class="app-content">
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="new-record">سجل جديد</button>
+                    <button class="tab-btn" data-tab="records-list">قائمة السجلات</button>
+                </div>
+                
+                <div id="new-record" class="tab-content active">
+                    <form id="record-form">
+                        <!-- قسم الصورة (تم تحديثه ليطابق توماری ئاریشە) -->
+                        <div class="person-photo-section">
+                            <div class="person-photo-preview">
+                                <i class="fas fa-user-circle" id="default-photo-icon-1"></i>
+                                <img id="selected-photo-1" style="display: none;" alt="وێنێ كەسی">
+                                <div class="person-photo-number">1</div>
+                            </div>
+                            <button type="button" class="primary-button photo-button" data-person-id="1">
+                                <i class="fas fa-camera"></i> وێنەگرتن یان باركرن
+                            </button>
+                            <input type="file" class="photo-input" id="photo-input-1" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <!-- معلومات شخصية -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-user"></i>
+                                زانیاری کەسی
+                            </h3>
+                            <div class="form-group">
+                                <label for="name">ناڤێ تومەتباری</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="birthdate">ژدایـــكبون</label>
+                                <input type="tel" id="birthdate" name="birthdate">
+                            </div>
+                            <div class="form-group">
+                                <label for="address">ئاكنجی بوون</label>
+                                <input type="text" id="address" name="address">
+                            </div>
+                            <div class="form-group">
+                                <label for="problem-type">جورێ ئاریشێ</label>
+                                <input list="problem-type-list" id="problem-type" name="problem-type">
+                                <datalist id="problem-type-list">
+                                    <option value="ئاریشا خێزانی">
+                                    <option value="خازوك">
+                                    <option value="شـــەر">
+                                    <option value="سەرخوش">
+                                    <option value="رویدانا ترومبێلێ">
+                                    <option value="مخەدەر">
+                                    <option value="دزی">
+                                    <option value="بەرزەبون">
+                                    <option value="ازعــاج">
+                                    <option value="داخازكری">
+                                    <option value="گومانلێكری">
+                                    <option value="هەولا خوكوشتنێ">
+                                    <option value="خوكوشتن">
+                                    <option value="كوشتن">
+                                    <option value="گیان ژدەستدان">
+                                    <option value="بێ سەمیان">
+                                    <option value="كێشانا سكوتینێ">
+                                    <option value="فیلبازی تشقلە">
+                                    <option value="ترومبيلا بي خودان">
+                                    <option value="ئاگر بەربون">
+                                    <option value="تەقەكرن">
+                                    <option value="مەلەڤاني جهی قەدەغە">
+                                    <option value="تێكدەر">
+                                    <option value="خەندقین">
+                                    <option value="گەفكرن">
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="marital-status">بارێ خێزانی</label>
+                                <input list="marital-status-list" id="marital-status" name="marital-status">
+                                <datalist id="marital-status-list">
+                                    <option value="خێزاندەرە">
+                                    <option value="نە خێزاندارە">
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="job">كارێ وی</label>
+                                <input type="text" id="job" name="job">
+                            </div>
+                            <div class="form-group">
+                                <label for="prison">زیندانكرن</label>
+                                <input list="prison-list" id="prison" name="prison">
+                                <datalist id="prison-list">
+                                    <option value="بەلی">
+                                    <option value="نەخێر">
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">ژمارا موبایلي</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                        </div>
+                        
+                        <!-- معلومات الوقت -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-clock"></i>
+                                دەمژمێر
+                            </h3>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="time-from">من</label>
+                                    <input type="time" id="time-from" name="time-from">
+                                </div>
+                                <div class="form-group half">
+                                    <label for="time-to">إلى</label>
+                                    <input type="time" id="time-to" name="time-to">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="period">الفترة</label>
+                                <input list="period-list" id="period" name="period">
+                                <datalist id="period-list">
+                                    <option value="روژ">
+                                    <option value="شەڤ">
+                                </datalist>
+                            </div>
+                        </div>
+                        
+                        <!-- توماركرنا پێزانینێن رویدانێ -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-info-circle"></i>
+                                توماركرنا پێزانینێن رویدانێ
+                            </h3>
+                            <div class="form-group">
+                                <label for="problem-location">جهێ ئاریشێ</label>
+                                <input type="text" id="problem-location" name="problem-location">
+                            </div>
+                            <div class="form-group">
+                                <label for="driver-name">ناڤێ شوفێری</label>
+                                <input list="driver-name-list" id="driver-name" name="driver-name">
+                                <datalist id="driver-name-list">
+                                    <option value="سليمان علي حميد">
+                                    <option value="نیچیرڤان عباس بشار">
+                                    <option value="نعمان رمضان محمد">
+                                    <option value="رضوان محمود محمد">
+                                    <option value="داود قادر ندیر ناصر">
+                                    <option value="سربست محمدعلی">
+                                    <option value="حسن رؤوف حسن">
+                                    <option value="ريزان سمو محمد">
+                                    <option value="صابر شفیق شمزین">
+                                    <option value="رضوان رمضان علی">
+                                    <option value="سعید سربست رسول">
+                                    <option value="نیجیرڤان احمد علی">
+                                    <option value="دشتی عادل عثمان">
+                                    <option value="ریبر سلمان عثمان">
+                                    <option value="ازاد عدنان عبدالله">
+                                    <option value="بیوار اسماعیل محمد">
+                                    <option value="مهڤان تحسين پيراموس">
+                                    <option value="فارس بكر رشید">
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="point">خالا</label>
+                                <input list="point-list" id="point" name="point">
+                                <datalist id="point-list">
+                                    <option value="101">
+                                    <option value="102">
+                                    <option value="103">
+                                    <option value="104">
+                                    <option value="105">
+                                    <option value="106">
+                                    <option value="107">
+                                    <option value="108">
+                                    <option value="109">
+                                    <option value="110">
+                                    <option value="111">
+                                    <option value="112">
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label for="sent-to">رەوانەكرن بـــو</label>
+                                <input list="sent-to-list" id="sent-to" name="sent-to">
+                                <datalist id="sent-to-list">
+                                    <option value="بنگەهێ پولیسێن كارێز">
+                                    <option value="بنگەهێ پولیسێن زاخو">
+                                    <option value="بنگەهێ پولیسێن سێمالكا">
+                                    <option value="بنگەهێ پولیسێن دەلال">
+                                    <option value="بنگەهێ پولیسێن بێدارێ">
+                                    <option value="بنگەهێ پولیسێن نیو زاخو">
+                                    <option value="بنگەهێ پولیسێن رزگاری">
+                                    <option value="رێڤەبەریا پولیسێن زاخو">
+                                    <option value="توندوتیژیا زاخو">
+                                    <option value="نەخوشخانا زاخو">
+                                    <option value="دەستێ سەمیانا">
+                                    <option value="مكافحا زاخو">
+                                    <option value="مكافحا بێدارێ">
+                                    <option value="ئاسايشا زاخو">
+                                    <option value="ئاگرڤەمراندنا زاخو">
+                                    <option value="گرتیخانا زاخو">
+                                    <option value="هاتوچووا زاخو">
+                                </datalist>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">خەزنكرنا كارتێ</button>
+                    </form>
+                </div>
+                
+                <div id="records-list" class="tab-content">
+                    <div id="records-container" class="records-grid">
+                        <!-- سيتم إضافة السجلات هنا ديناميكيًا -->
+                        <div class="no-records">لا توجد سجلات حتى الآن</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- النافذة المنبثقة لعرض البطاقة -->
+    <div class="modal" id="card-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="card-preview">
+                <!-- سيتم إضافة محتوى البطاقة هنا ديناميكيًا -->
+            </div>
+            <div class="card-actions">
+                <button id="share-btn" class="card-btn share-btn">
+                    <i class="fas fa-share-alt"></i>
+                    مشاركة
+                </button>
+                <button id="download-btn" class="card-btn download-btn">
+                    <i class="fas fa-download"></i>
+                    تحميل
+                </button>
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: 0.8rem; color: #666;">
+                <p>إذا لم تظهر البطاقة بشكل صحيح، يرجى النقر على زر التحميل لحفظ البطاقة</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- إضافة سكريبت لتحسين تجربة المستخدم على الأجهزة المحمولة -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        // التأكد من أن النافذة المنبثقة تعمل بشكل صحيح على الأجهزة المحمولة
+        document.addEventListener('DOMContentLoaded', function() {
+            // إضافة استماع لحدث النقر على زر المشاركة
+            document.getElementById('share-btn').addEventListener('click', function() {
+                // التحقق من دعم واجهة مشاركة الويب
+                if (navigator.share) {
+                    // استخدام واجهة مشاركة الويب على الأجهزة المحمولة
+                    html2canvas(document.querySelector('.full-card')).then(canvas => {
+                        canvas.toBlob(function(blob) {
+                            const file = new File([blob], 'suspect-card.png', { type: 'image/png' });
+                            navigator.share({
+                                title: 'بطاقة معلومات المتهم',
+                                files: [file]
+                            }).catch(error => {
+                                console.error('خطأ في المشاركة:', error);
+                                alert('حدث خطأ أثناء محاولة المشاركة');
+                            });
+                        });
+                    });
+                } else {
+                    alert('المشاركة غير مدعومة على هذا الجهاز');
+                }
+            });
+        });
+    </script>
+
+    <!-- JavaScript -->
+    <script>
+        // تم تعريف متغير personPhotos مسبقًا في الكود
+        
+        // تبديل التبويبات
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // إزالة الفئة النشطة من جميع الأزرار والمحتويات
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // إضافة الفئة النشطة للزر المضغوط والمحتوى المرتبط به
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // تم نقل معالجة الصورة إلى مكان آخر في الكود
+        
+        // معالجة النموذج
+        const recordForm = document.getElementById('record-form');
+        
+        recordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // التحقق من اختيار صورة
+            if (!personPhotos['1']) {
+                alert('الرجاء اختيار صورة');
+                return;
+            }
+            
+            // جمع بيانات النموذج
+            const formData = new FormData(recordForm);
+            const photoSrc = personPhotos['1'];
+            
+            // إنشاء كائن السجل
+            const record = {
+                id: Date.now(),
+                photo: photoSrc,
+                name: document.getElementById('name').value,
+                birthdate: document.getElementById('birthdate').value,
+                address: document.getElementById('address').value,
+                problemType: document.getElementById('problem-type').value,
+                maritalStatus: document.getElementById('marital-status').value,
+                job: document.getElementById('job').value,
+                prison: document.getElementById('prison').value,
+                phone: document.getElementById('phone').value,
+                timeFrom: document.getElementById('time-from').value,
+                timeTo: document.getElementById('time-to').value,
+                period: document.getElementById('period').value,
+                problemLocation: document.getElementById('problem-location').value,
+                driverName: document.getElementById('driver-name').value,
+                point: document.getElementById('point').value,
+                sentTo: document.getElementById('sent-to').value,
+                date: new Date().toISOString()
+            };
+            
+            // حفظ السجل في localStorage
+            let records = JSON.parse(localStorage.getItem('violationRecords') || '[]');
+            records.push(record);
+            localStorage.setItem('violationRecords', JSON.stringify(records));
+            
+            // عرض تنبيه النجاح
+            alert('تم حفظ السجل بنجاح');
+            
+            // إعادة ضبط النموذج
+            recordForm.reset();
+            
+            // إعادة ضبط بيانات الصورة
+            // استخدام Object.keys لمسح المحتوى مع الحفاظ على المرجع الأصلي للكائن
+            Object.keys(personPhotos).forEach(key => delete personPhotos[key]);
+            
+            // إعادة ضبط عرض الصورة
+            const selectedPhoto = document.getElementById('selected-photo-1');
+            const defaultIcon = document.getElementById('default-photo-icon-1');
+            
+            if (selectedPhoto && defaultIcon) {
+                selectedPhoto.style.display = 'none';
+                selectedPhoto.src = '';
+                defaultIcon.style.display = 'block';
+            }
+            
+            // تحديث قائمة السجلات
+            loadRecords();
+            
+            // فتح بطاقة المعلومات وتنزيل الصورة تلقائيًا بعد تأخير قصير للتأكد من جاهزية الصفحة
+            console.log('جاري تحضير عرض البطاقة وتنزيلها...');
+            
+            // إظهار رسالة تحميل للمستخدم
+            const loadingMessage = document.createElement('div');
+            loadingMessage.style.position = 'fixed';
+            loadingMessage.style.top = '50%';
+            loadingMessage.style.left = '50%';
+            loadingMessage.style.transform = 'translate(-50%, -50%)';
+            loadingMessage.style.background = 'rgba(0, 0, 0, 0.7)';
+            loadingMessage.style.color = 'white';
+            loadingMessage.style.padding = '20px';
+            loadingMessage.style.borderRadius = '10px';
+            loadingMessage.style.zIndex = '10000';
+            loadingMessage.textContent = 'جاري حفظ البطاقة...';
+            document.body.appendChild(loadingMessage);
+            
+            // تأكد من تحميل مكتبة html2canvas أولاً
+            (async function() {
+                try {
+                    // تحميل المكتبة إذا لم تكن محملة
+                    if (!window.html2canvas) {
+                        console.warn('مكتبة html2canvas غير محملة، جاري تحميلها...');
+                        try {
+                            await loadHtml2Canvas();
+                        } catch (loadError) {
+                            console.error('فشل تحميل مكتبة html2canvas:', loadError);
+                            document.body.removeChild(loadingMessage);
+                            alert('فشل تحميل مكتبة التصوير. يرجى التحقق من اتصالك بالإنترنت وإعادة المحاولة.');
+                            return;
+                        }
+                    }
+                    
+                    console.log('بدء عرض البطاقة...');
+                    // إعادة تعيين موضع التمرير للصفحة لضمان رؤية النافذة المنبثقة
+                    window.scrollTo(0, 0);
+                    
+                    // التأكد من وجود عنصر النافذة المنبثقة
+                    const cardModal = document.getElementById('card-modal');
+                    if (!cardModal) {
+                        console.error('لم يتم العثور على عنصر card-modal');
+                        document.body.removeChild(loadingMessage);
+                        alert('حدث خطأ: لم يتم العثور على عنصر card-modal');
+                        return;
+                    }
+                    
+                    console.log('تم العثور على عنصر card-modal، جاري عرض البطاقة...');
+                    
+                    // عرض النافذة المنبثقة
+                    showCardModal(record);
+                    
+                    // التأكد من أن النافذة المنبثقة مرئية
+                    cardModal.style.display = 'block';
+                    cardModal.style.opacity = '1';
+                    
+                    // التمرير إلى أعلى الصفحة لضمان رؤية النافذة المنبثقة
+                    window.scrollTo(0, 0);
+                    
+                    // إزالة رسالة التحميل بعد عرض البطاقة
+                    document.body.removeChild(loadingMessage);
+                    
+                    console.log('تم عرض البطاقة بنجاح');
+                    
+                    // تنزيل البطاقة تلقائيًا بعد عرضها - زيادة التأخير لضمان تحميل الصورة
+                    setTimeout(async () => {
+                        try {
+                            console.log('بدء تنزيل البطاقة تلقائيًا...');
+                            
+                            // إظهار رسالة تحميل للمستخدم
+                            const downloadingMessage = document.createElement('div');
+                            downloadingMessage.style.position = 'fixed';
+                            downloadingMessage.style.top = '50%';
+                            downloadingMessage.style.left = '50%';
+                            downloadingMessage.style.transform = 'translate(-50%, -50%)';
+                            downloadingMessage.style.background = 'rgba(0, 0, 0, 0.7)';
+                            downloadingMessage.style.color = 'white';
+                            downloadingMessage.style.padding = '20px';
+                            downloadingMessage.style.borderRadius = '10px';
+                            downloadingMessage.style.zIndex = '10000';
+                            downloadingMessage.textContent = 'جاري تنزيل البطاقة...';
+                            document.body.appendChild(downloadingMessage);
+                            
+                            const cardPreview = document.getElementById('card-preview');
+                            if (!cardPreview) {
+                                console.error('لم يتم العثور على عنصر card-preview');
+                                document.body.removeChild(downloadingMessage);
+                                alert('حدث خطأ: لم يتم العثور على عنصر card-preview');
+                                return;
+                            }
+                            
+                            const cardElement = cardPreview.querySelector('.full-card');
+                            if (!cardElement) {
+                                console.error('لم يتم العثور على عنصر full-card داخل card-preview');
+                                document.body.removeChild(downloadingMessage);
+                                alert('حدث خطأ: لم يتم العثور على عنصر full-card');
+                                return;
+                            }
+                            
+                            // تأكد من تحميل الصورة قبل إنشاء الكانفاس
+                            const cardImage = cardElement.querySelector('img');
+                            if (cardImage) {
+                                console.log('التحقق من حالة تحميل الصورة...');
+                                if (!cardImage.complete) {
+                                    console.log('انتظار تحميل الصورة...');
+                                    await new Promise((resolve, reject) => {
+                                        // تعيين مهلة للانتظار
+                                        const timeoutId = setTimeout(() => {
+                                            console.warn('انتهت مهلة انتظار تحميل الصورة');
+                                            resolve(); // نستمر على أي حال
+                                        }, 5000);
+                                        
+                                        cardImage.onload = () => {
+                                            clearTimeout(timeoutId);
+                                            console.log('تم تحميل الصورة بنجاح');
+                                            resolve();
+                                        };
+                                        
+                                        cardImage.onerror = (err) => {
+                                            clearTimeout(timeoutId);
+                                            console.error('خطأ في تحميل الصورة:', err);
+                                            resolve(); // نستمر على أي حال
+                                        };
+                                        
+                                        // إذا كانت الصورة محملة بالفعل، نستمر
+                                        if (cardImage.complete) {
+                                            clearTimeout(timeoutId);
+                                            resolve();
+                                        }
+                                    });
+                                } else {
+                                    console.log('الصورة محملة بالفعل');
+                                }
+                            }
+                            
+                            // تحسين جودة الصورة
+                            console.log('بدء إنشاء الصورة للتنزيل التلقائي باستخدام html2canvas...');
+                            try {
+                                const canvas = await html2canvas(cardElement, { 
+                                    scale: 3,
+                                    useCORS: true,
+                                    allowTaint: true,
+                                    backgroundColor: null,
+                                    logging: true,
+                                    imageTimeout: 0, // لا وقت محدد للانتظار
+                                    onclone: function(clonedDoc) {
+                                        // التأكد من أن العناصر المستنسخة مرئية
+                                        const clonedCard = clonedDoc.querySelector('.full-card');
+                                        if (clonedCard) {
+                                            clonedCard.style.display = 'flex';
+                                            clonedCard.style.visibility = 'visible';
+                                            clonedCard.style.opacity = '1';
+                                        }
+                                    }
+                                });
+                                console.log('تم إنشاء الصورة للتنزيل التلقائي بنجاح');
+                                
+                                const fileName = `بطاقة_تومەتبار_${Date.now()}.png`;
+                                document.body.removeChild(downloadingMessage);
+                                downloadCanvas(canvas, fileName);
+                            } catch (canvasError) {
+                                console.error('خطأ في إنشاء الصورة باستخدام html2canvas:', canvasError);
+                                document.body.removeChild(downloadingMessage);
+                                alert('حدث خطأ أثناء إنشاء الصورة: ' + canvasError.message);
+                            }
+                        } catch (error) {
+                            console.error('خطأ في التنزيل التلقائي للصورة:', error);
+                            // التأكد من إزالة رسالة التحميل في حالة حدوث خطأ
+                            try {
+                                const downloadingMessage = document.querySelector('div[style*="position: fixed"][style*="z-index: 10000"]');
+                                if (downloadingMessage) {
+                                    document.body.removeChild(downloadingMessage);
+                                }
+                            } catch (removeError) {
+                                console.error('خطأ في إزالة رسالة التحميل:', removeError);
+                            }
+                            alert('حدث خطأ أثناء تنزيل البطاقة: ' + error.message);
+                        }
+                    }, 1500); // زيادة التأخير إلى 1500 مللي ثانية
+                } catch (error) {
+                    console.error('حدث خطأ أثناء عرض البطاقة:', error);
+                    alert('حدث خطأ أثناء عرض البطاقة: ' + error.message);
+                }
+            })();
+        });
+        
+        // تحميل السجلات من localStorage
+        function loadRecords() {
+            const recordsContainer = document.getElementById('records-container');
+            const records = JSON.parse(localStorage.getItem('violationRecords') || '[]');
+            
+            if (records.length === 0) {
+                recordsContainer.innerHTML = '<div class="no-records">لا توجد سجلات حتى الآن</div>';
+                return;
+            }
+            
+            // ترتيب السجلات من الأحدث إلى الأقدم
+            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // إنشاء بطاقات السجلات
+            recordsContainer.innerHTML = '';
+            records.forEach(record => {
+                const recordCard = document.createElement('div');
+                recordCard.className = 'record-card';
+                recordCard.innerHTML = `
+                    <div class="card-photo">
+                        <img src="${record.photo}" alt="${record.name}">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">${record.name}</div>
+                        <div class="card-type">${record.problemType}</div>
+                        <div class="card-date">${new Date(record.date).toLocaleDateString('ar-IQ')}</div>
+                    </div>
+                `;
+                
+                // إضافة حدث النقر لفتح البطاقة الكاملة
+                recordCard.addEventListener('click', () => {
+                    showCardModal(record);
+                });
+                
+                recordsContainer.appendChild(recordCard);
+            });
+        }
+        
+        // دالة لتحويل الوقت من صيغة 24 ساعة إلى صيغة 12 ساعة
+        function formatTo12Hour(time24) {
+            if (!time24) return '-';
+            
+            // تقسيم الوقت إلى ساعات ودقائق
+            const [hours24, minutes] = time24.split(':');
+            
+            // تحويل الساعات إلى صيغة 12 ساعة
+            let hours12 = parseInt(hours24, 10) % 12;
+            if (hours12 === 0) hours12 = 12; // تحويل 00 إلى 12
+            
+            // تحديد الفترة (صباحًا/مساءً)
+            const period = parseInt(hours24, 10) < 12 ? 'ص' : 'م';
+            
+            // إرجاع الوقت بصيغة 12 ساعة
+            return `${hours12}:${minutes} ${period}`;
+        }
+        
+        // دالة لتحويل الوقت من formattedTime إلى صيغة 12 ساعة
+        function formatTimeFrom24Hour(formattedTime) {
+            if (!formattedTime) return '-';
+            
+            try {
+                // استخراج الساعات والدقائق من النص
+                const timeParts = formattedTime.split(':');
+                if (timeParts.length < 2) return formattedTime;
+                
+                // تنسيق الوقت بصيغة HH:MM
+                const hours = timeParts[0];
+                let minutes = timeParts[1];
+                
+                // التعامل مع الثواني إذا كانت موجودة
+                if (minutes.includes(':') || minutes.includes(' ')) {
+                    minutes = minutes.split(/[: ]/)[0];
+                }
+                
+                // استخدام دالة formatTo12Hour للتحويل
+                return formatTo12Hour(`${hours}:${minutes}`);
+            } catch (error) {
+                console.error('خطأ في تنسيق الوقت:', error);
+                return formattedTime; // إرجاع الوقت الأصلي في حالة حدوث خطأ
+            }
+        }
+        
+        // عرض النافذة المنبثقة للبطاقة
+        function showCardModal(record) {
+            console.log('تم استدعاء دالة showCardModal مع البيانات:', record);
+            
+            // التأكد من وجود عنصر النافذة المنبثقة
+            const cardModal = document.getElementById('card-modal');
+            if (!cardModal) {
+                console.error('لم يتم العثور على عنصر card-modal');
+                alert('حدث خطأ: لم يتم العثور على عنصر card-modal');
+                return;
+            }
+            
+            // التأكد من وجود عنصر معاينة البطاقة
+            const cardPreview = document.getElementById('card-preview');
+            if (!cardPreview) {
+                console.error('لم يتم العثور على عنصر card-preview');
+                alert('حدث خطأ: لم يتم العثور على عنصر card-preview');
+                return;
+            }
+            
+            console.log('تم العثور على عناصر DOM المطلوبة، جاري إنشاء البطاقة...');
+            
+            // تنسيق التاريخ والوقت
+            const recordDate = new Date(record.date);
+            const formattedDate = recordDate.toLocaleDateString('ar-IQ');
+            
+            // تنسيق الوقت بصيغة 12 ساعة مباشرة
+            const hours = recordDate.getHours();
+            const minutes = recordDate.getMinutes();
+            let hours12 = hours % 12;
+            if (hours12 === 0) hours12 = 12;
+            const period = hours < 12 ? 'ص' : 'م';
+            const formattedTime12 = `${hours12}:${minutes < 10 ? '0' + minutes : minutes} ${period}`;
+            
+            // إنشاء محتوى البطاقة
+            cardPreview.innerHTML = `
+                <div class="full-card suspect-card" style="display: flex; flex-direction: column; max-width: 600px; margin: 0 auto;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <h2 style="margin: 0; font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); text-align: center; padding: 8px 0;">بەشێ پولیسێن هەوارهاتنێ</h2>
+                    </div>
+                    
+                    <div class="card-body" style="padding: 12px;">
+                        <div class="suspect-info-container" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                            <div style="display: flex; width: 100%; gap: 10px; align-items: flex-start;">
+                                <div class="suspect-photo-container" style="width: 172px; height: 320px; border-radius: 8px; border: 2px solid #e74c3c; overflow: hidden; box-shadow: 0 3px 6px rgba(0,0,0,0.1); flex-shrink: 0;">
+                                    <img src="${record.photo}" alt="${record.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 4px; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ناڤێ تومەتباری:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.name}</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 4px; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ژدایـــكبون:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.birthdate || '-'}</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 4px; padding: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ژمارا موبایلي:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.phone || '-'}</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 5px; padding: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">ئاكنجی بوون:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.address || '-'}</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 5px; padding: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">بارێ خێزانی:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.maritalStatus || '-'}</div>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; background-color: #f8f9fa; border-radius: 5px; padding: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                        <div class="field-label" style="font-weight: bold; color: #e74c3c; margin-bottom: 1px; font-size: 0.85rem;">زیندانكرن:</div>
+                                        <div class="field-value" style="padding: 1px 3px;">${record.prison || '-'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="time-info-box" style="background: linear-gradient(135deg, #3498db, #2980b9); margin: 3px 0; border-radius: 5px; padding: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%;">
+                                <h3 style="text-align: center; margin-top: 0; margin-bottom: 2px; color: white; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 2px;">پێزانینێن رویدانێ</h3>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px;">
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">الوقت والفترة:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${formatTo12Hour(record.timeFrom) || '-'} - ${formatTo12Hour(record.timeTo) || '-'} (${record.period === 'day' ? 'روژ' : 'شەڤ'})</div>
+                                    </div>
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">جهێ ئاریشێ:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.problemLocation || '-'}</div>
+                                    </div>
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">ناڤێ شوفێری:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.driverName || '-'}</div>
+                                    </div>
+                                    <div style="background-color: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">خالا:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.point || '-'}</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 5px; margin: 6px auto; width: 100%;">
+                                    <div style="background-color: rgba(144, 238, 144, 0.3); border-radius: 3px; padding: 8px; flex: 1; text-align: center;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">رەوانەكرن بـــو:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.sentTo || '-'}</div>
+                                    </div>
+                                    <div style="background-color: rgba(255, 0, 0, 0.3); border-radius: 3px; padding: 8px; flex: 1; text-align: center;">
+                                        <div style="font-weight: bold; color: rgba(255,255,255,0.9); font-size: 0.75rem;">جورێ ئاریشێ:</div>
+                                        <div style="color: white; font-size: 0.85rem;">${record.problemType || '-'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 4px; background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 5px; color: white; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; font-size: 0.85rem;">
+                                <i class="fas fa-exclamation-triangle" style="margin-left: 5px;"></i>
+                                مێژویا توماركرنا رویدانێ: ${formattedDate} - ${formattedTime12}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // إعادة تعيين موضع التمرير للصفحة
+            window.scrollTo(0, 0);
+            
+            // عرض النافذة المنبثقة مع تأثير انتقالي
+            cardModal.style.opacity = '0';
+            cardModal.style.display = 'block';
+            
+            // تأخير قصير لضمان تطبيق التأثير الانتقالي
+            setTimeout(() => {
+                cardModal.style.opacity = '1';
+                // تمرير إلى أعلى النافذة المنبثقة
+                cardModal.scrollTop = 0;
+            }, 50);
+        }
+        
+        // إغلاق النافذة المنبثقة
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            const cardModal = document.getElementById('card-modal');
+            // إضافة تأثير انتقالي عند الإغلاق
+            cardModal.style.opacity = '0';
+            setTimeout(() => {
+                cardModal.style.display = 'none';
+                cardModal.style.opacity = '1';
+            }, 300);
+        });
+        
+        // إغلاق النافذة المنبثقة عند النقر خارجها
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('card-modal');
+            if (e.target === modal) {
+                // إضافة تأثير انتقالي عند الإغلاق
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    modal.style.opacity = '1';
+                }, 300);
+            }
+        });
+        
+        // تحميل مكتبة html2canvas عند الحاجة
+        function loadHtml2Canvas() {
+            return new Promise((resolve, reject) => {
+                console.log('التحقق من وجود مكتبة html2canvas...');
+                // المكتبة محملة مسبقًا في رأس الصفحة
+                if (window.html2canvas) {
+                    console.log('مكتبة html2canvas موجودة بالفعل');
+                    resolve(window.html2canvas);
+                    return;
+                }
+                
+                // في حالة عدم تحميل المكتبة، نحاول تحميلها مرة أخرى
+                console.log('محاولة تحميل مكتبة html2canvas...');
+                const script = document.createElement('script');
+                script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+                script.async = false; // تأكد من تحميل السكريبت بشكل متزامن
+                script.crossOrigin = 'anonymous'; // السماح بالوصول عبر المجالات المختلفة
+                
+                // تعيين مهلة للتحميل
+                const timeoutId = setTimeout(() => {
+                    console.error('انتهت مهلة تحميل مكتبة html2canvas');
+                    alert('استغرق تحميل مكتبة التصوير وقتًا طويلاً. يرجى التحقق من اتصالك بالإنترنت وإعادة المحاولة.');
+                    reject(new Error('انتهت مهلة التحميل'));
+                }, 10000); // 10 ثوانٍ كحد أقصى للتحميل
+                
+                script.onload = () => {
+                    clearTimeout(timeoutId);
+                    console.log('تم تحميل مكتبة html2canvas بنجاح');
+                    // تأكد من أن المكتبة متاحة بالفعل
+                    if (window.html2canvas) {
+                        resolve(window.html2canvas);
+                    } else {
+                        console.error('تم تحميل السكريبت ولكن html2canvas غير متاح');
+                        alert('حدث خطأ في تحميل مكتبة التصوير. يرجى تحديث الصفحة وإعادة المحاولة.');
+                        reject(new Error('html2canvas غير متاح بعد التحميل'));
+                    }
+                };
+                
+                script.onerror = (error) => {
+                    clearTimeout(timeoutId);
+                    console.error('فشل تحميل مكتبة html2canvas:', error);
+                    alert('فشل تحميل مكتبة التصوير. يرجى التحقق من اتصالك بالإنترنت وإعادة المحاولة.');
+                    reject(error);
+                };
+                
+                document.body.appendChild(script);
+            });
+        }
+        
+        // مشاركة البطاقة
+        document.getElementById('share-btn').addEventListener('click', async () => {
+            try {
+                // إظهار رسالة تحميل
+                const loadingMessage = document.createElement('div');
+                loadingMessage.style.position = 'fixed';
+                loadingMessage.style.top = '50%';
+                loadingMessage.style.left = '50%';
+                loadingMessage.style.transform = 'translate(-50%, -50%)';
+                loadingMessage.style.background = 'rgba(0, 0, 0, 0.7)';
+                loadingMessage.style.color = 'white';
+                loadingMessage.style.padding = '15px 20px';
+                loadingMessage.style.borderRadius = '5px';
+                loadingMessage.style.zIndex = '2000';
+                loadingMessage.style.textAlign = 'center';
+                loadingMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء الصورة...';
+                document.body.appendChild(loadingMessage);
+                
+                console.log('بدء عملية إنشاء الصورة...');
+                // التأكد من أن المكتبة محملة
+                if (!window.html2canvas) {
+                    console.warn('مكتبة html2canvas غير محملة، جاري تحميلها...');
+                    await loadHtml2Canvas();
+                }
+                
+                const cardPreview = document.getElementById('card-preview');
+                if (!cardPreview) {
+                    console.error('لم يتم العثور على عنصر card-preview');
+                    document.body.removeChild(loadingMessage);
+                    alert('حدث خطأ: لم يتم العثور على عنصر card-preview');
+                    return;
+                }
+                
+                const cardElement = cardPreview.querySelector('.full-card');
+                if (!cardElement) {
+                    console.error('لم يتم العثور على عنصر full-card داخل card-preview');
+                    document.body.removeChild(loadingMessage);
+                    alert('حدث خطأ: لم يتم العثور على عنصر full-card');
+                    return;
+                }
+                
+                console.log('تم العثور على عنصر cardPreview:', cardPreview);
+                console.log('تم العثور على عنصر full-card:', cardElement);
+                
+                // تحسين جودة الصورة
+                console.log('بدء إنشاء الصورة باستخدام html2canvas...');
+                const canvas = await html2canvas(cardElement, { 
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null,
+                    logging: true
+                });
+                console.log('تم إنشاء الصورة بنجاح');
+                
+                // إزالة رسالة التحميل
+                document.body.removeChild(loadingMessage);
+                
+                canvas.toBlob(async (blob) => {
+                    const fileName = `بطاقة_تومەتبار_${Date.now()}.png`;
+                    const file = new File([blob], fileName, { type: 'image/png' });
+                    
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                title: 'توماركرنا تومەتبارا',
+                                files: [file]
+                            });
+                        } catch (error) {
+                            console.error('خطأ في المشاركة:', error);
+                            // إذا فشلت المشاركة، نقوم بالتنزيل
+                            downloadCanvas(canvas, fileName);
+                            alert('تم حفظ الصورة في جهازك');
+                        }
+                    } else {
+                        // إذا كانت واجهة المشاركة غير مدعومة، نقوم بالتنزيل
+                        downloadCanvas(canvas, fileName);
+                        alert('تم حفظ الصورة في جهازك');
+                    }
+                }, 'image/png', 0.95);
+            } catch (error) {
+                console.error('خطأ في إنشاء الصورة:', error);
+                alert('حدث خطأ أثناء إنشاء الصورة');
+            }
+        });
+        
+        // معالج حدث زر التنزيل
+        document.getElementById('download-btn').addEventListener('click', async () => {
+            try {
+                // إظهار رسالة تحميل
+                const loadingMessage = document.createElement('div');
+                loadingMessage.style.position = 'fixed';
+                loadingMessage.style.top = '50%';
+                loadingMessage.style.left = '50%';
+                loadingMessage.style.transform = 'translate(-50%, -50%)';
+                loadingMessage.style.background = 'rgba(0, 0, 0, 0.7)';
+                loadingMessage.style.color = 'white';
+                loadingMessage.style.padding = '15px 20px';
+                loadingMessage.style.borderRadius = '5px';
+                loadingMessage.style.zIndex = '2000';
+                loadingMessage.style.textAlign = 'center';
+                loadingMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء الصورة...';
+                document.body.appendChild(loadingMessage);
+                
+                console.log('بدء عملية تحميل الصورة...');
+                // التأكد من أن المكتبة محملة
+                if (!window.html2canvas) {
+                    console.warn('مكتبة html2canvas غير محملة، جاري تحميلها...');
+                    await loadHtml2Canvas();
+                }
+                
+                const cardPreview = document.getElementById('card-preview');
+                if (!cardPreview) {
+                    console.error('لم يتم العثور على عنصر card-preview');
+                    document.body.removeChild(loadingMessage);
+                    alert('حدث خطأ: لم يتم العثور على عنصر card-preview');
+                    return;
+                }
+                
+                const cardElement = cardPreview.querySelector('.full-card');
+                if (!cardElement) {
+                    console.error('لم يتم العثور على عنصر full-card داخل card-preview');
+                    document.body.removeChild(loadingMessage);
+                    alert('حدث خطأ: لم يتم العثور على عنصر full-card');
+                    return;
+                }
+                
+                console.log('تم العثور على عنصر cardPreview للتحميل:', cardPreview);
+                console.log('تم العثور على عنصر full-card للتحميل:', cardElement);
+                
+                // تحسين جودة الصورة
+                console.log('بدء إنشاء الصورة للتنزيل باستخدام html2canvas...');
+                const canvas = await window.html2canvas(cardElement, { 
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null,
+                    logging: true
+                });
+                console.log('تم إنشاء الصورة للتنزيل بنجاح');
+                
+                // إزالة رسالة التحميل
+                document.body.removeChild(loadingMessage);
+                
+                const fileName = `بطاقة_تومەتبار_${Date.now()}.png`;
+                downloadCanvas(canvas, fileName);
+                alert('تم حفظ الصورة في جهازك');
+            } catch (error) {
+                console.error('خطأ في إنشاء الصورة:', error);
+                alert('حدث خطأ أثناء إنشاء الصورة');
+            }
+        });
+        
+        // تنزيل الصورة من الكانفاس
+        function downloadCanvas(canvas, fileName) {
+            try {
+                console.log('بدء تنزيل الصورة من الكانفاس...');
+                
+                // إظهار رسالة تحميل للمستخدم
+                const loadingMessage = document.createElement('div');
+                loadingMessage.style.position = 'fixed';
+                loadingMessage.style.top = '50%';
+                loadingMessage.style.left = '50%';
+                loadingMessage.style.transform = 'translate(-50%, -50%)';
+                loadingMessage.style.background = 'rgba(0, 0, 0, 0.7)';
+                loadingMessage.style.color = 'white';
+                loadingMessage.style.padding = '20px';
+                loadingMessage.style.borderRadius = '10px';
+                loadingMessage.style.zIndex = '10000';
+                loadingMessage.textContent = 'جاري حفظ البطاقة...';
+                document.body.appendChild(loadingMessage);
+                
+                // تحسين جودة الصورة عند التنزيل - استخدام أعلى جودة ممكنة
+                const imageData = canvas.toDataURL('image/png', 1.0);
+                console.log('تم إنشاء بيانات الصورة بنجاح، حجم البيانات:', imageData.length);
+                
+                if (imageData.length < 100) {
+                    console.error('بيانات الصورة فارغة أو صغيرة جدًا');
+                    document.body.removeChild(loadingMessage);
+                    alert('حدث خطأ: لم يتم إنشاء الصورة بشكل صحيح. يرجى المحاولة مرة أخرى.');
+                    return;
+                }
+                
+                // إنشاء رابط للتنزيل
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = imageData;
+                link.target = '_blank'; // فتح في نافذة جديدة إذا لم يتم التنزيل تلقائيًا
+                
+                // إضافة الرابط للصفحة وتفعيله ثم إزالته
+                document.body.appendChild(link);
+                console.log('تم إنشاء رابط التنزيل، جاري النقر عليه...');
+                
+                // استخدام setTimeout لضمان تنفيذ النقر بعد إضافة الرابط للصفحة
+                setTimeout(() => {
+                    try {
+                        link.click();
+                        console.log('تم النقر على رابط التنزيل');
+                        
+                        // إزالة الرابط بعد التنزيل
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            document.body.removeChild(loadingMessage);
+                            console.log('تم تنزيل الصورة بنجاح');
+                            
+                            // عرض رسالة نجاح للمستخدم
+                            alert('تم حفظ البطاقة وتنزيلها بنجاح');
+                        }, 500);
+                    } catch (clickError) {
+                        console.error('خطأ أثناء النقر على رابط التنزيل:', clickError);
+                        document.body.removeChild(loadingMessage);
+                        alert('حدث خطأ أثناء محاولة تنزيل الصورة. يرجى المحاولة مرة أخرى.');
+                    }
+                }, 300);
+            } catch (error) {
+                console.error('خطأ في تنزيل الصورة:', error);
+                alert('حدث خطأ أثناء محاولة تنزيل الصورة: ' + error.message);
+            }
+        }
+        
+        // تحميل السجلات عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRecords();
+        });
+        
+        // دعم PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // زر التثبيت
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+        
+        installBtn.addEventListener('click', () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('تم تثبيت التطبيق');
+                }
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
