@@ -281,6 +281,9 @@ function saveMultiPersonData(event) {
     const date = new Date();
     saveRecord(personsData, caseData, cardImage, date);
     
+    // تحديث قائمة السجلات مباشرة بعد الحفظ
+    renderRecordsList();
+    
     // Show success modal
     document.getElementById('success-modal').style.display = 'flex';
 }
