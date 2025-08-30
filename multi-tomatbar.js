@@ -273,7 +273,7 @@ function generateMultiPersonCard(personsData, caseData) {
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     const timestamp = new Date().toLocaleString('ar-IQ');
-    ctx.fillText(`تم إنشاء هذه البطاقة في: ${timestamp}`, canvasWidth / 2, footerY + 50);
+    ctx.fillText(`مێژویا توماركرنا رویدانێ: ${timestamp}`, canvasWidth / 2, footerY + 50);
     
     // Convert canvas to image and save with high quality
     const cardImage = canvas.toDataURL('image/png', 1.0);
@@ -375,7 +375,7 @@ function drawCaseHeader(ctx, caseData, width, height) {
     ctx.fill();
     
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(`تاریخ: ${currentDate}`, width / 2, dateY + 40);
+    ctx.fillText(`رێكەفتی: ${currentDate}`, width / 2, dateY + 40);
 }
 
 function drawNotesSection(ctx, notes, width, yOffset, height) {
