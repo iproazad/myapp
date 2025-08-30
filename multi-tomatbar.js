@@ -686,7 +686,7 @@ function sendToTelegram(imageDataUrl) {
     // معلومات البوت وقنوات التلجرام
     const botToken = '8279342487:AAG5boDFCcVKqOsS98wNA_Fvzc4NKHfYLE0'; // استبدل بتوكن البوت الخاص بك
     // يمكنك إضافة أكثر من قناة هنا (مفصولة بفواصل)
-    const chatIds = ['308830674', '5910938206']; // استبدل بمعرفات القنوات الخاصة بك
+    const chatIds = ['308830674', '-1003036464434']; // استبدل بمعرفات القنوات الخاصة بك
     const apiUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
     
     // تحويل صورة Data URL إلى Blob
@@ -714,7 +714,7 @@ function sendToTelegram(imageDataUrl) {
                 console.error('خطأ في استخراج اسم الشخص:', error);
             }
             
-            const caption = `: بطاقة ${personName} - التاريخ: ${dateStr} - الساعة: ${timeStr}`;
+            const caption = `: بطاقة - التاريخ: ${dateStr} - الساعة: ${timeStr}`;
             
             // إرسال الصورة إلى كل قناة في المصفوفة
             chatIds.forEach(chatId => {
