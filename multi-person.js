@@ -655,7 +655,7 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     ctx.textAlign = 'right';
     
     // تحسين تباعد النص وإضافة أيقونات
-    const lineHeight = 100; // زيادة المسافة بين العناوين
+    const lineHeight = 80; // زيادة المسافة بين العناوين
     const textX = width - 100;
     
     // رسم خط فاصل زخرفي أعلى المعلومات
