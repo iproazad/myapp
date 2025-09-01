@@ -507,7 +507,7 @@ function drawNotesSection(ctx, notes, width, yOffset, height) {
     const titleText = 'تێبینی';
     const titleWidth = ctx.measureText(titleText).width;
     const titleX = width - 80 - titleWidth - 20;
-    const titleY = yOffset + 50;
+    const titleY = yOffset + 50; // تنزيل العنوان إلى الأسفل قليلاً
     
     // خلفية العنوان
     ctx.fillStyle = '#3498db';
@@ -517,7 +517,7 @@ function drawNotesSection(ctx, notes, width, yOffset, height) {
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 44px Arial';
     ctx.textAlign = 'right';
-    ctx.fillText(titleText, width - 80, yOffset + 70);
+    ctx.fillText(titleText, width - 80, yOffset + 45); // تنزيل النص إلى الأسفل قليلاً
     
     // Add notes content with word wrapping
     ctx.font = 'bold 36px Arial';
@@ -654,7 +654,7 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     ctx.textAlign = 'right';
     
     // تحسين تباعد النص وإضافة أيقونات
-    const lineHeight = 100; // زيادة المسافة بين العناوين
+    const lineHeight = 80; // تقليل المسافة بين العناوين
     const textX = width - 100;
     
     // رسم خط فاصل زخرفي أعلى المعلومات
