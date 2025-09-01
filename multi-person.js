@@ -143,6 +143,7 @@ function addNewPerson() {
                 <option value="" disabled selected>اختر نوع الشخص</option>
                 <option value="مشتەكی">مشتەكی</option>
                 <option value="تاوانبار">تاوانبار</option>
+                <option value="...">...</option>
             </select>
         </div>
         
@@ -627,8 +628,8 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
         ctx.fillText(person.id, photoX + photoSize - 30, photoY + photoSize - 20);
     }
     
-    // Draw person type badge only if type is not ".........." or "..."
-    if (person.type !== '..........' && person.type !== '...') {
+    // Draw person type badge only if type is not "..."
+    if (person.type !== '...') {
         const typeBadgeWidth = 240;
         const typeBadgeHeight = 60;
         const typeBadgeX = photoX + (photoSize / 2) - (typeBadgeWidth / 2);
@@ -654,7 +655,7 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     ctx.textAlign = 'right';
     
     // تحسين تباعد النص وإضافة أيقونات
-    const lineHeight = 80; // تقليل المسافة بين العناوين
+    const lineHeight = 100; // زيادة المسافة بين العناوين
     const textX = width - 100;
     
     // رسم خط فاصل زخرفي أعلى المعلومات
