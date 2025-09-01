@@ -503,7 +503,7 @@ function drawNotesSection(ctx, notes, width, yOffset, height) {
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
     
-    // رسم عنوان الملاحظات داخل إطار أزرق
+   // رسم عنوان الملاحظات داخل إطار أزرق
     const titleText = 'تێبینی';
     const titleWidth = ctx.measureText(titleText).width;
     const titleX = width - 80 - titleWidth - 20;
@@ -627,21 +627,23 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
         ctx.fillText(person.id, photoX + photoSize - 30, photoY + photoSize - 20);
     }
     
-    // Draw person type badge
-    const typeBadgeWidth = 240;
-    const typeBadgeHeight = 60;
-    const typeBadgeX = photoX + (photoSize / 2) - (typeBadgeWidth / 2);
-    const typeBadgeY = photoY + photoSize + 20;
-    
-    ctx.fillStyle = person.type === 'مشتەكی' ? '#27ae60' : '#e74c3c';
-    ctx.beginPath();
-    ctx.roundRect(typeBadgeX, typeBadgeY, typeBadgeWidth, typeBadgeHeight, 30);
-    ctx.fill();
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 32px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(person.type, typeBadgeX + (typeBadgeWidth / 2), typeBadgeY + 40);
+    // Draw person type badge only if type is not ".........." or "..."
+    if (person.type !== '..........' && person.type !== '...') {
+        const typeBadgeWidth = 240;
+        const typeBadgeHeight = 60;
+        const typeBadgeX = photoX + (photoSize / 2) - (typeBadgeWidth / 2);
+        const typeBadgeY = photoY + photoSize + 20;
+        
+        ctx.fillStyle = person.type === 'مشتەكی' ? '#27ae60' : '#e74c3c';
+        ctx.beginPath();
+        ctx.roundRect(typeBadgeX, typeBadgeY, typeBadgeWidth, typeBadgeHeight, 30);
+        ctx.fill();
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 32px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(person.type, typeBadgeX + (typeBadgeWidth / 2), typeBadgeY + 40);
+    }
     
     // Draw person information
     const infoX = 600;
@@ -652,7 +654,7 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     ctx.textAlign = 'right';
     
     // تحسين تباعد النص وإضافة أيقونات
-    const lineHeight = 80;
+    const lineHeight = 100; // زيادة المسافة بين العناوين
     const textX = width - 100;
     
     // رسم خط فاصل زخرفي أعلى المعلومات
@@ -666,23 +668,24 @@ function drawPersonInfo(ctx, person, yOffset, width, height) {
     // رسم المعلومات مع تأثيرات أفضل
     // وظيفة لرسم العنوان داخل إطار أحمر والمعلومات داخل إطار شفاف
     function drawInfoLine(label, value, lineNumber) {
-        // رسم إطار أحمر للعنوان
+        // رسم إطار أزرق للعنوان
         const labelWidth = ctx.measureText(label).width;
-        const labelX = textX - labelWidth - 20;
+        const fixedLabelWidth = 230; // تعديل عرض خلفية العناوين إلى 220
+        const labelX = textX - fixedLabelWidth;
         const labelY = infoY + lineHeight * lineNumber - 40;
         
         // خلفية العنوان
         ctx.fillStyle = '#3498db';
-        ctx.fillRect(labelX - 10, labelY, labelWidth + 20, 50);
+        ctx.fillRect(labelX - 10, labelY, fixedLabelWidth, 50);
         
         // نص العنوان
         ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'right';
-        ctx.fillText(label, textX - 20, infoY + lineHeight * lineNumber);
+        ctx.textAlign = 'center';
+        ctx.fillText(label, labelX - 10 + fixedLabelWidth/2, infoY + lineHeight * lineNumber);
         
         // رسم إطار شفاف للمعلومات
         const valueWidth = ctx.measureText(value).width;
-        const valueX = textX - labelWidth - 40;
+        const valueX = labelX - 40;
         
         // خلفية المعلومات
         ctx.fillStyle = 'rgba(236, 240, 241, 0.5)';
