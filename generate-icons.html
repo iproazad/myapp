@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate App Icons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .icon-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .download-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>أداة إنشاء أيقونات التطبيق</h1>
+        <p>هذه الأداة تقوم بتحويل ملف icon.svg إلى صور PNG بالأحجام المطلوبة للتطبيق.</p>
+        
+        <div class="icon-preview">
+            <h2>معاينة الأيقونة الأصلية</h2>
+            <img id="svg-icon" src="icon.svg" width="192" height="192" alt="App Icon">
+        </div>
+        
+        <div>
+            <h2>إنشاء أيقونات PNG</h2>
+            <button id="generate-btn">إنشاء الأيقونات</button>
+        </div>
+        
+        <div class="icon-preview">
+            <h3>أيقونة 192×192</h3>
+            <canvas id="canvas-192" width="192" height="192"></canvas>
+        </div>
+        
+        <div class="icon-preview">
+            <h3>أيقونة 512×512</h3>
+            <canvas id="canvas-512" width="512" height="512"></canvas>
+        </div>
+        
+        <div class="download-links" id="download-links" style="display: none;">
+            <h2>تحميل الأيقونات</h2>
+            <a id="download-192" href="#" download="icon-192.png">تحميل أيقونة 192×192</a>
+            <a id="download-512" href="#" download="icon-512.png">تحميل أيقونة 512×512</a>
+            <p>بعد تحميل الأيقونات، ضعها في نفس مجلد التطبيق.</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const svgIcon = document.getElementById('svg-icon');
+            const generateBtn = document.getElementById('generate-btn');
+            const canvas192 = document.getElementById('canvas-192');
+            const canvas512 = document.getElementById('canvas-512');
+            const download192 = document.getElementById('download-192');
+            const download512 = document.getElementById('download-512');
+            const downloadLinks = document.getElementById('download-links');
+            
+            generateBtn.addEventListener('click', function() {
+                // Generate 192x192 icon
+                generatePNG(svgIcon, canvas192, 192, download192);
+                
+                // Generate 512x512 icon
+                generatePNG(svgIcon, canvas512, 512, download512);
+                
+                // Show download links
+                downloadLinks.style.display = 'flex';
+            });
+            
+            function generatePNG(svgElement, canvas, size, downloadLink) {
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                // Convert SVG to data URL
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+                const url = URL.createObjectURL(svgBlob);
+                
+                img.onload = function() {
+                    // Clear canvas
+                    ctx.clearRect(0, 0, size, size);
+                    
+                    // Draw image to canvas
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    // Set download link
+                    downloadLink.href = canvas.toDataURL('image/png');
+                };
+                
+                img.src = url;
+            }
+        });
+    </script>
+</body>
+</html>
