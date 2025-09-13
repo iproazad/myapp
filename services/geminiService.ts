@@ -5,13 +5,17 @@ import { GoogleGenAI } from "@google/genai";
 const DEMO_API_KEY = process.env.API_KEY;
 
 export const generateLogosApi = async (prompt: string, apiKey?: string): Promise<string[]> => {
-  // Use the user's API key if provided (after limit is reached), otherwise use the demo key.
-  const effectiveApiKey = apiKey || DEMO_API_KEY;
+  const isDemoMode = !apiKey;
+  const effectiveApiKey = isDemoMode ? DEMO_API_KEY : apiKey;
   
   if (!effectiveApiKey) {
-     // This error message is a fallback. It will be shown if the demo key is not available
-     // AND the user has not provided their own key.
-     throw new Error("Application is not configured correctly. No API key is available.");
+     if (isDemoMode) {
+        // This is the specific error for when the platform-provided demo key is missing.
+        throw new Error("The demo API key is not configured. Please provide your own API key to proceed.");
+     } else {
+        // This error occurs if the user's key is somehow empty, though the UI should prevent this.
+        throw new Error("A valid API key is required. Please enter your key and try again.");
+     }
   }
 
   try {
@@ -43,6 +47,10 @@ export const generateLogosApi = async (prompt: string, apiKey?: string): Promise
         if (error.message.includes('quota')) {
             // This could be triggered by either the demo key or the user's key.
             throw new Error('The API quota for the provided key has been exceeded. If using the demo, please try again tomorrow or enter your own API key.');
+        }
+        // Pass through our specific, user-friendly errors
+        if (error.message.includes('demo API key is not configured') || error.message.includes('valid API key is required')) {
+            throw error;
         }
         throw new Error(`Failed to generate logos: ${error.message}`);
     }
